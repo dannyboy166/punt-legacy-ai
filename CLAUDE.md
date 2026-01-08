@@ -70,11 +70,16 @@ punt-legacy-ai/
 ├── api/                   # API clients
 │   ├── puntingform.py     # PuntingForm API wrapper ✅
 │   └── ladbrokes.py       # Ladbrokes API wrapper ✅
-├── core/                  # Core calculations
-│   └── normalize.py       # Horse/track name normalization ✅
-├── tests/                 # Unit tests (41 tests)
-│   ├── test_normalize.py  # Normalization tests ✅
-│   └── test_api.py        # API client tests ✅
+├── core/                  # Core utilities
+│   ├── normalize.py       # Horse/track name normalization ✅
+│   ├── track_mapping.py   # Track name mapping between APIs ✅
+│   ├── results.py         # Prediction results & error handling ✅
+│   └── logging.py         # Structured logging ✅
+├── tests/                 # Unit tests (89 tests)
+│   ├── test_normalize.py      # Normalization tests ✅
+│   ├── test_track_mapping.py  # Track mapping tests ✅
+│   ├── test_api.py            # API client tests ✅
+│   └── test_results.py        # Results system tests ✅
 ├── docs/                  # API documentation
 │   ├── puntingform_api.md      # Full PF API docs ✅
 │   ├── ladbrokes_api.md        # Full LB API docs ✅
@@ -114,6 +119,66 @@ See `docs/puntingform_odds_issue.md` for full details.
 
 ### Claude API
 - **Key:** Stored in `.env` as `ANTHROPIC_API_KEY`
+
+---
+
+## Track Name Mapping
+
+Different APIs use different names for the same tracks:
+
+| PuntingForm | Ladbrokes |
+|-------------|-----------|
+| Sandown-Lakeside | Sandown |
+| Yarra Glen | Yarra Valley |
+| Murray Bridge GH | Murray Bridge |
+| Geelong | Ladbrokes Geelong |
+| Fannie Bay | Darwin |
+
+**Tracks without Ladbrokes coverage:** Pioneer Park (Alice Springs), NZ tracks, HK tracks
+
+```python
+from api.ladbrokes import LadbrokeAPI
+
+api = LadbrokeAPI()
+
+# Use this method - handles track mapping automatically
+odds, error = api.get_odds_for_pf_track("Sandown-Lakeside", 1)
+if error:
+    print(f"Skipped: {error}")  # e.g., "Tauranga is not covered by Ladbrokes"
+else:
+    print(f"Got odds for {len(odds)} runners")
+```
+
+---
+
+## Error Handling
+
+All predictions return structured results for frontend display:
+
+```python
+from core.results import PredictionResult, RaceStatus
+
+# Successful prediction
+result = PredictionResult.success(
+    horse="Fast Horse",
+    odds=3.50,
+    track="Randwick",
+    race_number=1,
+)
+
+# Failed prediction with clear reason
+result = PredictionResult.track_not_supported(
+    track="Tauranga",
+    race_number=1,
+)
+# result.message = "Tauranga is not currently supported (no Ladbrokes coverage)"
+
+# Check and display
+if result.ok:
+    print(f"Bet: {result.horse} @ ${result.odds}")
+else:
+    print(f"Skipped: {result.message}")
+```
 
 ---
 
