@@ -10,6 +10,9 @@ Usage:
     api = LadbrokeAPI()
     meetings = api.get_meetings()
     odds = api.get_odds_for_race("Eagle Farm", 1)
+
+    # With track mapping (handles name differences)
+    odds = api.get_odds_for_pf_track("Sandown-Lakeside", 1)  # Searches "Sandown"
 """
 
 from typing import Optional
@@ -17,6 +20,14 @@ from dataclasses import dataclass
 import requests
 
 from core.normalize import normalize_horse_name, normalize_track_name, tracks_match
+from core.track_mapping import (
+    get_lb_track_for_odds,
+    is_pf_only_track,
+    tracks_equivalent,
+)
+from core.logging import get_logger, log_prediction_skip, log_odds_mismatch
+
+logger = get_logger(__name__)
 
 BASE_URL = "https://api.ladbrokes.com.au/affiliates/v1"
 DEFAULT_TIMEOUT = 10
@@ -184,12 +195,14 @@ class LadbrokeAPI:
                 ...
             }
         """
+        logger.debug(f"Fetching odds for {track_name} R{race_number}")
+
         meetings = self.get_meetings()
 
         for meeting in meetings:
             meeting_name = meeting.get("name", "")
 
-            if tracks_match(track_name, meeting_name):
+            if tracks_match(track_name, meeting_name) or tracks_equivalent(track_name, meeting_name):
                 # Found the track, find the race
                 for race in meeting.get("races", []):
                     if race.get("race_number") == race_number:
@@ -197,12 +210,65 @@ class LadbrokeAPI:
                         race_data = self.get_race(race_id)
 
                         if not race_data:
+                            logger.warning(f"No race data for {track_name} R{race_number}")
                             return {}
 
-                        # Build odds dict keyed by normalized horse name
-                        return self._build_odds_dict(race_data.get("runners", []))
+                        odds = self._build_odds_dict(race_data.get("runners", []))
+                        logger.debug(f"Found odds for {len(odds)} runners at {track_name} R{race_number}")
+                        return odds
 
+        logger.info(f"Track not found in Ladbrokes: {track_name}")
         return {}
+
+    def get_odds_for_pf_track(
+        self,
+        pf_track_name: str,
+        race_number: int,
+    ) -> tuple[dict[str, dict], Optional[str]]:
+        """
+        Get odds for a PuntingForm track, handling name differences.
+
+        This is the recommended method when starting from PuntingForm data.
+        It handles track name mapping (e.g., Sandown-Lakeside -> Sandown).
+
+        Args:
+            pf_track_name: Track name from PuntingForm
+            race_number: Race number
+
+        Returns:
+            Tuple of (odds_dict, error_message)
+            - If successful: (odds_dict, None)
+            - If failed: ({}, "Human-readable error message")
+
+        Examples:
+            odds, error = api.get_odds_for_pf_track("Sandown-Lakeside", 1)
+            if error:
+                print(f"Skipped: {error}")
+            else:
+                print(f"Got odds for {len(odds)} runners")
+        """
+        # Check if track is supported
+        if is_pf_only_track(pf_track_name):
+            reason = f"{pf_track_name} is not covered by Ladbrokes"
+            log_prediction_skip(logger, pf_track_name, race_number, reason)
+            return {}, reason
+
+        # Get the Ladbrokes track name
+        lb_track = get_lb_track_for_odds(pf_track_name)
+        if not lb_track:
+            reason = f"No Ladbrokes mapping for {pf_track_name}"
+            log_prediction_skip(logger, pf_track_name, race_number, reason)
+            return {}, reason
+
+        # Fetch odds
+        odds = self.get_odds_for_race(lb_track, race_number)
+
+        if not odds:
+            reason = f"No odds available for {pf_track_name} R{race_number} (searched: {lb_track})"
+            log_prediction_skip(logger, pf_track_name, race_number, reason)
+            return {}, reason
+
+        return odds, None
 
     def _build_odds_dict(self, runners: list[dict]) -> dict[str, dict]:
         """
