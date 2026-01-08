@@ -4,7 +4,7 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 1 - API Documentation & Data Foundation
+**Status:** Phase 1 Complete - Starting Phase 2
 
 ---
 
@@ -21,13 +21,14 @@ A subscription product where users can:
 
 ## Development Phases
 
-### Phase 1: API Documentation (CURRENT)
-- [ ] Document ALL PuntingForm API endpoints
-- [ ] Document ALL Ladbrokes API endpoints
-- [ ] Test each endpoint, save example responses
-- [ ] Identify all available data fields
+### Phase 1: API Documentation & Foundation ✅ COMPLETE
+- [x] Document ALL PuntingForm API endpoints (10 endpoints)
+- [x] Document ALL Ladbrokes API endpoints
+- [x] Document PuntingForm odds reliability issue
+- [x] Build clean API wrappers with tests (41 tests passing)
+- [x] Horse name normalization for cross-API matching
 
-### Phase 2: Core Calculations
+### Phase 2: Core Calculations (CURRENT)
 - [ ] Speed rating calculation (with tests)
 - [ ] Time/margin calculations (with tests)
 - [ ] Normalization by distance/condition (with tests)
@@ -49,34 +50,86 @@ A subscription product where users can:
 
 ---
 
-## Project Structure
+## Quick Start
 
-```
-punt-legacy-ai/
-├── CLAUDE.md           # This file - project guidance
-├── api/                # API clients
-│   ├── puntingform.py  # PuntingForm API wrapper
-│   └── ladbrokes.py    # Ladbrokes API wrapper
-├── core/               # Core calculations
-│   ├── speed.py        # Speed rating calculations
-│   ├── time.py         # Time/margin calculations
-│   └── normalize.py    # Distance/condition normalization
-├── tests/              # Unit tests for everything
-├── docs/               # API documentation
-│   ├── puntingform_api.md
-│   └── ladbrokes_api.md
-└── data/               # Example responses, test data
+```bash
+# Run all tests
+python3 -m pytest tests/ -v
+
+# Test API connection
+python3 -c "from api.puntingform import PuntingFormAPI; api = PuntingFormAPI(); print(api.get_meetings('08-Jan-2026'))"
 ```
 
 ---
 
-## Guiding Principles
+## Project Structure
 
-1. **100% Correctness** - Every calculation must be verified with tests
-2. **Documentation First** - Document what we're building before building it
-3. **Ask When Unsure** - If unclear about data/logic, ask before implementing
-4. **Clean Code** - This is a product, not a prototype
-5. **Test Everything** - No untested code in core/
+```
+punt-legacy-ai/
+├── CLAUDE.md              # This file - project guidance
+├── api/                   # API clients
+│   ├── puntingform.py     # PuntingForm API wrapper ✅
+│   └── ladbrokes.py       # Ladbrokes API wrapper ✅
+├── core/                  # Core calculations
+│   └── normalize.py       # Horse/track name normalization ✅
+├── tests/                 # Unit tests (41 tests)
+│   ├── test_normalize.py  # Normalization tests ✅
+│   └── test_api.py        # API client tests ✅
+├── docs/                  # API documentation
+│   ├── puntingform_api.md      # Full PF API docs ✅
+│   ├── ladbrokes_api.md        # Full LB API docs ✅
+│   └── puntingform_odds_issue.md  # Known issue ✅
+└── data/                  # Example responses, test data
+```
+
+---
+
+## Known Issues
+
+### PuntingForm Odds Unreliable
+
+**Status:** NOT FIXED (as of Jan 8, 2026)
+
+PuntingForm's `bestPrice_Current` sometimes returns incorrect odds (up to 6x actual price).
+
+**Solution:** Use `api.ladbrokes.LadbrokeAPI` for live odds instead.
+
+See `docs/puntingform_odds_issue.md` for full details.
+
+---
+
+## APIs
+
+### PuntingForm API
+- **Base:** `https://api.puntingform.com.au/v2/`
+- **Auth:** `?apiKey=YOUR_KEY`
+- **Docs:** `docs/puntingform_api.md`
+- **Use for:** Form history, career stats, A/E data, speedmaps, conditions
+
+### Ladbrokes API
+- **Base:** `https://api.ladbrokes.com.au/affiliates/v1/`
+- **Auth:** Headers (`From`, `X-Partner`)
+- **Docs:** `docs/ladbrokes_api.md`
+- **Use for:** Live odds (accurate)
+
+### Claude API
+- **Key:** Stored in `.env` as `ANTHROPIC_API_KEY`
+
+---
+
+## Horse Name Matching
+
+When linking data between PuntingForm and Ladbrokes, use `core.normalize`:
+
+```python
+from core.normalize import normalize_horse_name, horses_match
+
+# Normalize names for dictionary lookup
+name = normalize_horse_name("O'Brien's Star")  # "obriens star"
+
+# Check if two names match
+horses_match("O'Brien's Star", "OBRIENS STAR")  # True
+```
 
 ---
 
@@ -87,52 +140,9 @@ punt-legacy-ai/
 
 ---
 
-## APIs
-
-### PuntingForm API
-- **Base:** `https://api.puntingform.com.au/v2/`
-- **Auth:** `?apiKey=YOUR_KEY`
-- **Docs:** https://docs.puntingform.com.au/reference/meetingslist
-- **Key:** Stored in `.env` as `PUNTINGFORM_API_KEY`
-
-### Ladbrokes API
-- **Base:** `https://api.ladbrokes.com.au/affiliates/v1/racing/`
-- **Auth:** None required (public affiliate API)
-
-### Claude API
-- **Key:** Stored in `.env` as `ANTHROPIC_API_KEY`
-
----
-
-## Speed Rating Formula (Reference)
-
-From pfai-tracker - to be reimplemented with full testing:
-
-```python
-# 1. Calculate horse's finishing time
-seconds_per_length = 2.4 / winner_speed  # Dynamic based on winner's speed
-horse_time = winner_time + (margin * seconds_per_length)
-
-# 2. Calculate actual speed
-actual_speed = distance / horse_time  # meters per second
-
-# 3. Get expected speed (normalized baseline)
-expected_speed = baseline_speed(distance) * condition_multiplier(track_condition)
-
-# 4. Calculate rating
-rating = actual_speed / expected_speed
-# > 1.0 = faster than average for distance/condition
-# < 1.0 = slower than average
-```
-
-**Critical:** This formula must be thoroughly tested before use.
-
----
-
 ## Next Steps
 
-1. Open new chat in this project directory
-2. Go through each PuntingForm API endpoint
-3. Document available fields
-4. Save example responses
-5. Identify what's useful for predictions
+1. Build speed rating calculation in `core/speed.py`
+2. Use form data from `api.puntingform.get_form()` for calculations
+3. Implement time/margin calculations with tests
+4. Port normalization logic from pfai-tracker with improvements
