@@ -126,6 +126,7 @@ def get_meetings(date: str):
             )
             for m in meetings
             if m.get("track", {}).get("name")
+            and m.get("track", {}).get("country") == "AUS"  # Australian races only
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
