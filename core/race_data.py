@@ -1,0 +1,609 @@
+"""
+Race Data Pipeline for Claude AI Predictor.
+
+Fetches, processes, and formats race data from PuntingForm and Ladbrokes
+into a structure suitable for the Claude AI predictor.
+
+Usage:
+    from core.race_data import RaceDataPipeline
+
+    pipeline = RaceDataPipeline()
+    race_data = pipeline.get_race_data("Randwick", 1, "09-Jan-2026")
+
+    # race_data contains everything Claude needs:
+    # - Today's race info (distance, condition, class)
+    # - All runners with form history, ratings, odds
+    # - Speedmap data
+"""
+
+from dataclasses import dataclass, field
+from typing import Optional, Any
+from datetime import datetime
+
+from api.puntingform import PuntingFormAPI
+from api.ladbrokes import LadbrokeAPI
+from core.normalize import normalize_horse_name, horses_match
+from core.speed import calculate_run_rating, parse_condition_number
+from core.results import PredictionResult, RaceStatus
+
+
+@dataclass
+class FormRun:
+    """A single past run from form history."""
+    date: str
+    track: str
+    distance: int
+    condition: str
+    condition_num: int
+    position: int
+    margin: float
+    weight: float
+    barrier: int
+    starters: int
+    class_: str
+    prize_money: int
+    rating: Optional[float]  # Normalized speed rating
+    prep_run: Optional[int] = None  # 1 = first up, 2 = second up, etc.
+
+    def to_dict(self) -> dict:
+        return {
+            "date": self.date,
+            "track": self.track,
+            "distance": self.distance,
+            "condition": self.condition,
+            "condition_num": self.condition_num,
+            "position": self.position,
+            "margin": self.margin,
+            "weight": self.weight,
+            "barrier": self.barrier,
+            "starters": self.starters,
+            "class": self.class_,
+            "prize_money": self.prize_money,
+            "rating": round(self.rating, 4) if self.rating else None,
+            "prep_run": self.prep_run,  # 1=1st up, 2=2nd up, etc.
+        }
+
+
+@dataclass
+class RunnerData:
+    """Complete data for a single runner."""
+    name: str
+    tab_no: int
+    barrier: int
+    weight: float
+    age: int
+    sex: str
+
+    # Odds
+    odds: Optional[float]
+    odds_source: str
+    implied_prob: Optional[float]
+
+    # Connections
+    jockey: str
+    trainer: str
+    jockey_a2e: Optional[float]
+    trainer_a2e: Optional[float]
+    jockey_trainer_a2e: Optional[float]
+
+    # Career stats
+    career_starts: int
+    career_wins: int
+    career_seconds: int
+    career_thirds: int
+    win_pct: float
+    place_pct: float
+
+    # Records at today's conditions
+    track_record: Optional[dict]
+    distance_record: Optional[dict]
+    condition_record: Optional[dict]
+    first_up: bool
+    second_up: bool
+    first_up_record: Optional[dict] = None  # Career record when first up
+    second_up_record: Optional[dict] = None  # Career record when second up
+
+    # Form history with ratings
+    form: list[FormRun] = field(default_factory=list)
+
+    # Speedmap
+    early_speed_rank: Optional[int] = None
+    settling_position: Optional[int] = None
+
+    # Calculated aggregates (for quick reference)
+    avg_rating: Optional[float] = None
+    best_rating: Optional[float] = None
+
+    # Prep stage ratings (from form history)
+    first_up_avg_rating: Optional[float] = None   # Avg rating when 1st up
+    second_up_avg_rating: Optional[float] = None  # Avg rating when 2nd up
+    third_up_avg_rating: Optional[float] = None   # Avg rating when 3rd+ up
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "tab_no": self.tab_no,
+            "barrier": self.barrier,
+            "weight": self.weight,
+            "age": self.age,
+            "sex": self.sex,
+            "odds": self.odds,
+            "odds_source": self.odds_source,
+            "implied_prob": round(self.implied_prob, 1) if self.implied_prob else None,
+            "jockey": self.jockey,
+            "trainer": self.trainer,
+            "jockey_a2e": round(self.jockey_a2e, 2) if self.jockey_a2e else None,
+            "trainer_a2e": round(self.trainer_a2e, 2) if self.trainer_a2e else None,
+            "jockey_trainer_a2e": round(self.jockey_trainer_a2e, 2) if self.jockey_trainer_a2e else None,
+            "career": f"{self.career_starts}: {self.career_wins}-{self.career_seconds}-{self.career_thirds}",
+            "win_pct": round(self.win_pct, 1),
+            "place_pct": round(self.place_pct, 1),
+            "track_record": self.track_record,
+            "distance_record": self.distance_record,
+            "condition_record": self.condition_record,
+            "first_up": self.first_up,
+            "second_up": self.second_up,
+            "first_up_record": self.first_up_record,
+            "second_up_record": self.second_up_record,
+            "form": [f.to_dict() for f in self.form],
+            "early_speed_rank": self.early_speed_rank,
+            "settling_position": self.settling_position,
+            "avg_rating": round(self.avg_rating, 4) if self.avg_rating else None,
+            "best_rating": round(self.best_rating, 4) if self.best_rating else None,
+            "first_up_avg_rating": round(self.first_up_avg_rating, 4) if self.first_up_avg_rating else None,
+            "second_up_avg_rating": round(self.second_up_avg_rating, 4) if self.second_up_avg_rating else None,
+            "third_up_avg_rating": round(self.third_up_avg_rating, 4) if self.third_up_avg_rating else None,
+        }
+
+
+@dataclass
+class RaceData:
+    """Complete race data for Claude."""
+    track: str
+    race_number: int
+    race_name: str
+    distance: int
+    condition: str
+    condition_num: int
+    class_: str
+    prize_money: int
+    start_time: str
+    rail_position: str
+
+    runners: list[RunnerData] = field(default_factory=list)
+
+    # Pace scenario
+    leaders_count: int = 0  # Runners with speed rank 1-2
+    pace_scenario: str = "unknown"  # "hot", "moderate", "soft"
+
+    # Metadata
+    timestamp: datetime = field(default_factory=datetime.now)
+    warnings: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return {
+            "track": self.track,
+            "race_number": self.race_number,
+            "race_name": self.race_name,
+            "distance": self.distance,
+            "condition": self.condition,
+            "condition_num": self.condition_num,
+            "class": self.class_,
+            "prize_money": self.prize_money,
+            "start_time": self.start_time,
+            "rail_position": self.rail_position,
+            "runners": [r.to_dict() for r in self.runners],
+            "leaders_count": self.leaders_count,
+            "pace_scenario": self.pace_scenario,
+            "field_size": len(self.runners),
+            "warnings": self.warnings,
+        }
+
+    def to_prompt_text(self) -> str:
+        """Format as text for Claude prompt."""
+        lines = [
+            f"# {self.track} Race {self.race_number}: {self.race_name}",
+            f"Distance: {self.distance}m | Condition: {self.condition} | Class: {self.class_}",
+            f"Prize: ${self.prize_money:,} | Start: {self.start_time} | Rail: {self.rail_position}",
+            f"Field Size: {len(self.runners)} | Pace: {self.pace_scenario} ({self.leaders_count} leaders)",
+            "",
+            "## Runners",
+            "",
+        ]
+
+        for r in sorted(self.runners, key=lambda x: x.tab_no):
+            lines.append(f"### {r.tab_no}. {r.name}")
+            lines.append(f"Barrier: {r.barrier} | Weight: {r.weight}kg | Age: {r.age}{r.sex[0]}")
+
+            if r.odds:
+                lines.append(f"Odds: ${r.odds:.2f} ({r.odds_source}) → {r.implied_prob:.1f}% implied")
+            else:
+                lines.append("Odds: Not available")
+
+            lines.append(f"Jockey: {r.jockey} (A/E: {r.jockey_a2e or 'N/A'})")
+            lines.append(f"Trainer: {r.trainer} (A/E: {r.trainer_a2e or 'N/A'})")
+            lines.append(f"Career: {r.career_starts}: {r.career_wins}-{r.career_seconds}-{r.career_thirds} ({r.win_pct:.0f}% win)")
+
+            if r.first_up:
+                record = r.first_up_record or {}
+                rec_str = f"{record.get('starts', 0)}: {record.get('firsts', 0)}-{record.get('seconds', 0)}-{record.get('thirds', 0)}"
+                lines.append(f"**FIRST UP** (career 1st-up record: {rec_str})")
+            elif r.second_up:
+                record = r.second_up_record or {}
+                rec_str = f"{record.get('starts', 0)}: {record.get('firsts', 0)}-{record.get('seconds', 0)}-{record.get('thirds', 0)}"
+                lines.append(f"**SECOND UP** (career 2nd-up record: {rec_str})")
+
+            if r.early_speed_rank:
+                lines.append(f"Speed Rank: {r.early_speed_rank} | Settles: {r.settling_position}")
+
+            # Form table with prep run indicator
+            if r.form:
+                lines.append("")
+                lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep |")
+                lines.append("|------|-------|------|------|-----|--------|--------|------|")
+                for f in r.form[:10]:  # Max 10 runs
+                    rating_str = f"{f.rating:.3f}" if f.rating else "N/A"
+                    prep_str = f"{f.prep_run}" if f.prep_run else "-"
+                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} |")
+
+                if r.avg_rating:
+                    lines.append(f"Avg Rating: {r.avg_rating:.3f} | Best: {r.best_rating:.3f}")
+
+                # Show prep stage ratings if available
+                prep_ratings = []
+                if r.first_up_avg_rating:
+                    prep_ratings.append(f"1st-up: {r.first_up_avg_rating:.3f}")
+                if r.second_up_avg_rating:
+                    prep_ratings.append(f"2nd-up: {r.second_up_avg_rating:.3f}")
+                if r.third_up_avg_rating:
+                    prep_ratings.append(f"3rd+: {r.third_up_avg_rating:.3f}")
+                if prep_ratings:
+                    lines.append(f"Prep Ratings: {' | '.join(prep_ratings)}")
+            else:
+                lines.append("No form available")
+
+            lines.append("")
+
+        return "\n".join(lines)
+
+
+class RaceDataPipeline:
+    """
+    Pipeline to fetch and process race data for Claude.
+
+    Combines data from PuntingForm (form, stats) and Ladbrokes (odds).
+    """
+
+    def __init__(
+        self,
+        pf_api: Optional[PuntingFormAPI] = None,
+        lb_api: Optional[LadbrokeAPI] = None,
+    ):
+        self.pf_api = pf_api or PuntingFormAPI()
+        self.lb_api = lb_api or LadbrokeAPI()
+
+    def get_race_data(
+        self,
+        track: str,
+        race_number: int,
+        date: str,
+    ) -> tuple[Optional[RaceData], Optional[str]]:
+        """
+        Get complete race data for Claude.
+
+        Args:
+            track: Track name (PuntingForm format)
+            race_number: Race number
+            date: Date in PuntingForm format (dd-MMM-yyyy)
+
+        Returns:
+            Tuple of (RaceData, error_message)
+            - If successful: (RaceData, None)
+            - If failed: (None, "Human-readable error")
+        """
+        # 1. Get meeting ID from PuntingForm
+        try:
+            meetings = self.pf_api.get_meetings(date)
+        except Exception as e:
+            return None, f"Failed to get meetings: {str(e)}"
+
+        meeting_id = None
+        meeting_track = None
+        for m in meetings:
+            m_track = m.get("track", {}).get("name", "")
+            if m_track.lower() == track.lower() or track.lower() in m_track.lower():
+                meeting_id = m.get("meetingId")
+                meeting_track = m_track
+                break
+
+        if not meeting_id:
+            return None, f"Track '{track}' not found in meetings for {date}"
+
+        # 2. Fetch all data in parallel (form, fields, speedmaps, odds)
+        try:
+            fields_data = self.pf_api.get_fields(meeting_id, race_number)
+            form_data = self.pf_api.get_form(meeting_id, race_number, runs=10)
+            speedmap_data = self.pf_api.get_speedmaps(meeting_id, race_number)
+        except Exception as e:
+            return None, f"Failed to fetch PuntingForm data: {str(e)}"
+
+        # 3. Get Ladbrokes odds
+        lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number)
+
+        # 4. Find the race in fields data
+        race_info = None
+        runners_fields = []
+
+        races = fields_data.get("races", [])
+        for race in races:
+            if race.get("number") == race_number:
+                race_info = race
+                runners_fields = race.get("runners", [])
+                break
+
+        if not race_info:
+            return None, f"Race {race_number} not found at {track}"
+
+        # 5. Get form data indexed by runner ID
+        form_by_runner = {}
+        if isinstance(form_data, list):
+            for runner in form_data:
+                runner_id = runner.get("runnerId")
+                if runner_id:
+                    form_by_runner[runner_id] = runner.get("forms", [])
+
+        # 6. Get speedmap data indexed by runner ID
+        speedmap_by_runner = {}
+        if isinstance(speedmap_data, list):
+            for sm in speedmap_data:
+                runner_id = sm.get("runnerId")
+                if runner_id:
+                    speedmap_by_runner[runner_id] = sm
+
+        # 7. Get race-level info
+        condition = fields_data.get("expectedCondition") or "G4"
+        condition_num = parse_condition_number(condition) or 4
+
+        race_data = RaceData(
+            track=meeting_track,
+            race_number=race_number,
+            race_name=race_info.get("name", ""),
+            distance=race_info.get("distance", 0),
+            condition=condition,
+            condition_num=condition_num,
+            class_=race_info.get("raceClass", ""),
+            prize_money=race_info.get("prizeMoney", 0),
+            start_time=race_info.get("startTime", ""),
+            rail_position=fields_data.get("railPosition", ""),
+        )
+
+        # 8. Process each runner
+        for runner in runners_fields:
+            runner_id = runner.get("runnerId")
+            horse_name = runner.get("name", "")
+
+            # Get odds from Ladbrokes
+            normalized_name = normalize_horse_name(horse_name)
+            lb_runner_odds = lb_odds.get(normalized_name, {})
+            odds = lb_runner_odds.get("fixed_win")
+            odds_source = "ladbrokes" if odds else "none"
+            implied_prob = (100 / odds) if odds and odds > 0 else None
+
+            # Skip if scratched
+            if lb_runner_odds.get("scratched", False):
+                continue
+
+            # Get A/E data
+            jockey_a2e = None
+            trainer_a2e = None
+            jt_a2e = None
+
+            jockey_a2e_data = runner.get("jockeyA2E_Last100") or {}
+            trainer_a2e_data = runner.get("trainerA2E_Last100") or {}
+            jt_a2e_data = runner.get("trainerJockeyA2E_Last100") or {}
+
+            if jockey_a2e_data.get("a2E"):
+                jockey_a2e = jockey_a2e_data["a2E"]
+            if trainer_a2e_data.get("a2E"):
+                trainer_a2e = trainer_a2e_data["a2E"]
+            if jt_a2e_data.get("a2E"):
+                jt_a2e = jt_a2e_data["a2E"]
+
+            # Get condition record based on today's condition
+            condition_record = None
+            if condition_num <= 4:
+                condition_record = runner.get("goodRecord")
+            elif condition_num <= 6:
+                condition_record = runner.get("softRecord")
+            else:
+                condition_record = runner.get("heavyRecord")
+
+            # Determine first-up/second-up
+            prep_runs = runner.get("prepRuns", 0)
+            first_up = prep_runs == 0
+            second_up = prep_runs == 1
+
+            # Get first-up/second-up career records
+            first_up_record = runner.get("firstUpRecord")
+            second_up_record = runner.get("secondUpRecord")
+
+            # Get speedmap data
+            sm = speedmap_by_runner.get(runner_id, {})
+
+            # Process form history
+            form_runs = []
+            ratings = []
+            runner_form = form_by_runner.get(runner_id, [])
+
+            for run in runner_form[:10]:  # Max 10 runs
+                # Calculate rating for this run
+                rating = calculate_run_rating(run)
+                if rating:
+                    ratings.append(rating)
+
+                # Parse date
+                run_date = run.get("meetingDate", "")
+                if run_date:
+                    try:
+                        dt = datetime.fromisoformat(run_date.replace("Z", "+00:00"))
+                        run_date = dt.strftime("%d-%b")
+                    except:
+                        run_date = run_date[:10]
+
+                run_track = run.get("track", {})
+                if isinstance(run_track, dict):
+                    run_track = run_track.get("name", "")
+
+                run_condition = run.get("trackCondition") or "G4"
+
+                # Get prep run number (1 = first up, 2 = second up, etc.)
+                run_prep = run.get("prepRuns")
+                if run_prep is not None:
+                    run_prep = run_prep + 1  # API returns 0-indexed, we want 1-indexed
+
+                form_run = FormRun(
+                    date=run_date,
+                    track=run_track,
+                    distance=run.get("distance", 0),
+                    condition=run_condition,
+                    condition_num=parse_condition_number(run_condition) or 4,
+                    position=run.get("position", 0),
+                    margin=run.get("margin", 0) or 0,
+                    weight=run.get("weight", 0) or 0,
+                    barrier=run.get("barrier", 0) or 0,
+                    starters=run.get("starters", 0) or 0,
+                    class_=run.get("raceClass", ""),
+                    prize_money=run.get("prizeMoney", 0) or 0,
+                    rating=rating,
+                    prep_run=run_prep,
+                )
+                form_runs.append(form_run)
+
+            # Calculate aggregate ratings
+            avg_rating = sum(ratings) / len(ratings) if ratings else None
+            best_rating = max(ratings) if ratings else None
+
+            # Calculate prep stage ratings (1st up, 2nd up, 3rd+ up)
+            first_up_ratings = [f.rating for f in form_runs if f.prep_run == 1 and f.rating]
+            second_up_ratings = [f.rating for f in form_runs if f.prep_run == 2 and f.rating]
+            third_up_ratings = [f.rating for f in form_runs if f.prep_run and f.prep_run >= 3 and f.rating]
+
+            first_up_avg = sum(first_up_ratings) / len(first_up_ratings) if first_up_ratings else None
+            second_up_avg = sum(second_up_ratings) / len(second_up_ratings) if second_up_ratings else None
+            third_up_avg = sum(third_up_ratings) / len(third_up_ratings) if third_up_ratings else None
+
+            runner_data = RunnerData(
+                name=horse_name,
+                tab_no=runner.get("tabNo", 0),
+                barrier=runner.get("barrier", 0),
+                weight=runner.get("weight", 0),
+                age=runner.get("age", 0),
+                sex=runner.get("sex", ""),
+                odds=odds,
+                odds_source=odds_source,
+                implied_prob=implied_prob,
+                jockey=runner.get("jockey", {}).get("fullName", "") if isinstance(runner.get("jockey"), dict) else "",
+                trainer=runner.get("trainer", {}).get("fullName", "") if isinstance(runner.get("trainer"), dict) else "",
+                jockey_a2e=jockey_a2e,
+                trainer_a2e=trainer_a2e,
+                jockey_trainer_a2e=jt_a2e,
+                career_starts=runner.get("careerStarts", 0),
+                career_wins=runner.get("careerWins", 0),
+                career_seconds=runner.get("careerSeconds", 0),
+                career_thirds=runner.get("careerThirds", 0),
+                win_pct=runner.get("winPct", 0) or 0,
+                place_pct=runner.get("placePct", 0) or 0,
+                track_record=runner.get("trackRecord"),
+                distance_record=runner.get("distanceRecord"),
+                condition_record=condition_record,
+                first_up=first_up,
+                second_up=second_up,
+                first_up_record=first_up_record,
+                second_up_record=second_up_record,
+                form=form_runs,
+                early_speed_rank=sm.get("speed"),
+                settling_position=sm.get("settle"),
+                avg_rating=avg_rating,
+                best_rating=best_rating,
+                first_up_avg_rating=first_up_avg,
+                second_up_avg_rating=second_up_avg,
+                third_up_avg_rating=third_up_avg,
+            )
+
+            race_data.runners.append(runner_data)
+
+        # 9. Calculate pace scenario
+        leaders = sum(1 for r in race_data.runners if r.early_speed_rank and r.early_speed_rank <= 2)
+        race_data.leaders_count = leaders
+        if leaders >= 3:
+            race_data.pace_scenario = "hot"
+        elif leaders <= 1:
+            race_data.pace_scenario = "soft"
+        else:
+            race_data.pace_scenario = "moderate"
+
+        # 10. Add warnings
+        if lb_error:
+            race_data.warnings.append(f"Odds: {lb_error}")
+
+        runners_without_odds = sum(1 for r in race_data.runners if not r.odds)
+        if runners_without_odds > 0:
+            race_data.warnings.append(f"{runners_without_odds} runners missing odds")
+
+        runners_without_form = sum(1 for r in race_data.runners if not r.form)
+        if runners_without_form > 0:
+            race_data.warnings.append(f"{runners_without_form} runners missing form")
+
+        return race_data, None
+
+    def get_meeting_races(
+        self,
+        track: str,
+        date: str,
+    ) -> tuple[list[RaceData], list[str]]:
+        """
+        Get data for all races at a meeting.
+
+        Args:
+            track: Track name
+            date: Date in PuntingForm format
+
+        Returns:
+            Tuple of (list of RaceData, list of errors)
+        """
+        races = []
+        errors = []
+
+        # Get meeting info to find race count
+        try:
+            meetings = self.pf_api.get_meetings(date)
+        except Exception as e:
+            return [], [f"Failed to get meetings: {str(e)}"]
+
+        meeting_id = None
+        for m in meetings:
+            m_track = m.get("track", {}).get("name", "")
+            if m_track.lower() == track.lower() or track.lower() in m_track.lower():
+                meeting_id = m.get("meetingId")
+                break
+
+        if not meeting_id:
+            return [], [f"Track '{track}' not found"]
+
+        # Get fields to find all race numbers
+        try:
+            fields = self.pf_api.get_fields(meeting_id, 0)
+        except Exception as e:
+            return [], [f"Failed to get fields: {str(e)}"]
+
+        race_numbers = [r.get("number") for r in fields.get("races", [])]
+
+        # Fetch each race
+        for race_num in race_numbers:
+            race_data, error = self.get_race_data(track, race_num, date)
+            if race_data:
+                races.append(race_data)
+            if error:
+                errors.append(f"R{race_num}: {error}")
+
+        return races, errors

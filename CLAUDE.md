@@ -4,7 +4,7 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 1 Complete - Starting Phase 2
+**Status:** Phase 4 Complete - Ready for Testing
 
 ---
 
@@ -28,20 +28,23 @@ A subscription product where users can:
 - [x] Build clean API wrappers with tests (41 tests passing)
 - [x] Horse name normalization for cross-API matching
 
-### Phase 2: Core Calculations (CURRENT)
-- [ ] Speed rating calculation (with tests)
-- [ ] Time/margin calculations (with tests)
-- [ ] Normalization by distance/condition (with tests)
+### Phase 2: Core Calculations ✅ COMPLETE
+- [x] Speed rating calculation (with tests)
+- [x] Time/margin calculations (with tests)
+- [x] Normalization by distance/condition (with tests)
 
-### Phase 3: Data Pipeline
-- [ ] Fetch race data
-- [ ] Calculate derived metrics
-- [ ] Format for AI prompt
+### Phase 3: Data Pipeline ✅ COMPLETE
+- [x] Fetch race data from both APIs
+- [x] Calculate per-run speed ratings
+- [x] Format for AI prompt (markdown tables)
+- [x] Merge PuntingForm + Ladbrokes data
 
-### Phase 4: AI Integration
-- [ ] Build default predictor prompt
+### Phase 4: AI Integration ✅ COMPLETE
+- [x] Build default predictor prompt
+- [x] Claude API integration
+- [x] Value bet identification logic
 - [ ] Test on historical races
-- [ ] Add user customization options
+- [ ] Add user customization options (CURRENT)
 
 ### Phase 5: Product
 - [ ] User accounts
@@ -70,14 +73,22 @@ punt-legacy-ai/
 ├── api/                   # API clients
 │   ├── puntingform.py     # PuntingForm API wrapper ✅
 │   └── ladbrokes.py       # Ladbrokes API wrapper ✅
-├── core/                  # Core utilities
+├── core/                  # Core logic
 │   ├── normalize.py       # Horse/track name normalization ✅
 │   ├── track_mapping.py   # Track name mapping between APIs ✅
+│   ├── speed.py           # Speed rating calculations ✅
+│   ├── race_data.py       # Data pipeline for Claude ✅
+│   ├── predictor.py       # Claude AI predictor ✅
 │   ├── results.py         # Prediction results & error handling ✅
-│   └── logging.py         # Structured logging ✅
-├── tests/                 # Unit tests (89 tests)
+│   ├── logging.py         # Structured logging ✅
+│   └── normalization/     # Baseline data
+│       ├── distance.csv   # Distance -> speed baselines ✅
+│       └── condition.csv  # Condition -> speed multipliers ✅
+├── tests/                 # Unit tests (163 tests passing)
 │   ├── test_normalize.py      # Normalization tests ✅
 │   ├── test_track_mapping.py  # Track mapping tests ✅
+│   ├── test_speed.py          # Speed rating tests ✅
+│   ├── test_race_data.py      # Data pipeline tests ✅
 │   ├── test_api.py            # API client tests ✅
 │   └── test_results.py        # Results system tests ✅
 ├── docs/                  # API documentation
@@ -205,9 +216,120 @@ horses_match("O'Brien's Star", "OBRIENS STAR")  # True
 
 ---
 
+## Speed Ratings
+
+Speed ratings normalize performance across different distances and track conditions.
+
+```python
+from core.speed import calculate_speed_rating, calculate_run_rating
+
+# Rating = actual_speed / expected_speed
+# Rating > 1.0 = faster than expected
+# Rating < 1.0 = slower than expected
+# Rating = 1.0 = exactly average for distance/condition
+
+rating = calculate_speed_rating(
+    distance=1200,
+    winner_time=71.5,
+    margin=2.5,      # Lengths behind winner
+    position=3,
+    condition="G4"   # Good 4
+)
+# Returns ~0.99 (slightly below average)
+```
+
+**Baseline data** (from 30k+ Australian races):
+- `core/normalization/distance.csv` - Expected speed by distance
+- `core/normalization/condition.csv` - Speed multiplier by track condition
+
+---
+
+## Prep Stage Analysis
+
+The system tracks which run in a preparation (campaign) each race was:
+
+| Prep | Meaning |
+|------|---------|
+| 1 | First up (resuming from spell) |
+| 2 | Second up |
+| 3+ | Deeper into prep |
+
+**What Claude sees for each runner:**
+
+```
+**SECOND UP** (career 2nd-up record: 5: 2-1-1)
+
+| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep |
+|------|-------|------|------|-----|--------|--------|------|
+| 01-Jan | Randwick | 1200m | G4 | 2/10 | 1.5L | 1.020 | 2 |
+| 15-Dec | Rosehill | 1200m | G4 | 5/9 | 4.0L | 0.965 | 1 |
+| 01-Sep | Warwick | 1400m | H8 | 1/12 | 0L | 1.045 | 4 |
+
+Avg Rating: 1.010 | Best: 1.045
+Prep Ratings: 1st-up: 0.965 | 2nd-up: 1.020 | 3rd+: 1.045
+```
+
+**Pattern detected:** This horse improves throughout a prep. Slow first up (0.965), better second up (1.020), best deeper in (1.045).
+
+---
+
+## Using the Predictor
+
+### Quick Start
+
+```python
+from core.predictor import analyze_race
+
+# Analyze a single race
+prediction = analyze_race("Randwick", 1, "09-Jan-2026")
+
+if prediction.has_value_bet:
+    print(f"VALUE BET: {prediction.selection} @ ${prediction.odds}")
+    print(f"Estimated: {prediction.estimated_probability}%")
+    print(f"Implied: {prediction.implied_probability}%")
+    print(f"Edge: +{prediction.edge:.1f}%")
+    print(f"Reasoning: {prediction.reasoning}")
+else:
+    print(f"No value bet found: {prediction.reasoning}")
+```
+
+### Full Pipeline
+
+```python
+from core.race_data import RaceDataPipeline
+from core.predictor import Predictor
+
+# 1. Get race data
+pipeline = RaceDataPipeline()
+race_data, error = pipeline.get_race_data("Randwick", 1, "09-Jan-2026")
+
+if error:
+    print(f"Error: {error}")
+else:
+    # 2. See what Claude will receive
+    print(race_data.to_prompt_text())
+
+    # 3. Run prediction
+    predictor = Predictor()
+    result = predictor.predict(race_data)
+    print(result.to_dict())
+```
+
+### Custom Instructions
+
+```python
+# Tell Claude to focus on specific factors
+prediction = analyze_race(
+    "Randwick", 1, "09-Jan-2026",
+    custom_instructions="Focus on wet track form - it's currently raining."
+)
+```
+
+---
+
 ## Next Steps
 
-1. Build speed rating calculation in `core/speed.py`
-2. Use form data from `api.puntingform.get_form()` for calculations
-3. Implement time/margin calculations with tests
-4. Port normalization logic from pfai-tracker with improvements
+1. Test predictor on historical races to validate accuracy
+2. Add user customization options (factor weighting)
+3. Build confidence scoring system
+4. Add stake sizing based on edge/confidence
