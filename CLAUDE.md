@@ -283,15 +283,41 @@ from core.predictor import analyze_race
 # Analyze a single race
 prediction = analyze_race("Randwick", 1, "09-Jan-2026")
 
-if prediction.has_value_bet:
-    print(f"VALUE BET: {prediction.selection} @ ${prediction.odds}")
-    print(f"Estimated: {prediction.estimated_probability}%")
-    print(f"Implied: {prediction.implied_probability}%")
-    print(f"Edge: +{prediction.edge:.1f}%")
-    print(f"Reasoning: {prediction.reasoning}")
-else:
-    print(f"No value bet found: {prediction.reasoning}")
+# Returns 1-3 contenders with natural language analysis
+for c in prediction.contenders:
+    print(f"{c.horse} @ ${c.odds} - {c.chance.upper()}")
+    print(f"   {c.analysis}")
+
+print(f"\nSummary: {prediction.summary}")
 ```
+
+### Example Output
+
+```
+BALLINA R3
+============================================================
+
+1. Call To Courage (#7) @ $2.80 - BEST
+   Impressive last-start winner with a strong rating of 1.011 at Lismore.
+   At $2.80 she looks like solid value as the form pick in a winnable Class 1.
+
+2. Aquatier (#3) @ $2.50 - SOLID
+   Dominant 5.5-length winner last start, but poor first-up record (0 from 3)
+   is a major concern. Short price for a horse that historically struggles fresh.
+
+3. Darling Take Care (#4) @ $9.50 - EACH-WAY
+   Won at this exact track and distance in November. Worth an each-way play
+   at decent odds despite the first-up query.
+
+SUMMARY: Call To Courage looks the pick based on recent winning form and
+first-up ability, while Aquatier's brilliant last start is offset by poor fresh form.
+```
+
+### Contender Levels
+
+- **BEST** = Most likely winner
+- **SOLID** = Genuine winning chance
+- **EACH-WAY** = Could win if things go right
 
 ### Full Pipeline
 
@@ -312,7 +338,9 @@ else:
     # 3. Run prediction
     predictor = Predictor()
     result = predictor.predict(race_data)
-    print(result.to_dict())
+
+    for c in result.contenders:
+        print(f"{c.horse}: {c.analysis}")
 ```
 
 ### Custom Instructions
@@ -327,9 +355,28 @@ prediction = analyze_race(
 
 ---
 
+## Design Philosophy
+
+**Why contenders instead of "BET/NO BET"?**
+
+The predictor identifies 1-3 horses that could realistically win and gives natural language analysis on each, including thoughts on the price. This approach:
+
+1. Lets users make their own betting decisions
+2. Avoids rigid "bet/no bet" that can frustrate users if a "no bet" wins
+3. Provides more nuanced analysis (e.g., "best horse but short price")
+4. Claude can express uncertainty naturally (e.g., "worth a small each-way")
+
+**Example analysis styles:**
+- "Looks good value at this price"
+- "Short price for what you're getting"
+- "Worth a small each-way"
+- "The one to beat but tight in the market"
+
+---
+
 ## Next Steps
 
-1. Test predictor on historical races to validate accuracy
-2. Add user customization options (factor weighting)
-3. Build confidence scoring system
-4. Add stake sizing based on edge/confidence
+1. Build frontend to display predictions
+2. Add user accounts and usage tracking
+3. Implement subscription tiers
+4. Historical backtesting

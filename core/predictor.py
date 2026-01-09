@@ -1,7 +1,7 @@
 """
 Claude AI Predictor for Horse Racing.
 
-Uses Claude API to analyze race data and identify value bets.
+Uses Claude API to analyze race data and pick winners.
 
 Usage:
     from core.predictor import Predictor
@@ -9,9 +9,10 @@ Usage:
     predictor = Predictor()
     prediction = predictor.predict(race_data)
 
-    if prediction.has_value_bet:
-        print(f"Value bet: {prediction.selection} @ ${prediction.odds}")
-        print(f"Reasoning: {prediction.reasoning}")
+    print(f"Top pick: {prediction.top_pick} @ ${prediction.top_pick_odds}")
+    print(f"Win probability: {prediction.win_probability}%")
+    print(f"BET: {'YES' if prediction.bet_recommendation else 'NO'}")
+    print(f"Reasoning: {prediction.reasoning}")
 """
 
 import os
@@ -40,25 +41,34 @@ DEFAULT_MODEL = "claude-sonnet-4-20250514"
 # =============================================================================
 
 @dataclass
+class Contender:
+    """A horse identified as a genuine winning chance."""
+
+    horse: str
+    tab_no: int
+    odds: float
+    chance: str  # "best", "solid", "each-way"
+    analysis: str  # Natural language analysis of the horse and price
+
+    def to_dict(self) -> dict:
+        return {
+            "horse": self.horse,
+            "tab_no": self.tab_no,
+            "odds": self.odds,
+            "chance": self.chance,
+            "analysis": self.analysis,
+        }
+
+
+@dataclass
 class PredictionOutput:
     """Output from Claude predictor."""
 
-    # Did Claude find a value bet?
-    has_value_bet: bool
+    # 1-3 contenders
+    contenders: list[Contender] = field(default_factory=list)
 
-    # Selection details (if has_value_bet)
-    selection: Optional[str] = None
-    tab_no: Optional[int] = None
-    odds: Optional[float] = None
-    estimated_probability: Optional[float] = None
-    implied_probability: Optional[float] = None
-    edge: Optional[float] = None  # estimated - implied
-    confidence: Optional[str] = None  # "high", "medium", "low"
-
-    # Reasoning
-    reasoning: str = ""
-    key_factors: list[str] = field(default_factory=list)
-    concerns: list[str] = field(default_factory=list)
+    # Overall summary
+    summary: str = ""
 
     # Race context
     track: str = ""
@@ -71,17 +81,8 @@ class PredictionOutput:
 
     def to_dict(self) -> dict:
         return {
-            "has_value_bet": self.has_value_bet,
-            "selection": self.selection,
-            "tab_no": self.tab_no,
-            "odds": self.odds,
-            "estimated_probability": self.estimated_probability,
-            "implied_probability": self.implied_probability,
-            "edge": round(self.edge, 1) if self.edge else None,
-            "confidence": self.confidence,
-            "reasoning": self.reasoning,
-            "key_factors": self.key_factors,
-            "concerns": self.concerns,
+            "contenders": [c.to_dict() for c in self.contenders],
+            "summary": self.summary,
             "track": self.track,
             "race_number": self.race_number,
             "model": self.model,
@@ -95,100 +96,73 @@ class PredictionOutput:
 
 SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
 
-Your task is to analyze race data and identify VALUE BETS - horses where the true probability of winning is HIGHER than what the odds imply.
+Your task is to identify the CONTENDERS (1-3 horses that could realistically win) and give your thoughts on each.
+
+## Your Approach
+
+**Step 1: Identify contenders.** Which horses could realistically WIN this race? Usually 1-3 horses.
+
+**Step 2: Rank them.** Who's the best horse? Who else has a genuine chance?
+
+**Step 3: Give your view.** For each contender, explain why they can win and your thoughts on the price.
 
 ## Key Concepts
 
-**Implied Probability**: The probability the market assigns based on odds.
-- Formula: 100 / odds
-- Example: $4.00 odds = 25% implied probability
-
-**Value Bet**: When your estimated probability > implied probability.
-- Example: You estimate 30% chance, odds imply 25% = VALUE (+5% edge)
-- You should NOT bet if: You estimate 20% chance, odds imply 25% = NO VALUE
-
 **Speed Ratings**: Normalized performance measure.
 - Rating = 1.000 means average performance for that distance/condition
-- Rating > 1.000 means faster than expected
-- Rating < 1.000 means slower than expected
-- **CRITICAL: Compare ratings WITHIN THIS FIELD, not against absolute standards**
-- Even if all horses are below 1.0, the highest-rated horse is still best in the field
-- Someone HAS to win - focus on relative rankings, not absolute numbers
+- Rating > 1.000 means faster than expected, < 1.000 means slower
+- **CRITICAL: Compare ratings WITHIN THIS FIELD** - the highest-rated horse is best in the field
 
-**Prep Run (1st up, 2nd up, etc.)**: The "Prep" column shows which run in the prep each form run was.
-- Prep=1 means first-up (resuming from a spell)
-- Prep=2 means second-up
+**Prep Run (1st up, 2nd up, etc.)**: The "Prep" column shows which run in the prep.
+- Prep=1 means first-up, Prep=2 means second-up
 - Look for patterns: does the horse improve 2nd-up? Are they better fresh?
-- First-up/second-up career records show historical performance at these stages
 
 **A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations.
 - A/E > 1.0 = consistently beats market (positive signal)
 - A/E < 1.0 = underperforms market (negative signal)
 
-## Analysis Framework
-
-1. **Form Analysis**: Look at each horse's recent runs
-   - Are they improving or declining? (compare ratings across runs)
-   - Do they perform better at certain distances/conditions?
-   - How does today's race compare to their past races?
-   - **Check prep patterns**: Do their 1st-up or 2nd-up runs show better/worse ratings?
-
-2. **Class Assessment**: Is the horse rising, dropping, or staying at same level?
-   - Dropping class = positive if form warrants it
-   - Rising class = concerning unless progressive improvement shown
-
-3. **Condition Suitability**: Does today's track suit the horse?
-   - Filter their form by similar conditions and compare ratings
-   - Some horses improve dramatically on wet tracks
-
-4. **Spell/Prep Analysis**:
-   - If horse is FIRST UP: check their first-up career record and past 1st-up ratings
-   - If horse is SECOND UP: check their second-up career record and past 2nd-up ratings
-   - Some horses improve sharply 2nd-up, others are best fresh
-
-5. **Pace Scenario**: Who benefits from the expected pace?
-   - Hot pace (3+ leaders) often helps backmarkers
-   - Soft pace (0-1 leaders) often helps on-pace runners
-
-6. **Barrier and Weight**: Consider their impact
-   - Wide barriers disadvantage in short races
-   - Weight matters more in longer races
-
 ## Output Format
 
-You MUST respond with a JSON object in this exact format:
+Return 1-3 contenders. You MUST respond with a JSON object in this exact format:
 
 ```json
 {
-  "has_value_bet": true/false,
-  "selection": "Horse Name" or null,
-  "tab_no": number or null,
-  "estimated_probability": number (0-100) or null,
-  "confidence": "high"/"medium"/"low" or null,
-  "reasoning": "2-3 sentence summary of why this is/isn't a value bet",
-  "key_factors": ["factor 1", "factor 2", "factor 3"],
-  "concerns": ["concern 1", "concern 2"]
+  "contenders": [
+    {
+      "horse": "Horse Name",
+      "tab_no": number,
+      "odds": number,
+      "chance": "best" / "solid" / "each-way",
+      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price. Be natural - you can say things like 'looks good value', 'short price for what you're getting', 'worth a small each-way', 'standout on the ratings', etc. Don't use explicit percentages."
+    }
+  ],
+  "summary": "1-2 sentences summarizing the race overall"
 }
 ```
 
+**Chance levels:**
+- "best" = Most likely winner
+- "solid" = Genuine winning chance
+- "each-way" = Could win if things go right
+
 ## Important Rules
 
-1. Only recommend a bet if you genuinely believe there's VALUE (edge > 5%)
-2. If no value exists, set has_value_bet to false and explain why
-3. Be conservative - it's better to pass than force a bad bet
-4. Focus on the DATA, not gut feeling
-5. Consider the full field, not just the favourite
-6. If odds are missing for key runners, be more cautious"""
+1. Only include horses that could realistically WIN - not place hopes or longshot lottery tickets
+2. Maximum 3 contenders per race
+3. Be natural in your analysis - give your honest view on each horse and the price
+4. You can mention if you like the value, if it's short, if it's worth a small bet, etc. - use your judgment
+5. Don't use explicit percentages or rigid "bet/no bet" language
+6. Be honest: some races only have 1 real contender, others have 2-3"""
 
 
-USER_PROMPT_TEMPLATE = """Analyze this race and identify if there's a value bet.
+USER_PROMPT_TEMPLATE = """Analyze this race and identify the contenders.
 
 {race_data}
 
 Remember:
-- Only recommend a bet if estimated probability > implied probability (from odds)
-- Respond with valid JSON only
-- Be conservative - passing on a race is fine if no clear value exists"""
+- Identify 1-3 horses that could realistically WIN
+- For each, say if it's a bet or not based on value
+- Respond with valid JSON only"""
 
 
 # =============================================================================
@@ -267,7 +241,6 @@ class Predictor:
         except Exception as e:
             logger.error(f"Claude API error: {str(e)}")
             return PredictionOutput(
-                has_value_bet=False,
                 reasoning=f"API error: {str(e)}",
                 track=race_data.track,
                 race_number=race_data.race_number,
@@ -300,7 +273,6 @@ class Predictor:
         except (json.JSONDecodeError, ValueError) as e:
             logger.warning(f"Failed to parse JSON: {e}")
             return PredictionOutput(
-                has_value_bet=False,
                 reasoning=f"Failed to parse response: {raw_response[:200]}",
                 track=race_data.track,
                 race_number=race_data.race_number,
@@ -308,42 +280,34 @@ class Predictor:
                 raw_response=raw_response,
             )
 
-        # Build output
-        has_value = data.get("has_value_bet", False)
+        # Parse contenders
+        contenders = []
+        for c in data.get("contenders", []):
+            horse = c.get("horse")
+            tab_no = c.get("tab_no")
+            odds = c.get("odds")
 
-        # Calculate edge if we have the data
-        est_prob = data.get("estimated_probability")
-        selection = data.get("selection")
+            # Look up odds from race data if not provided
+            if horse and not odds:
+                for runner in race_data.runners:
+                    if runner.name.lower() == horse.lower() or runner.tab_no == tab_no:
+                        odds = runner.odds
+                        tab_no = runner.tab_no
+                        horse = runner.name  # Canonical name
+                        break
 
-        # Find odds for selection
-        odds = None
-        implied_prob = None
-        tab_no = data.get("tab_no")
-
-        if selection:
-            for runner in race_data.runners:
-                if runner.name.lower() == selection.lower() or runner.tab_no == tab_no:
-                    odds = runner.odds
-                    implied_prob = runner.implied_prob
-                    tab_no = runner.tab_no
-                    break
-
-        edge = None
-        if est_prob and implied_prob:
-            edge = est_prob - implied_prob
+            if horse and tab_no and odds:
+                contenders.append(Contender(
+                    horse=horse,
+                    tab_no=tab_no,
+                    odds=odds,
+                    chance=c.get("chance", "solid"),
+                    analysis=c.get("analysis", ""),
+                ))
 
         return PredictionOutput(
-            has_value_bet=has_value,
-            selection=selection if has_value else None,
-            tab_no=tab_no if has_value else None,
-            odds=odds,
-            estimated_probability=est_prob,
-            implied_probability=implied_prob,
-            edge=edge,
-            confidence=data.get("confidence"),
-            reasoning=data.get("reasoning", ""),
-            key_factors=data.get("key_factors", []),
-            concerns=data.get("concerns", []),
+            contenders=contenders,
+            summary=data.get("summary", ""),
             track=race_data.track,
             race_number=race_data.race_number,
             model=self.model,
@@ -371,12 +335,11 @@ class Predictor:
             prediction = self.predict(race, custom_instructions)
             predictions.append(prediction)
 
-            if prediction.has_value_bet:
+            if prediction.contenders:
+                top = prediction.contenders[0]
                 logger.info(
-                    f"Value bet found: {race.track} R{race.race_number} - "
-                    f"{prediction.selection} @ ${prediction.odds} "
-                    f"(est: {prediction.estimated_probability}%, "
-                    f"implied: {prediction.implied_probability}%)"
+                    f"{race.track} R{race.race_number}: "
+                    f"{top.horse} @ ${top.odds} ({top.chance})"
                 )
 
         return predictions
@@ -412,7 +375,6 @@ def analyze_race(
 
     if error:
         return PredictionOutput(
-            has_value_bet=False,
             reasoning=f"Failed to get race data: {error}",
             track=track,
             race_number=race_number,

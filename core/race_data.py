@@ -355,6 +355,10 @@ class RaceDataPipeline:
             runner_id = runner.get("runnerId")
             horse_name = runner.get("name", "")
 
+            # Skip if scratched (check PuntingForm first)
+            if runner.get("scratched", False):
+                continue
+
             # Get odds from Ladbrokes
             normalized_name = normalize_horse_name(horse_name)
             lb_runner_odds = lb_odds.get(normalized_name, {})
@@ -362,7 +366,7 @@ class RaceDataPipeline:
             odds_source = "ladbrokes" if odds else "none"
             implied_prob = (100 / odds) if odds and odds > 0 else None
 
-            # Skip if scratched
+            # Skip if scratched (also check Ladbrokes)
             if lb_runner_odds.get("scratched", False):
                 continue
 
