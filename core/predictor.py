@@ -47,7 +47,7 @@ class Contender:
     horse: str
     tab_no: int
     odds: float
-    chance: str  # "best", "solid", "each-way"
+    tag: str  # Natural description like "The one to beat", "Value pick", etc.
     analysis: str  # Natural language analysis of the horse and price
 
     def to_dict(self) -> dict:
@@ -55,7 +55,7 @@ class Contender:
             "horse": self.horse,
             "tab_no": self.tab_no,
             "odds": self.odds,
-            "chance": self.chance,
+            "tag": self.tag,
             "analysis": self.analysis,
         }
 
@@ -96,34 +96,24 @@ class PredictionOutput:
 
 SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
 
-Your task is to identify the CONTENDERS (1-3 horses that could realistically win) and give your thoughts on each.
+Your task is to identify 1-3 horses that could realistically WIN this race and give your thoughts on each.
 
-## Your Approach
+## Understanding the Data
 
-**Step 1: Identify contenders.** Which horses could realistically WIN this race? Usually 1-3 horses.
+**Speed Ratings**: Normalized performance measure (1.000 = average for that distance/condition).
+- Compare ratings WITHIN THIS FIELD - the highest-rated horse has run the fastest relative to competitors
+- Consider which runs are most relevant (similar distance, recent form, track conditions)
 
-**Step 2: Rank them.** Who's the best horse? Who else has a genuine chance?
+**Prep Run**: The "Prep" column shows which run in the current preparation (1 = first-up, 2 = second-up, etc.)
+- Horses marked **FIRST UP** or **SECOND UP** show their career record in that state
 
-**Step 3: Give your view.** For each contender, explain why they can win and your thoughts on the price.
+**A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations (>1.0 = beats market, <1.0 = underperforms)
 
-## Key Concepts
-
-**Speed Ratings**: Normalized performance measure.
-- Rating = 1.000 means average performance for that distance/condition
-- Rating > 1.000 means faster than expected, < 1.000 means slower
-- **CRITICAL: Compare ratings WITHIN THIS FIELD** - the highest-rated horse is best in the field
-
-**Prep Run (1st up, 2nd up, etc.)**: The "Prep" column shows which run in the prep.
-- Prep=1 means first-up, Prep=2 means second-up
-- Look for patterns: does the horse improve 2nd-up? Are they better fresh?
-
-**A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations.
-- A/E > 1.0 = consistently beats market (positive signal)
-- A/E < 1.0 = underperforms market (negative signal)
+**Other factors to consider**: Class changes, weight, barrier, track/distance form, recent form vs older runs
 
 ## Output Format
 
-Return 1-3 contenders. You MUST respond with a JSON object in this exact format:
+Return 1-3 contenders as JSON:
 
 ```json
 {
@@ -132,37 +122,27 @@ Return 1-3 contenders. You MUST respond with a JSON object in this exact format:
       "horse": "Horse Name",
       "tab_no": number,
       "odds": number,
-      "chance": "best" / "solid" / "each-way",
-      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price. Be natural - you can say things like 'looks good value', 'short price for what you're getting', 'worth a small each-way', 'standout on the ratings', etc. Don't use explicit percentages."
+      "tag": "short phrase - e.g. The one to beat, Value pick, Main danger",
+      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price."
     }
   ],
-  "summary": "1-2 sentences summarizing the race overall"
+  "summary": "1-2 sentences summarizing the race"
 }
 ```
 
-**Chance levels:**
-- "best" = Most likely winner
-- "solid" = Genuine winning chance
-- "each-way" = Could win if things go right
+## Guidelines
 
-## Important Rules
-
-1. Only include horses that could realistically WIN - not place hopes or longshot lottery tickets
-2. Maximum 3 contenders per race
-3. Be natural in your analysis - give your honest view on each horse and the price
-4. You can mention if you like the value, if it's short, if it's worth a small bet, etc. - use your judgment
-5. Don't use explicit percentages or rigid "bet/no bet" language
-6. Be honest: some races only have 1 real contender, others have 2-3"""
+- Pick based on who you think wins
+- Quality over quantity - if only 1 horse stands out, just pick 1
+- Only suggest each-way if place odds are $1.80+
+- Your summary should align with your picks"""
 
 
 USER_PROMPT_TEMPLATE = """Analyze this race and identify the contenders.
 
 {race_data}
 
-Remember:
-- Identify 1-3 horses that could realistically WIN
-- For each, say if it's a bet or not based on value
-- Respond with valid JSON only"""
+Respond with valid JSON only."""
 
 
 # =============================================================================
@@ -301,7 +281,7 @@ class Predictor:
                     horse=horse,
                     tab_no=tab_no,
                     odds=odds,
-                    chance=c.get("chance", "solid"),
+                    tag=c.get("tag", "Contender"),
                     analysis=c.get("analysis", ""),
                 ))
 
@@ -339,7 +319,7 @@ class Predictor:
                 top = prediction.contenders[0]
                 logger.info(
                     f"{race.track} R{race.race_number}: "
-                    f"{top.horse} @ ${top.odds} ({top.chance})"
+                    f"{top.horse} @ ${top.odds} ({top.tag})"
                 )
 
         return predictions

@@ -76,6 +76,7 @@ class RunnerData:
 
     # Odds
     odds: Optional[float]
+    place_odds: Optional[float]
     odds_source: str
     implied_prob: Optional[float]
 
@@ -120,6 +121,7 @@ class RunnerData:
             "age": self.age,
             "sex": self.sex,
             "odds": self.odds,
+            "place_odds": self.place_odds,
             "odds_source": self.odds_source,
             "implied_prob": round(self.implied_prob, 1) if self.implied_prob else None,
             "jockey": self.jockey,
@@ -199,10 +201,11 @@ class RaceData:
 
         for r in sorted(self.runners, key=lambda x: x.tab_no):
             lines.append(f"### {r.tab_no}. {r.name}")
-            lines.append(f"Barrier: {r.barrier} | Weight: {r.weight}kg | Age: {r.age}{r.sex[0]}")
+            lines.append(f"Barrier: {r.barrier} | Weight: {r.weight}kg")
 
             if r.odds:
-                lines.append(f"Odds: ${r.odds:.2f} ({r.odds_source}) → {r.implied_prob:.1f}% implied")
+                place_str = f" / ${r.place_odds:.2f} place" if r.place_odds else ""
+                lines.append(f"Odds: ${r.odds:.2f} win{place_str} → {r.implied_prob:.1f}% implied")
             else:
                 lines.append("Odds: Not available")
 
@@ -363,6 +366,7 @@ class RaceDataPipeline:
             normalized_name = normalize_horse_name(horse_name)
             lb_runner_odds = lb_odds.get(normalized_name, {})
             odds = lb_runner_odds.get("fixed_win")
+            place_odds = lb_runner_odds.get("fixed_place")
             odds_source = "ladbrokes" if odds else "none"
             implied_prob = (100 / odds) if odds and odds > 0 else None
 
@@ -461,6 +465,7 @@ class RaceDataPipeline:
                 age=runner.get("age", 0),
                 sex=runner.get("sex", ""),
                 odds=odds,
+                place_odds=place_odds,
                 odds_source=odds_source,
                 implied_prob=implied_prob,
                 jockey=runner.get("jockey", {}).get("fullName", "") if isinstance(runner.get("jockey"), dict) else "",

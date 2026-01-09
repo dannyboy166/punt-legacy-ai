@@ -4,18 +4,18 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 4 Complete - Ready for Testing
+**Status:** Phase 4 Complete - Predictor Working
 
 ---
 
 ## Project Vision
 
 A subscription product where users can:
-1. Get AI-powered race predictions
-2. Customize which factors the AI emphasizes
+1. Get AI-powered race predictions (1-3 contenders per race)
+2. Natural language analysis with price commentary
 3. Free tier (2-3 races/day) → Paid tiers for more
 
-**Key principle:** Every calculation must be 100% correct and well-documented.
+**Key principle:** Let Claude be the expert - provide good data, minimal rules.
 
 ---
 
@@ -25,7 +25,7 @@ A subscription product where users can:
 - [x] Document ALL PuntingForm API endpoints (10 endpoints)
 - [x] Document ALL Ladbrokes API endpoints
 - [x] Document PuntingForm odds reliability issue
-- [x] Build clean API wrappers with tests (41 tests passing)
+- [x] Build clean API wrappers with tests
 - [x] Horse name normalization for cross-API matching
 
 ### Phase 2: Core Calculations ✅ COMPLETE
@@ -38,15 +38,16 @@ A subscription product where users can:
 - [x] Calculate per-run speed ratings
 - [x] Format for AI prompt (markdown tables)
 - [x] Merge PuntingForm + Ladbrokes data
+- [x] Include place odds from Ladbrokes
 
 ### Phase 4: AI Integration ✅ COMPLETE
-- [x] Build default predictor prompt
+- [x] Build predictor prompt (simplified, lets Claude decide)
 - [x] Claude API integration
-- [x] Value bet identification logic
-- [ ] Test on historical races
-- [ ] Add user customization options (CURRENT)
+- [x] Natural language tags (not forced categories)
+- [x] Place odds consideration for each-way ($1.80+ threshold)
 
 ### Phase 5: Product
+- [ ] Build frontend to display predictions
 - [ ] User accounts
 - [ ] Usage tracking
 - [ ] Billing integration
@@ -252,8 +253,8 @@ For each runner, Claude sees **raw form data** - no pre-calculated averages. Cla
 
 ```
 ### 3. So You Ready
-Barrier: 1 | Weight: 59kg | Age: 4G
-Odds: $3.30 (ladbrokes) → 30.3% implied
+Barrier: 1 | Weight: 59kg
+Odds: $3.30 win / $1.45 place → 30.3% implied
 Jockey: Jay Ford (A/E: 0.49)
 Trainer: Ms K Buchanan (A/E: 0.89)
 Career: 13: 1-1-0 (8% win)
@@ -267,7 +268,12 @@ Career: 13: 1-1-0 (8% win)
 | 12-Jun | Gosford | 2100m | S6 | 1/9 | 3L | 0.996 | 5 |
 ```
 
-**Claude reasons:** "Today is 2100m G4. This horse has a previous win at Gosford 2100m (0.996). Ratings improving this prep: 0.972 → 0.990 → 1.003. Third-up and peaking."
+**Data includes:**
+- Barrier, weight (no age/sex - removed as not critical)
+- Win AND place odds from Ladbrokes
+- Jockey/trainer A/E ratios
+- Career record + first-up/second-up record
+- Last 10 runs with speed ratings and prep run number
 
 **Key principle:** No pre-calculated averages. Claude analyzes which runs are relevant based on today's race conditions.
 
@@ -278,99 +284,120 @@ Career: 13: 1-1-0 (8% win)
 ### Quick Start
 
 ```python
-from core.predictor import analyze_race
-
-# Analyze a single race
-prediction = analyze_race("Randwick", 1, "09-Jan-2026")
-
-# Returns 1-3 contenders with natural language analysis
-for c in prediction.contenders:
-    print(f"{c.horse} @ ${c.odds} - {c.chance.upper()}")
-    print(f"   {c.analysis}")
-
-print(f"\nSummary: {prediction.summary}")
-```
-
-### Example Output
-
-```
-BALLINA R3
-============================================================
-
-1. Call To Courage (#7) @ $2.80 - BEST
-   Impressive last-start winner with a strong rating of 1.011 at Lismore.
-   At $2.80 she looks like solid value as the form pick in a winnable Class 1.
-
-2. Aquatier (#3) @ $2.50 - SOLID
-   Dominant 5.5-length winner last start, but poor first-up record (0 from 3)
-   is a major concern. Short price for a horse that historically struggles fresh.
-
-3. Darling Take Care (#4) @ $9.50 - EACH-WAY
-   Won at this exact track and distance in November. Worth an each-way play
-   at decent odds despite the first-up query.
-
-SUMMARY: Call To Courage looks the pick based on recent winning form and
-first-up ability, while Aquatier's brilliant last start is offset by poor fresh form.
-```
-
-### Contender Levels
-
-- **BEST** = Most likely winner
-- **SOLID** = Genuine winning chance
-- **EACH-WAY** = Could win if things go right
-
-### Full Pipeline
-
-```python
 from core.race_data import RaceDataPipeline
 from core.predictor import Predictor
 
 # 1. Get race data
 pipeline = RaceDataPipeline()
-race_data, error = pipeline.get_race_data("Randwick", 1, "09-Jan-2026")
+race_data, error = pipeline.get_race_data("Gosford", 4, "09-Jan-2026")
 
 if error:
     print(f"Error: {error}")
 else:
-    # 2. See what Claude will receive
-    print(race_data.to_prompt_text())
-
-    # 3. Run prediction
+    # 2. Run prediction
     predictor = Predictor()
     result = predictor.predict(race_data)
 
+    # 3. Display results
     for c in result.contenders:
-        print(f"{c.horse}: {c.analysis}")
+        print(f"{c.horse} (#{c.tab_no}) @ ${c.odds}")
+        print(f'   "{c.tag}"')
+        print(f"   {c.analysis}")
+
+    print(f"\nSummary: {result.summary}")
 ```
 
-### Custom Instructions
+### Example Output
 
-```python
-# Tell Claude to focus on specific factors
-prediction = analyze_race(
-    "Randwick", 1, "09-Jan-2026",
-    custom_instructions="Focus on wet track form - it's currently raining."
-)
 ```
+============================================================
+
+  GOSFORD RACE 4
+  1600m • G4 • Class 1
+
+============================================================
+
+  1. FEDERAL RESERVE (#2)
+     $2.35 win / $1.50 place
+
+     "The one to beat"
+
+     Strong recent form with a win at Beaumont and close
+     second at Newcastle. Price looks fair given the form
+     edge, but he's clearly the horse to beat.
+
+  --------------------------------------------------
+
+  2. MURPHILLY (#5)
+     $5.50 win / $2.60 place
+
+     "Value pick"
+
+     Won his last start at Gosford over this exact distance.
+     The jockey/trainer combo has excellent A/E figures,
+     making this price attractive value.
+
+  --------------------------------------------------
+
+  3. OCEAN TSUNAMI (#7)
+     $3.30 win / $1.45 place
+
+     "Lightly-raced improver"
+
+     Won first-up on debut then ran a strong second. The
+     price reflects the upside potential but carries the
+     risk of inexperience.
+
+============================================================
+
+  SUMMARY
+  Federal Reserve looks the most reliable pick with strong
+  recent form, while Murphilly offers good value returning
+  to his winning track and distance.
+
+============================================================
+```
+
+### Natural Tags
+
+Claude uses natural language tags - not forced categories. Examples:
+- "The one to beat"
+- "Value pick"
+- "Main danger"
+- "First-up specialist"
+- "Course specialist"
+- "Each-way chance" (only if place odds $1.80+)
 
 ---
 
 ## Design Philosophy
 
+**Let Claude be the expert.**
+
+The prompt is intentionally simple - it explains what the data means, but doesn't force Claude to follow rigid rules. Claude decides:
+- How many contenders (1-3)
+- What tags to use
+- How to weight different factors (speed ratings, A/E, prep patterns, etc.)
+- Whether to mention each-way (only if place odds $1.80+)
+
 **Why contenders instead of "BET/NO BET"?**
 
-The predictor identifies 1-3 horses that could realistically win and gives natural language analysis on each, including thoughts on the price. This approach:
-
 1. Lets users make their own betting decisions
-2. Avoids rigid "bet/no bet" that can frustrate users if a "no bet" wins
-3. Provides more nuanced analysis (e.g., "best horse but short price")
-4. Claude can express uncertainty naturally (e.g., "worth a small each-way")
+2. Avoids rigid "bet/no bet" that frustrates users if a "no bet" wins
+3. Claude can express nuance naturally ("best horse but short price")
+4. Quality over quantity - if only 1 horse stands out, just pick 1
 
-**Example analysis styles:**
-- "Looks good value at this price"
-- "Short price for what you're getting"
-- "Worth a small each-way"
-- "The one to beat but tight in the market"
+**Speed ratings are RELATIVE:**
+
+Compare within the field only. If everyone is 0.98 and one horse is 0.99, that horse is best. No absolute thresholds like "must be 1.015+".
+
+---
+
+## Cost
+
+~$0.025 per race (~6,500 tokens)
+- 50 races/day = ~$1.25/day
+- Uses Claude Sonnet 4 by default
 
 ---
 
