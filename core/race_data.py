@@ -44,6 +44,7 @@ class FormRun:
     prize_money: int
     rating: Optional[float]  # Normalized speed rating
     prep_run: Optional[int] = None  # 1 = first up, 2 = second up, etc.
+    is_barrier_trial: bool = False  # True if this was a barrier trial
 
     def to_dict(self) -> dict:
         return {
@@ -61,6 +62,7 @@ class FormRun:
             "prize_money": self.prize_money,
             "rating": round(self.rating, 4) if self.rating else None,
             "prep_run": self.prep_run,  # 1=1st up, 2=2nd up, etc.
+            "is_barrier_trial": self.is_barrier_trial,
         }
 
 
@@ -112,6 +114,16 @@ class RunnerData:
     settling_position: Optional[int] = None
 
 
+    @property
+    def race_runs_count(self) -> int:
+        """Count actual race runs (excluding barrier trials)."""
+        return len([f for f in self.form if not f.is_barrier_trial])
+
+    @property
+    def trial_runs_count(self) -> int:
+        """Count barrier trial runs."""
+        return len([f for f in self.form if f.is_barrier_trial])
+
     def to_dict(self) -> dict:
         return {
             "name": self.name,
@@ -140,6 +152,8 @@ class RunnerData:
             "first_up_record": self.first_up_record,
             "second_up_record": self.second_up_record,
             "form": [f.to_dict() for f in self.form],
+            "race_runs_count": self.race_runs_count,
+            "trial_runs_count": self.trial_runs_count,
             "early_speed_rank": self.early_speed_rank,
             "settling_position": self.settling_position,
         }
@@ -225,18 +239,26 @@ class RaceData:
             if r.early_speed_rank:
                 lines.append(f"Speed Rank: {r.early_speed_rank} | Settles: {r.settling_position}")
 
-            # Form table with prep run indicator
+            # Form table with prep run and barrier trial indicator
             if r.form:
+                # Show form summary with warning if limited
+                form_summary = f"Form: {r.race_runs_count} race runs"
+                if r.trial_runs_count > 0:
+                    form_summary += f", {r.trial_runs_count} trials"
+                if r.race_runs_count < 3:
+                    form_summary += " ⚠️ LIMITED FORM DATA"
+                lines.append(form_summary)
                 lines.append("")
-                lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep |")
-                lines.append("|------|-------|------|------|-----|--------|--------|------|")
+                lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |")
+                lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
                     rating_str = f"{f.rating:.3f}" if f.rating else "N/A"
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
-                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} |")
+                    trial_str = "TRIAL" if f.is_barrier_trial else "-"
+                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} | {trial_str} |")
 
             else:
-                lines.append("No form available")
+                lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")
 
             lines.append("")
 
@@ -370,8 +392,17 @@ class RaceDataPipeline:
             odds_source = "ladbrokes" if odds else "none"
             implied_prob = (100 / odds) if odds and odds > 0 else None
 
-            # Skip if scratched (also check Ladbrokes)
+            # Skip if scratched (also check Ladbrokes is_scratched)
             if lb_runner_odds.get("scratched", False):
+                continue
+
+            # Skip if jockey is blank (late scratching indicator)
+            pf_jockey = runner.get("jockey", {})
+            if isinstance(pf_jockey, dict):
+                jockey_name = pf_jockey.get("fullName", "")
+            else:
+                jockey_name = ""
+            if not jockey_name or jockey_name.strip() == "":
                 continue
 
             # Get A/E data
@@ -454,6 +485,7 @@ class RaceDataPipeline:
                     prize_money=run.get("prizeMoney", 0) or 0,
                     rating=rating,
                     prep_run=run_prep,
+                    is_barrier_trial=run.get("isBarrierTrial", False),
                 )
                 form_runs.append(form_run)
 
@@ -514,6 +546,24 @@ class RaceDataPipeline:
         runners_without_form = sum(1 for r in race_data.runners if not r.form)
         if runners_without_form > 0:
             race_data.warnings.append(f"{runners_without_form} runners missing form")
+
+        # Count first-up runners
+        first_up_count = sum(1 for r in race_data.runners if r.first_up)
+        field_size = len(race_data.runners)
+        if first_up_count > 0:
+            pct = (first_up_count / field_size) * 100 if field_size > 0 else 0
+            if pct >= 50:
+                race_data.warnings.append(f"LOW CONFIDENCE: {first_up_count}/{field_size} runners ({pct:.0f}%) are first-up with limited form")
+            elif first_up_count >= 3:
+                race_data.warnings.append(f"{first_up_count}/{field_size} runners are first-up")
+
+        # Count runners with limited form (< 3 actual race runs, excluding trials)
+        limited_form_count = sum(
+            1 for r in race_data.runners
+            if len([f for f in r.form if not f.is_barrier_trial]) < 3
+        )
+        if limited_form_count >= 3 and limited_form_count > field_size // 2:
+            race_data.warnings.append(f"{limited_form_count}/{field_size} runners have < 3 race runs (limited form data)")
 
         return race_data, None
 

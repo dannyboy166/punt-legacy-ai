@@ -290,13 +290,22 @@ class LadbrokeAPI:
                 continue
 
             odds = runner.get("odds", {})
+
+            # Check for scratching - API uses "is_scratched" field
+            is_scratched = runner.get("is_scratched", False)
+
+            # Also check for blank jockey as late scratching indicator
+            jockey = runner.get("jockey", "")
+            if not jockey or jockey.strip() == "":
+                is_scratched = True
+
             odds_dict[normalized_name] = {
                 "fixed_win": odds.get("fixed_win"),
                 "fixed_place": odds.get("fixed_place"),
-                "scratched": runner.get("scratched", False),
+                "scratched": is_scratched,
                 "barrier": runner.get("barrier"),
                 "runner_number": runner.get("runner_number"),
-                "jockey": runner.get("jockey"),
+                "jockey": jockey,
                 "trainer": runner.get("trainer_name"),
                 "original_name": name,  # Keep original for debugging
             }

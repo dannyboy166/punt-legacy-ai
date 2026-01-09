@@ -401,9 +401,80 @@ Compare within the field only. If everyone is 0.98 and one horse is 0.99, that h
 
 ---
 
+## Integration with racing-tips-platform
+
+The predictor is exposed via FastAPI server and called from the racing-tips-platform Next.js app.
+
+### Architecture
+
+```
+racing-tips-platform (Next.js)     punt-legacy-ai (Python FastAPI)
+        │                                    │
+        │  POST /predict                     │
+        │  {track, race_number, date}        │
+        ├───────────────────────────────────►│
+        │                                    │ → PuntingForm API
+        │                                    │ → Ladbrokes API
+        │                                    │ → Claude API
+        │◄───────────────────────────────────┤
+        │  {contenders[], summary}           │
+```
+
+### FastAPI Server
+
+```bash
+# Start the server
+cd punt-legacy-ai
+uvicorn server:app --host 0.0.0.0 --port 8000
+
+# Endpoints
+GET  /meetings?date=09-Jan-2026     # List tracks
+GET  /races?track=Gosford&date=X    # List races at track
+POST /predict                        # Generate prediction
+```
+
+### Modifying Claude Prompts
+
+The prompts are in `core/predictor.py`:
+- `SYSTEM_PROMPT` - The role/instructions for Claude
+- `USER_PROMPT_TEMPLATE` - The race data template
+
+Edit these directly - the FastAPI server uses them automatically.
+
+### Environment Variables
+
+```bash
+# .env
+ANTHROPIC_API_KEY=sk-ant-...
+PUNTINGFORM_API_KEY=...
+```
+
+### Running Locally
+
+```bash
+# Terminal 1: Start predictor API
+cd punt-legacy-ai
+pip install fastapi uvicorn
+uvicorn server:app --reload --port 8000
+
+# Terminal 2: Start frontend
+cd racing-tips-platform
+npm run dev
+```
+
+### Deployment
+
+Deploy FastAPI server to Railway/Render/Fly.io with:
+- Python 3.11+
+- Environment variables set
+- Port 8000 exposed
+
+Set `PREDICTOR_API_URL` in racing-tips-platform to the deployed URL.
+
+---
+
 ## Next Steps
 
-1. Build frontend to display predictions
-2. Add user accounts and usage tracking
-3. Implement subscription tiers
-4. Historical backtesting
+1. Historical backtesting
+2. Prediction accuracy tracking
+3. User customization options
