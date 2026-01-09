@@ -71,6 +71,8 @@ python3 -c "from api.puntingform import PuntingFormAPI; api = PuntingFormAPI(); 
 ```
 punt-legacy-ai/
 ├── CLAUDE.md              # This file - project guidance
+├── server.py              # FastAPI server ✅
+├── requirements.txt       # Python dependencies ✅
 ├── api/                   # API clients
 │   ├── puntingform.py     # PuntingForm API wrapper ✅
 │   └── ladbrokes.py       # Ladbrokes API wrapper ✅
@@ -210,6 +212,45 @@ horses_match("O'Brien's Star", "OBRIENS STAR")  # True
 
 ---
 
+## Scratching Detection
+
+Scratched horses are automatically filtered out using multiple checks:
+
+1. **PuntingForm `scratched` field** - Primary check
+2. **Ladbrokes `is_scratched` field** - Secondary check (note: uses `is_scratched` not `scratched`)
+3. **Blank jockey** - Late scratching indicator (if jockey field is empty, horse is likely scratched)
+
+This ensures late scratchings are caught even if APIs haven't updated their `scratched` flags yet.
+
+---
+
+## Barrier Trials & Form Confidence
+
+### Barrier Trial Detection
+
+Form runs from barrier trials are flagged with `isBarrierTrial: true` from PuntingForm. In the output:
+- Form table has a "Trial" column showing `TRIAL` for barrier trials
+- `race_runs_count` excludes trials (actual race runs only)
+- `trial_runs_count` shows number of trial runs
+
+### Form Confidence Warnings
+
+**Race-level warnings** (shown in `race_data.warnings`):
+- `"LOW CONFIDENCE: 5/8 runners (63%) are first-up with limited form"` - if 50%+ are first-up
+- `"3/8 runners are first-up"` - if 3+ are first-up but <50%
+- `"5/8 runners have < 3 race runs (limited form data)"` - if majority have limited data
+
+**Runner-level indicators**:
+```
+Form: 5 race runs, 2 trials
+Form: 2 race runs ⚠️ LIMITED FORM DATA
+⚠️ NO FORM AVAILABLE - first starter or no data
+```
+
+This helps Claude (and users) understand when predictions are less confident due to missing data.
+
+---
+
 ## Related Projects
 
 - `/Users/danielsamus/pfai-tracker` - Original research/prototyping (reference)
@@ -259,13 +300,15 @@ Jockey: Jay Ford (A/E: 0.49)
 Trainer: Ms K Buchanan (A/E: 0.89)
 Career: 13: 1-1-0 (8% win)
 **FIRST UP** (career 1st-up record: 3: 0-0-0)
+Form: 4 race runs, 1 trials
 
-| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep |
-|------|-------|------|------|-----|--------|--------|------|
-| 26-Dec | Beaumont | 2100m | G4 | 6/12 | 2.1L | 1.003 | 3 |
-| 10-Dec | Wyong | 1600m | G4 | 6/6 | 11.8L | 0.990 | 2 |
-| 20-Nov | Newcastle | 1400m | G4 | 7/8 | 10.7L | 0.972 | 1 |
-| 12-Jun | Gosford | 2100m | S6 | 1/9 | 3L | 0.996 | 5 |
+| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |
+|------|-------|------|------|-----|--------|--------|------|-------|
+| 26-Dec | Beaumont | 2100m | G4 | 6/12 | 2.1L | 1.003 | 3 | - |
+| 10-Dec | Wyong | 1600m | G4 | 6/6 | 11.8L | 0.990 | 2 | - |
+| 20-Nov | Newcastle | 1400m | G4 | 7/8 | 10.7L | 0.972 | 1 | - |
+| 05-Nov | Rosehill | 1000m | G3 | 2/8 | 1.5L | N/A | - | TRIAL |
+| 12-Jun | Gosford | 2100m | S6 | 1/9 | 3L | 0.996 | 5 | - |
 ```
 
 **Data includes:**
@@ -273,7 +316,8 @@ Career: 13: 1-1-0 (8% win)
 - Win AND place odds from Ladbrokes
 - Jockey/trainer A/E ratios
 - Career record + first-up/second-up record
-- Last 10 runs with speed ratings and prep run number
+- Form summary with race run count and trial count
+- Last 10 runs with speed ratings, prep run number, and barrier trial flag
 
 **Key principle:** No pre-calculated averages. Claude analyzes which runs are relevant based on today's race conditions.
 
