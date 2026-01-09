@@ -106,8 +106,6 @@ class TestRunnerData:
             form=[],
             early_speed_rank=3,
             settling_position=4,
-            avg_rating=1.012,
-            best_rating=1.045,
         )
 
         d = runner.to_dict()
@@ -236,8 +234,6 @@ class TestRaceData:
             ],
             early_speed_rank=2,
             settling_position=3,
-            avg_rating=1.015,
-            best_rating=1.015,
         )
 
         race = RaceData(

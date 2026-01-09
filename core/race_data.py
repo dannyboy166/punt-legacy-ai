@@ -110,14 +110,6 @@ class RunnerData:
     early_speed_rank: Optional[int] = None
     settling_position: Optional[int] = None
 
-    # Calculated aggregates (for quick reference)
-    avg_rating: Optional[float] = None
-    best_rating: Optional[float] = None
-
-    # Prep stage ratings (from form history)
-    first_up_avg_rating: Optional[float] = None   # Avg rating when 1st up
-    second_up_avg_rating: Optional[float] = None  # Avg rating when 2nd up
-    third_up_avg_rating: Optional[float] = None   # Avg rating when 3rd+ up
 
     def to_dict(self) -> dict:
         return {
@@ -148,11 +140,6 @@ class RunnerData:
             "form": [f.to_dict() for f in self.form],
             "early_speed_rank": self.early_speed_rank,
             "settling_position": self.settling_position,
-            "avg_rating": round(self.avg_rating, 4) if self.avg_rating else None,
-            "best_rating": round(self.best_rating, 4) if self.best_rating else None,
-            "first_up_avg_rating": round(self.first_up_avg_rating, 4) if self.first_up_avg_rating else None,
-            "second_up_avg_rating": round(self.second_up_avg_rating, 4) if self.second_up_avg_rating else None,
-            "third_up_avg_rating": round(self.third_up_avg_rating, 4) if self.third_up_avg_rating else None,
         }
 
 
@@ -204,7 +191,6 @@ class RaceData:
         lines = [
             f"# {self.track} Race {self.race_number}: {self.race_name}",
             f"Distance: {self.distance}m | Condition: {self.condition} | Class: {self.class_}",
-            f"Prize: ${self.prize_money:,} | Start: {self.start_time} | Rail: {self.rail_position}",
             f"Field Size: {len(self.runners)} | Pace: {self.pace_scenario} ({self.leaders_count} leaders)",
             "",
             "## Runners",
@@ -246,19 +232,6 @@ class RaceData:
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} |")
 
-                if r.avg_rating:
-                    lines.append(f"Avg Rating: {r.avg_rating:.3f} | Best: {r.best_rating:.3f}")
-
-                # Show prep stage ratings if available
-                prep_ratings = []
-                if r.first_up_avg_rating:
-                    prep_ratings.append(f"1st-up: {r.first_up_avg_rating:.3f}")
-                if r.second_up_avg_rating:
-                    prep_ratings.append(f"2nd-up: {r.second_up_avg_rating:.3f}")
-                if r.third_up_avg_rating:
-                    prep_ratings.append(f"3rd+: {r.third_up_avg_rating:.3f}")
-                if prep_ratings:
-                    lines.append(f"Prep Ratings: {' | '.join(prep_ratings)}")
             else:
                 lines.append("No form available")
 
@@ -432,14 +405,11 @@ class RaceDataPipeline:
 
             # Process form history
             form_runs = []
-            ratings = []
             runner_form = form_by_runner.get(runner_id, [])
 
             for run in runner_form[:10]:  # Max 10 runs
                 # Calculate rating for this run
                 rating = calculate_run_rating(run)
-                if rating:
-                    ratings.append(rating)
 
                 # Parse date
                 run_date = run.get("meetingDate", "")
@@ -479,19 +449,6 @@ class RaceDataPipeline:
                 )
                 form_runs.append(form_run)
 
-            # Calculate aggregate ratings
-            avg_rating = sum(ratings) / len(ratings) if ratings else None
-            best_rating = max(ratings) if ratings else None
-
-            # Calculate prep stage ratings (1st up, 2nd up, 3rd+ up)
-            first_up_ratings = [f.rating for f in form_runs if f.prep_run == 1 and f.rating]
-            second_up_ratings = [f.rating for f in form_runs if f.prep_run == 2 and f.rating]
-            third_up_ratings = [f.rating for f in form_runs if f.prep_run and f.prep_run >= 3 and f.rating]
-
-            first_up_avg = sum(first_up_ratings) / len(first_up_ratings) if first_up_ratings else None
-            second_up_avg = sum(second_up_ratings) / len(second_up_ratings) if second_up_ratings else None
-            third_up_avg = sum(third_up_ratings) / len(third_up_ratings) if third_up_ratings else None
-
             runner_data = RunnerData(
                 name=horse_name,
                 tab_no=runner.get("tabNo", 0),
@@ -523,11 +480,6 @@ class RaceDataPipeline:
                 form=form_runs,
                 early_speed_rank=sm.get("speed"),
                 settling_position=sm.get("settle"),
-                avg_rating=avg_rating,
-                best_rating=best_rating,
-                first_up_avg_rating=first_up_avg,
-                second_up_avg_rating=second_up_avg,
-                third_up_avg_rating=third_up_avg,
             )
 
             race_data.runners.append(runner_data)

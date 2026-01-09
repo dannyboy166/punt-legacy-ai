@@ -244,32 +244,32 @@ rating = calculate_speed_rating(
 
 ---
 
-## Prep Stage Analysis
+## What Claude Receives
 
-The system tracks which run in a preparation (campaign) each race was:
+For each runner, Claude sees **raw form data** - no pre-calculated averages. Claude uses its own reasoning to identify patterns.
 
-| Prep | Meaning |
-|------|---------|
-| 1 | First up (resuming from spell) |
-| 2 | Second up |
-| 3+ | Deeper into prep |
-
-**What Claude sees for each runner:**
+**Example runner data:**
 
 ```
-**SECOND UP** (career 2nd-up record: 5: 2-1-1)
+### 3. So You Ready
+Barrier: 1 | Weight: 59kg | Age: 4G
+Odds: $3.30 (ladbrokes) → 30.3% implied
+Jockey: Jay Ford (A/E: 0.49)
+Trainer: Ms K Buchanan (A/E: 0.89)
+Career: 13: 1-1-0 (8% win)
+**FIRST UP** (career 1st-up record: 3: 0-0-0)
 
 | Date | Track | Dist | Cond | Pos | Margin | Rating | Prep |
 |------|-------|------|------|-----|--------|--------|------|
-| 01-Jan | Randwick | 1200m | G4 | 2/10 | 1.5L | 1.020 | 2 |
-| 15-Dec | Rosehill | 1200m | G4 | 5/9 | 4.0L | 0.965 | 1 |
-| 01-Sep | Warwick | 1400m | H8 | 1/12 | 0L | 1.045 | 4 |
-
-Avg Rating: 1.010 | Best: 1.045
-Prep Ratings: 1st-up: 0.965 | 2nd-up: 1.020 | 3rd+: 1.045
+| 26-Dec | Beaumont | 2100m | G4 | 6/12 | 2.1L | 1.003 | 3 |
+| 10-Dec | Wyong | 1600m | G4 | 6/6 | 11.8L | 0.990 | 2 |
+| 20-Nov | Newcastle | 1400m | G4 | 7/8 | 10.7L | 0.972 | 1 |
+| 12-Jun | Gosford | 2100m | S6 | 1/9 | 3L | 0.996 | 5 |
 ```
 
-**Pattern detected:** This horse improves throughout a prep. Slow first up (0.965), better second up (1.020), best deeper in (1.045).
+**Claude reasons:** "Today is 2100m G4. This horse has a previous win at Gosford 2100m (0.996). Ratings improving this prep: 0.972 → 0.990 → 1.003. Third-up and peaking."
+
+**Key principle:** No pre-calculated averages. Claude analyzes which runs are relevant based on today's race conditions.
 
 ---
 
