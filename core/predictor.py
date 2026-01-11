@@ -18,6 +18,7 @@ Usage:
 import os
 import json
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Optional, Any
 from datetime import datetime
@@ -203,26 +204,68 @@ class Predictor:
         if custom_instructions:
             user_prompt += f"\n\nAdditional instructions: {custom_instructions}"
 
-        # Call Claude
+        # Call Claude with retry logic
         logger.info(f"Calling Claude for {race_data.track} R{race_data.race_number}")
 
-        try:
-            response = self.client.messages.create(
+        max_retries = 3
+        last_error = None
+
+        for attempt in range(max_retries):
+            try:
+                response = self.client.messages.create(
+                    model=self.model,
+                    max_tokens=2000,
+                    temperature=0.2,  # Low temp for consistent predictions
+                    system=SYSTEM_PROMPT,
+                    messages=[
+                        {"role": "user", "content": user_prompt}
+                    ],
+                )
+
+                raw_response = response.content[0].text
+                logger.debug(f"Raw response: {raw_response}")
+                break  # Success, exit retry loop
+
+            except anthropic.APIConnectionError as e:
+                last_error = e
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt  # 1s, 2s, 4s
+                    logger.warning(f"Connection error, retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+            except anthropic.RateLimitError as e:
+                last_error = e
+                if attempt < max_retries - 1:
+                    wait_time = 2 ** attempt
+                    logger.warning(f"Rate limited, retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+            except anthropic.APIStatusError as e:
+                last_error = e
+                if e.status_code >= 500 and attempt < max_retries - 1:
+                    wait_time = 2 ** attempt
+                    logger.warning(f"Server error {e.status_code}, retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                    continue
+                break  # Don't retry client errors (4xx)
+            except Exception as e:
+                last_error = e
+                break  # Don't retry unknown errors
+
+        else:
+            # All retries exhausted
+            logger.error(f"Claude API error after {max_retries} attempts: {str(last_error)}")
+            return PredictionOutput(
+                summary=f"API error: {str(last_error)}",
+                track=race_data.track,
+                race_number=race_data.race_number,
                 model=self.model,
-                max_tokens=2000,
-                system=SYSTEM_PROMPT,
-                messages=[
-                    {"role": "user", "content": user_prompt}
-                ],
             )
 
-            raw_response = response.content[0].text
-            logger.debug(f"Raw response: {raw_response}")
-
-        except Exception as e:
-            logger.error(f"Claude API error: {str(e)}")
+        if last_error and 'raw_response' not in dir():
+            logger.error(f"Claude API error: {str(last_error)}")
             return PredictionOutput(
-                reasoning=f"API error: {str(e)}",
+                summary=f"API error: {str(last_error)}",
                 track=race_data.track,
                 race_number=race_data.race_number,
                 model=self.model,
@@ -254,7 +297,7 @@ class Predictor:
         except (json.JSONDecodeError, ValueError) as e:
             logger.warning(f"Failed to parse JSON: {e}")
             return PredictionOutput(
-                reasoning=f"Failed to parse response: {raw_response[:200]}",
+                summary=f"Failed to parse response: {raw_response[:200]}",
                 track=race_data.track,
                 race_number=race_data.race_number,
                 model=self.model,
@@ -356,7 +399,7 @@ def analyze_race(
 
     if error:
         return PredictionOutput(
-            reasoning=f"Failed to get race data: {error}",
+            summary=f"Failed to get race data: {error}",
             track=track,
             race_number=race_number,
         )

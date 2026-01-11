@@ -15,9 +15,10 @@ Endpoints:
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 import os
+import re
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -55,10 +56,34 @@ pf_api = PuntingFormAPI()
 # MODELS
 # =============================================================================
 
+DATE_PATTERN = re.compile(r'^\d{2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{4}$')
+
+
 class PredictionRequest(BaseModel):
     track: str
     race_number: int
     date: str  # Format: dd-MMM-yyyy (e.g., "09-Jan-2026")
+
+    @field_validator('track')
+    @classmethod
+    def track_not_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Track name cannot be empty')
+        return v.strip()
+
+    @field_validator('race_number')
+    @classmethod
+    def race_number_valid(cls, v: int) -> int:
+        if v < 1 or v > 12:
+            raise ValueError('Race number must be between 1 and 12')
+        return v
+
+    @field_validator('date')
+    @classmethod
+    def date_format_valid(cls, v: str) -> str:
+        if not DATE_PATTERN.match(v):
+            raise ValueError('Date must be in format dd-MMM-yyyy (e.g., 09-Jan-2026)')
+        return v
 
 
 class Contender(BaseModel):
@@ -105,6 +130,15 @@ def health_check():
     return {"status": "ok", "service": "punt-legacy-ai"}
 
 
+def validate_date(date: str) -> None:
+    """Validate date format, raise HTTPException if invalid."""
+    if not DATE_PATTERN.match(date):
+        raise HTTPException(
+            status_code=400,
+            detail="Date must be in format dd-MMM-yyyy (e.g., 09-Jan-2026)"
+        )
+
+
 @app.get("/meetings", response_model=list[MeetingResponse])
 def get_meetings(date: str):
     """
@@ -116,6 +150,7 @@ def get_meetings(date: str):
     Returns:
         List of tracks with meeting IDs
     """
+    validate_date(date)
     try:
         meetings = pf_api.get_meetings(date)
         return [
@@ -144,6 +179,10 @@ def get_races(track: str, date: str):
     Returns:
         List of races with basic info
     """
+    validate_date(date)
+    if not track or not track.strip():
+        raise HTTPException(status_code=400, detail="Track name cannot be empty")
+    track = track.strip()
     try:
         meetings = pf_api.get_meetings(date)
 
