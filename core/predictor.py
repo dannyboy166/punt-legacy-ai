@@ -311,7 +311,14 @@ class Predictor:
             tab_no = c.get("tab_no")
             odds = c.get("odds")
 
-            # Look up odds from race data if not provided
+            # Check if odds is a valid number
+            if odds is not None:
+                try:
+                    odds = float(odds)
+                except (ValueError, TypeError):
+                    odds = None  # Invalid odds like "Not available"
+
+            # Look up odds from race data if not provided or invalid
             if horse and not odds:
                 for runner in race_data.runners:
                     if runner.name.lower() == horse.lower() or runner.tab_no == tab_no:
