@@ -28,6 +28,7 @@ from dotenv import load_dotenv
 
 from core.race_data import RaceData
 from core.logging import get_logger
+from core.normalize import normalize_horse_name
 
 load_dotenv()
 
@@ -320,12 +321,17 @@ class Predictor:
 
             # Look up odds from race data if not provided or invalid
             if horse and not odds:
+                normalized_horse = normalize_horse_name(horse)
                 for runner in race_data.runners:
-                    if runner.name.lower() == horse.lower() or runner.tab_no == tab_no:
+                    # Match by normalized name or tab number
+                    if normalize_horse_name(runner.name) == normalized_horse or runner.tab_no == tab_no:
                         odds = runner.odds
                         tab_no = runner.tab_no
                         horse = runner.name  # Canonical name
                         break
+
+                if not odds:
+                    logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
 
             if horse and tab_no and odds:
                 contenders.append(Contender(
@@ -335,6 +341,8 @@ class Predictor:
                     tag=c.get("tag", "Contender"),
                     analysis=c.get("analysis", ""),
                 ))
+            elif horse:
+                logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no} or odds={odds}")
 
         return PredictionOutput(
             contenders=contenders,
