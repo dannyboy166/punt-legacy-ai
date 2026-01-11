@@ -232,18 +232,20 @@ class TestLadbrokeAPI:
         mock_get.side_effect = [meetings_response, race_response]
 
         api = LadbrokeAPI()
-        odds = api.get_odds_for_race("Eagle Farm", 1)
+        odds, status, error = api.get_odds_for_race("Eagle Farm", 1)
 
         assert "fast horse" in odds
         assert odds["fast horse"]["fixed_win"] == 3.50
+        assert error is None
 
     def test_get_odds_for_race_no_match(self):
         """Test get_odds_for_race when track not found."""
         api = LadbrokeAPI()
 
         with patch.object(api, "get_meetings", return_value=[]):
-            odds = api.get_odds_for_race("Nonexistent Track", 1)
+            odds, status, error = api.get_odds_for_race("Nonexistent Track", 1)
             assert odds == {}
+            assert error is not None
 
 
 class TestCrossAPIIntegration:

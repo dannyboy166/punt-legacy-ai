@@ -175,7 +175,7 @@ class LadbrokeAPI:
         self,
         track_name: str,
         race_number: int,
-    ) -> dict[str, dict]:
+    ) -> tuple[dict[str, dict], Optional[str], Optional[str]]:
         """
         Get odds for a specific track and race.
 
@@ -184,16 +184,10 @@ class LadbrokeAPI:
             race_number: Race number
 
         Returns:
-            Dict mapping normalized horse names to odds:
-            {
-                "fast horse": {
-                    "fixed_win": 3.50,
-                    "fixed_place": 1.40,
-                    "scratched": False,
-                    "barrier": 5,
-                },
-                ...
-            }
+            Tuple of (odds_dict, race_status, error_message)
+            - odds_dict: Dict mapping normalized horse names to odds
+            - race_status: "open", "closed", "final", "abandoned" or None
+            - error_message: Human-readable error or None if success
         """
         logger.debug(f"Fetching odds for {track_name} R{race_number}")
 
@@ -207,18 +201,20 @@ class LadbrokeAPI:
                 for race in meeting.get("races", []):
                     if race.get("race_number") == race_number:
                         race_id = race.get("id")
+                        race_status = race.get("status", "unknown")
+
                         race_data = self.get_race(race_id)
 
                         if not race_data:
                             logger.warning(f"No race data for {track_name} R{race_number}")
-                            return {}
+                            return {}, race_status, f"No race data available"
 
                         odds = self._build_odds_dict(race_data.get("runners", []))
-                        logger.debug(f"Found odds for {len(odds)} runners at {track_name} R{race_number}")
-                        return odds
+                        logger.debug(f"Found odds for {len(odds)} runners at {track_name} R{race_number} (status: {race_status})")
+                        return odds, race_status, None
 
         logger.info(f"Track not found in Ladbrokes: {track_name}")
-        return {}
+        return {}, None, f"Track not found: {track_name}"
 
     def get_odds_for_pf_track(
         self,
@@ -260,8 +256,23 @@ class LadbrokeAPI:
             log_prediction_skip(logger, pf_track_name, race_number, reason)
             return {}, reason
 
-        # Fetch odds
-        odds = self.get_odds_for_race(lb_track, race_number)
+        # Fetch odds and check race status
+        odds, race_status, error = self.get_odds_for_race(lb_track, race_number)
+
+        # Check if race is still open for betting
+        if race_status and race_status != "open":
+            status_messages = {
+                "closed": "Race has started - betting is closed",
+                "final": "Race has finished",
+                "abandoned": "Race has been abandoned",
+            }
+            reason = status_messages.get(race_status, f"Race is not available (status: {race_status})")
+            log_prediction_skip(logger, pf_track_name, race_number, reason)
+            return {}, reason
+
+        if error:
+            log_prediction_skip(logger, pf_track_name, race_number, error)
+            return {}, error
 
         if not odds:
             reason = f"No odds available for {pf_track_name} R{race_number} (searched: {lb_track})"
@@ -333,7 +344,7 @@ class LadbrokeAPI:
         Returns:
             Odds dict or None if not found
         """
-        race_odds = self.get_odds_for_race(track_name, race_number)
+        race_odds, _, _ = self.get_odds_for_race(track_name, race_number)
         normalized_name = normalize_horse_name(horse_name)
         return race_odds.get(normalized_name)
 
