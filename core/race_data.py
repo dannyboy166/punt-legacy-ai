@@ -329,7 +329,7 @@ class RaceDataPipeline:
         lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number)
 
         # Check if race is closed/finished - return error immediately
-        if lb_error and any(x in lb_error for x in ["has started", "has finished", "been abandoned"]):
+        if lb_error and any(x in lb_error for x in ["has started", "has finished", "been abandoned", "not available"]):
             return None, lb_error
 
         # 4. Find the race in fields data

@@ -259,14 +259,15 @@ class LadbrokeAPI:
         # Fetch odds and check race status
         odds, race_status, error = self.get_odds_for_race(lb_track, race_number)
 
-        # Check if race is still open for betting
-        if race_status and race_status != "open":
+        # Check if race is still open for betting (case-insensitive)
+        if race_status and race_status.lower() != "open":
             status_messages = {
                 "closed": "Race has started - betting is closed",
                 "final": "Race has finished",
                 "abandoned": "Race has been abandoned",
+                "interim": "Race has finished - results pending",
             }
-            reason = status_messages.get(race_status, f"Race is not available (status: {race_status})")
+            reason = status_messages.get(race_status.lower(), f"Race is not available (status: {race_status})")
             log_prediction_skip(logger, pf_track_name, race_number, reason)
             return {}, reason
 
