@@ -237,6 +237,14 @@ def predict(req: PredictionRequest):
         if error:
             raise HTTPException(status_code=400, detail=error)
 
+        # Check if odds are available - we need odds to make predictions
+        runners_with_odds = sum(1 for r in race_data.runners if r.odds)
+        if runners_with_odds == 0:
+            raise HTTPException(
+                status_code=503,
+                detail="Odds not available yet. Please wait for the market to open and try again."
+            )
+
         # Generate prediction
         result = predictor.predict(race_data)
 
@@ -258,6 +266,13 @@ def predict(req: PredictionRequest):
                 tag=c.tag,
                 analysis=c.analysis
             ))
+
+        # Check we got at least one contender with odds
+        if not contenders:
+            raise HTTPException(
+                status_code=503,
+                detail="Could not generate predictions. Odds may not be available yet."
+            )
 
         return PredictionResponse(
             track=race_data.track,

@@ -326,7 +326,14 @@ class RaceDataPipeline:
             return None, f"Failed to fetch PuntingForm data: {str(e)}"
 
         # 3. Get Ladbrokes odds
-        lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number)
+        # Convert PF date format (dd-MMM-yyyy) to Ladbrokes format (YYYY-MM-DD)
+        try:
+            pf_date = datetime.strptime(date, "%d-%b-%Y")
+            lb_date = pf_date.strftime("%Y-%m-%d")
+        except ValueError:
+            lb_date = "today"  # Fallback if date parsing fails
+
+        lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number, lb_date)
 
         # Check if race is closed/finished - return error immediately
         if lb_error and any(x in lb_error for x in ["has started", "has finished", "been abandoned", "not available"]):

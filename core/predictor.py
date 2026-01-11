@@ -333,16 +333,16 @@ class Predictor:
                 if not odds:
                     logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
 
-            if horse and tab_no:
+            if horse and tab_no and odds:
                 contenders.append(Contender(
                     horse=horse,
                     tab_no=tab_no,
-                    odds=odds if odds else 0.0,  # Use 0.0 if no odds available yet
+                    odds=odds,
                     tag=c.get("tag", "Contender"),
                     analysis=c.get("analysis", ""),
                 ))
-                if not odds:
-                    logger.info(f"Contender {horse} added without odds (future race or market not open)")
+            elif horse and tab_no and not odds:
+                logger.warning(f"Skipping contender {horse}: no odds available")
             elif horse:
                 logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no}")
 

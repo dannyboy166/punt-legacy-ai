@@ -175,6 +175,7 @@ class LadbrokeAPI:
         self,
         track_name: str,
         race_number: int,
+        date: str = "today",
     ) -> tuple[dict[str, dict], Optional[str], Optional[str]]:
         """
         Get odds for a specific track and race.
@@ -182,6 +183,7 @@ class LadbrokeAPI:
         Args:
             track_name: Track name (partial match OK)
             race_number: Race number
+            date: Date for the race (YYYY-MM-DD, "today", or "tomorrow")
 
         Returns:
             Tuple of (odds_dict, race_status, error_message)
@@ -189,9 +191,9 @@ class LadbrokeAPI:
             - race_status: "open", "closed", "final", "abandoned" or None
             - error_message: Human-readable error or None if success
         """
-        logger.debug(f"Fetching odds for {track_name} R{race_number}")
+        logger.debug(f"Fetching odds for {track_name} R{race_number} on {date}")
 
-        meetings = self.get_meetings()
+        meetings = self.get_meetings(date_from=date)
 
         for meeting in meetings:
             meeting_name = meeting.get("name", "")
@@ -220,6 +222,7 @@ class LadbrokeAPI:
         self,
         pf_track_name: str,
         race_number: int,
+        date: str = "today",
     ) -> tuple[dict[str, dict], Optional[str]]:
         """
         Get odds for a PuntingForm track, handling name differences.
@@ -230,6 +233,7 @@ class LadbrokeAPI:
         Args:
             pf_track_name: Track name from PuntingForm
             race_number: Race number
+            date: Date for the race (YYYY-MM-DD, "today", or "tomorrow")
 
         Returns:
             Tuple of (odds_dict, error_message)
@@ -257,7 +261,7 @@ class LadbrokeAPI:
             return {}, reason
 
         # Fetch odds and check race status
-        odds, race_status, error = self.get_odds_for_race(lb_track, race_number)
+        odds, race_status, error = self.get_odds_for_race(lb_track, race_number, date)
 
         logger.debug(f"Race status for {pf_track_name} R{race_number}: '{race_status}' (repr: {repr(race_status)})")
 
