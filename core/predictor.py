@@ -63,11 +63,38 @@ class Contender:
 
 
 @dataclass
+class PromoBonusPick:
+    """A horse picked specifically for bonus bets or promo plays."""
+
+    horse: str
+    tab_no: int
+    odds: float
+    pick_type: str  # "bonus_bet" or "promo_play"
+    analysis: str  # Why this horse suits this type of bet
+
+    def to_dict(self) -> dict:
+        return {
+            "horse": self.horse,
+            "tab_no": self.tab_no,
+            "odds": self.odds,
+            "pick_type": self.pick_type,
+            "analysis": self.analysis,
+        }
+
+
+@dataclass
 class PredictionOutput:
     """Output from Claude predictor."""
 
-    # 1-3 contenders
+    # Mode: "normal" or "promo_bonus"
+    mode: str = "normal"
+
+    # 1-3 contenders (used in normal mode)
     contenders: list[Contender] = field(default_factory=list)
+
+    # Promo/Bonus picks (used in promo_bonus mode)
+    bonus_pick: Optional[PromoBonusPick] = None
+    promo_pick: Optional[PromoBonusPick] = None
 
     # Overall summary
     summary: str = ""
@@ -82,7 +109,8 @@ class PredictionOutput:
     raw_response: str = ""
 
     def to_dict(self) -> dict:
-        return {
+        result = {
+            "mode": self.mode,
             "contenders": [c.to_dict() for c in self.contenders],
             "summary": self.summary,
             "track": self.track,
@@ -90,6 +118,12 @@ class PredictionOutput:
             "model": self.model,
             "timestamp": self.timestamp.isoformat(),
         }
+        # Include promo/bonus picks if present
+        if self.bonus_pick:
+            result["bonus_pick"] = self.bonus_pick.to_dict()
+        if self.promo_pick:
+            result["promo_pick"] = self.promo_pick.to_dict()
+        return result
 
 
 # =============================================================================
@@ -141,7 +175,74 @@ Return 1-3 contenders as JSON:
 - Your summary should align with your picks"""
 
 
+PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
+
+Your task is to identify picks for bonus bets and/or promo plays in this race (if genuine value exists):
+
+1. **BONUS BET PICK**: A horse to use a bonus bet on (free bet where you only keep profits)
+   - Target odds of $5.00 or higher for maximum value
+   - Must have a genuine winning chance (don't just pick any longshot)
+   - Higher odds = better value since you only keep the profit, not the stake
+
+2. **PROMO PICK**: A horse with strong, consistent form that you're confident will run well
+   - Reliability and consistency matter more than odds
+   - Look for horses with proven form and solid recent runs
+
+## Understanding the Data
+
+**Speed Ratings** (MOST IMPORTANT): Normalized performance measure (1.000 = average for that distance/condition).
+- Compare ratings WITHIN THIS FIELD - the highest-rated horse has faster normalized speed relative to competitors
+- Prioritize runs at similar distance and similar track condition
+- More recent runs are more relevant than older runs
+
+**Prep Run**: The "Prep" column shows which run in the current preparation (1 = first-up, 2 = second-up, etc.)
+- Horses marked **FIRST UP** or **SECOND UP** show their career record in that state
+
+**A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations (>1.0 = beats market, <1.0 = underperforms)
+
+**Other factors to consider**: Class changes, weight, barrier, track/distance form, place odds
+
+## Output Format
+
+Return both picks as JSON:
+
+```json
+{
+  "bonus_pick": {
+    "horse": "Horse Name",
+    "tab_no": number,
+    "odds": number,
+    "analysis": "2-3 sentences: why this horse is good for a bonus bet (genuine chance + good odds)"
+  },
+  "promo_pick": {
+    "horse": "Horse Name",
+    "tab_no": number,
+    "odds": number,
+    "analysis": "2-3 sentences: why this horse is a strong chance based on form"
+  },
+  "summary": "1-2 sentences summarizing both picks"
+}
+```
+
+## Guidelines
+
+- Only provide picks you genuinely believe have a good chance
+- You may provide both picks, just one (bonus_pick OR promo_pick), or neither if no good options exist
+- Don't force a pick if there's no genuine value - it's OK to leave one blank
+- They can be the same horse if one horse fits both criteria well
+- For bonus_pick: prioritize odds $5.00+ with genuine winning chance
+- For promo_pick: prioritize consistent, reliable form over odds
+- Be realistic - don't pick hopeless outsiders just for high odds"""
+
+
 USER_PROMPT_TEMPLATE = """Analyze this race and identify the contenders.
+
+{race_data}
+
+Respond with valid JSON only."""
+
+
+PROMO_BONUS_USER_PROMPT_TEMPLATE = """Analyze this race and identify a bonus bet pick and a promo pick.
 
 {race_data}
 
@@ -185,6 +286,7 @@ class Predictor:
         self,
         race_data: RaceData,
         custom_instructions: Optional[str] = None,
+        mode: str = "normal",
     ) -> PredictionOutput:
         """
         Analyze race and predict value bets.
@@ -192,21 +294,32 @@ class Predictor:
         Args:
             race_data: Complete race data from RaceDataPipeline
             custom_instructions: Optional additional instructions for Claude
+            mode: Prediction mode - "normal" or "promo_bonus"
 
         Returns:
             PredictionOutput with selection and reasoning
         """
+        # Validate mode
+        if mode not in ("normal", "promo_bonus"):
+            logger.warning(f"Invalid mode '{mode}', defaulting to 'normal'")
+            mode = "normal"
+
         # Format race data for prompt
         race_text = race_data.to_prompt_text()
 
-        # Build user prompt
-        user_prompt = USER_PROMPT_TEMPLATE.format(race_data=race_text)
+        # Select prompt based on mode
+        if mode == "promo_bonus":
+            system_prompt = PROMO_BONUS_SYSTEM_PROMPT
+            user_prompt = PROMO_BONUS_USER_PROMPT_TEMPLATE.format(race_data=race_text)
+        else:
+            system_prompt = SYSTEM_PROMPT
+            user_prompt = USER_PROMPT_TEMPLATE.format(race_data=race_text)
 
         if custom_instructions:
             user_prompt += f"\n\nAdditional instructions: {custom_instructions}"
 
         # Call Claude with retry logic
-        logger.info(f"Calling Claude for {race_data.track} R{race_data.race_number}")
+        logger.info(f"Calling Claude for {race_data.track} R{race_data.race_number} (mode={mode})")
 
         max_retries = 3
         last_error = None
@@ -217,7 +330,7 @@ class Predictor:
                     model=self.model,
                     max_tokens=2000,
                     temperature=0.2,  # Low temp for consistent predictions
-                    system=SYSTEM_PROMPT,
+                    system=system_prompt,
                     messages=[
                         {"role": "user", "content": user_prompt}
                     ],
@@ -257,6 +370,7 @@ class Predictor:
             # All retries exhausted
             logger.error(f"Claude API error after {max_retries} attempts: {str(last_error)}")
             return PredictionOutput(
+                mode=mode,
                 summary=f"API error: {str(last_error)}",
                 track=race_data.track,
                 race_number=race_data.race_number,
@@ -266,22 +380,25 @@ class Predictor:
         if last_error and 'raw_response' not in dir():
             logger.error(f"Claude API error: {str(last_error)}")
             return PredictionOutput(
+                mode=mode,
                 summary=f"API error: {str(last_error)}",
                 track=race_data.track,
                 race_number=race_data.race_number,
                 model=self.model,
             )
 
-        # Parse response
+        # Parse response based on mode
         return self._parse_response(
             raw_response,
             race_data,
+            mode,
         )
 
     def _parse_response(
         self,
         raw_response: str,
         race_data: RaceData,
+        mode: str = "normal",
     ) -> PredictionOutput:
         """Parse Claude's JSON response into PredictionOutput."""
 
@@ -298,12 +415,27 @@ class Predictor:
         except (json.JSONDecodeError, ValueError) as e:
             logger.warning(f"Failed to parse JSON: {e}")
             return PredictionOutput(
+                mode=mode,
                 summary=f"Failed to parse response: {raw_response[:200]}",
                 track=race_data.track,
                 race_number=race_data.race_number,
                 model=self.model,
                 raw_response=raw_response,
             )
+
+        # Parse based on mode
+        if mode == "promo_bonus":
+            return self._parse_promo_bonus_response(data, race_data, raw_response)
+        else:
+            return self._parse_normal_response(data, race_data, raw_response)
+
+    def _parse_normal_response(
+        self,
+        data: dict,
+        race_data: RaceData,
+        raw_response: str,
+    ) -> PredictionOutput:
+        """Parse normal mode response with contenders."""
 
         # Parse contenders
         contenders = []
@@ -347,6 +479,7 @@ class Predictor:
                 logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no}")
 
         return PredictionOutput(
+            mode="normal",
             contenders=contenders,
             summary=data.get("summary", ""),
             track=race_data.track,
@@ -354,6 +487,89 @@ class Predictor:
             model=self.model,
             raw_response=raw_response,
         )
+
+    def _parse_promo_bonus_response(
+        self,
+        data: dict,
+        race_data: RaceData,
+        raw_response: str,
+    ) -> PredictionOutput:
+        """Parse promo/bonus mode response with bonus_pick and promo_pick."""
+
+        bonus_pick = None
+        promo_pick = None
+
+        # Parse bonus_pick
+        if "bonus_pick" in data and data["bonus_pick"]:
+            bonus_pick = self._parse_single_pick(
+                data["bonus_pick"],
+                race_data,
+                "bonus_bet",
+            )
+
+        # Parse promo_pick
+        if "promo_pick" in data and data["promo_pick"]:
+            promo_pick = self._parse_single_pick(
+                data["promo_pick"],
+                race_data,
+                "promo_play",
+            )
+
+        return PredictionOutput(
+            mode="promo_bonus",
+            bonus_pick=bonus_pick,
+            promo_pick=promo_pick,
+            summary=data.get("summary", ""),
+            track=race_data.track,
+            race_number=race_data.race_number,
+            model=self.model,
+            raw_response=raw_response,
+        )
+
+    def _parse_single_pick(
+        self,
+        pick_data: dict,
+        race_data: RaceData,
+        pick_type: str,
+    ) -> Optional[PromoBonusPick]:
+        """Parse a single bonus/promo pick from JSON data."""
+
+        horse = pick_data.get("horse")
+        tab_no = pick_data.get("tab_no")
+        odds = pick_data.get("odds")
+
+        # Check if odds is a valid number
+        if odds is not None:
+            try:
+                odds = float(odds)
+            except (ValueError, TypeError):
+                odds = None
+
+        # Look up odds from race data if not provided or invalid
+        if horse and not odds:
+            normalized_horse = normalize_horse_name(horse)
+            for runner in race_data.runners:
+                if normalize_horse_name(runner.name) == normalized_horse or runner.tab_no == tab_no:
+                    odds = runner.odds
+                    tab_no = runner.tab_no
+                    horse = runner.name  # Canonical name
+                    break
+
+            if not odds:
+                logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
+
+        if horse and tab_no and odds:
+            return PromoBonusPick(
+                horse=horse,
+                tab_no=tab_no,
+                odds=odds,
+                pick_type=pick_type,
+                analysis=pick_data.get("analysis", ""),
+            )
+        elif horse:
+            logger.warning(f"Skipping {pick_type} pick {horse}: missing data")
+
+        return None
 
     def predict_meeting(
         self,

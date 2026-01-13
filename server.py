@@ -63,6 +63,7 @@ class PredictionRequest(BaseModel):
     track: str
     race_number: int
     date: str  # Format: dd-MMM-yyyy (e.g., "09-Jan-2026")
+    mode: str = "normal"  # "normal" or "promo_bonus"
 
     @field_validator('track')
     @classmethod
@@ -85,6 +86,13 @@ class PredictionRequest(BaseModel):
             raise ValueError('Date must be in format dd-MMM-yyyy (e.g., 09-Jan-2026)')
         return v
 
+    @field_validator('mode')
+    @classmethod
+    def mode_valid(cls, v: str) -> str:
+        if v not in ("normal", "promo_bonus"):
+            raise ValueError('Mode must be "normal" or "promo_bonus"')
+        return v
+
 
 class Contender(BaseModel):
     horse: str
@@ -95,14 +103,26 @@ class Contender(BaseModel):
     analysis: str
 
 
+class PromoBonusPick(BaseModel):
+    horse: str
+    tab_no: int
+    odds: float
+    place_odds: Optional[float]
+    pick_type: str  # "bonus_bet" or "promo_play"
+    analysis: str
+
+
 class PredictionResponse(BaseModel):
+    mode: str = "normal"  # "normal" or "promo_bonus"
     track: str
     race_number: int
     race_name: str
     distance: int
     condition: str
     class_: str
-    contenders: list[Contender]
+    contenders: list[Contender] = []  # Used in normal mode
+    bonus_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
+    promo_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     summary: str
 
 
@@ -226,9 +246,11 @@ def predict(req: PredictionRequest):
         track: Track name
         race_number: Race number
         date: Date in format dd-MMM-yyyy
+        mode: "normal" or "promo_bonus"
 
     Returns:
-        1-3 contenders with analysis and summary
+        Normal mode: 1-3 contenders with analysis and summary
+        Promo/Bonus mode: bonus_pick and promo_pick with analysis and summary
     """
     try:
         # Get race data
@@ -245,45 +267,106 @@ def predict(req: PredictionRequest):
                 detail="Odds not available yet. Please wait for the market to open and try again."
             )
 
-        # Generate prediction
-        result = predictor.predict(race_data)
+        # Generate prediction with specified mode
+        result = predictor.predict(race_data, mode=req.mode)
 
-        # Build response
-        contenders = []
-        for c in result.contenders:
-            # Get place odds from race data
-            place_odds = None
-            for r in race_data.runners:
-                if r.tab_no == c.tab_no:
-                    place_odds = r.place_odds
-                    break
+        # Build response based on mode
+        if req.mode == "promo_bonus":
+            # Promo/Bonus mode response
+            bonus_pick_response = None
+            promo_pick_response = None
 
-            contenders.append(Contender(
-                horse=c.horse,
-                tab_no=c.tab_no,
-                odds=c.odds,
-                place_odds=place_odds,
-                tag=c.tag,
-                analysis=c.analysis
-            ))
+            # Build bonus_pick response
+            if result.bonus_pick:
+                place_odds = None
+                for r in race_data.runners:
+                    if r.tab_no == result.bonus_pick.tab_no:
+                        place_odds = r.place_odds
+                        break
+                bonus_pick_response = PromoBonusPick(
+                    horse=result.bonus_pick.horse,
+                    tab_no=result.bonus_pick.tab_no,
+                    odds=result.bonus_pick.odds,
+                    place_odds=place_odds,
+                    pick_type=result.bonus_pick.pick_type,
+                    analysis=result.bonus_pick.analysis
+                )
 
-        # Check we got at least one contender with odds
-        if not contenders:
-            raise HTTPException(
-                status_code=503,
-                detail="Could not generate predictions. Odds may not be available yet."
+            # Build promo_pick response
+            if result.promo_pick:
+                place_odds = None
+                for r in race_data.runners:
+                    if r.tab_no == result.promo_pick.tab_no:
+                        place_odds = r.place_odds
+                        break
+                promo_pick_response = PromoBonusPick(
+                    horse=result.promo_pick.horse,
+                    tab_no=result.promo_pick.tab_no,
+                    odds=result.promo_pick.odds,
+                    place_odds=place_odds,
+                    pick_type=result.promo_pick.pick_type,
+                    analysis=result.promo_pick.analysis
+                )
+
+            # Check we got at least one pick
+            if not bonus_pick_response and not promo_pick_response:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Could not generate promo/bonus picks. Odds may not be available yet."
+                )
+
+            return PredictionResponse(
+                mode="promo_bonus",
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=race_data.condition,
+                class_=race_data.class_,
+                contenders=[],
+                bonus_pick=bonus_pick_response,
+                promo_pick=promo_pick_response,
+                summary=result.summary
             )
 
-        return PredictionResponse(
-            track=race_data.track,
-            race_number=race_data.race_number,
-            race_name=race_data.race_name,
-            distance=race_data.distance,
-            condition=race_data.condition,
-            class_=race_data.class_,
-            contenders=contenders,
-            summary=result.summary
-        )
+        else:
+            # Normal mode response
+            contenders = []
+            for c in result.contenders:
+                # Get place odds from race data
+                place_odds = None
+                for r in race_data.runners:
+                    if r.tab_no == c.tab_no:
+                        place_odds = r.place_odds
+                        break
+
+                contenders.append(Contender(
+                    horse=c.horse,
+                    tab_no=c.tab_no,
+                    odds=c.odds,
+                    place_odds=place_odds,
+                    tag=c.tag,
+                    analysis=c.analysis
+                ))
+
+            # Check we got at least one contender with odds
+            if not contenders:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Could not generate predictions. Odds may not be available yet."
+                )
+
+            return PredictionResponse(
+                mode="normal",
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=race_data.condition,
+                class_=race_data.class_,
+                contenders=contenders,
+                summary=result.summary
+            )
 
     except HTTPException:
         raise
