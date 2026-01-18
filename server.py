@@ -432,6 +432,12 @@ def get_stats_by_race_confidence():
     return tracker.get_stats_by_race_confidence()
 
 
+@app.get("/stats/by-mode")
+def get_stats_by_mode():
+    """Get performance statistics grouped by mode (normal vs promo_bonus) and pick type."""
+    return tracker.get_stats_by_mode()
+
+
 @app.get("/predictions/pending")
 def get_pending_outcomes(race_date: Optional[str] = None):
     """Get predictions that haven't had outcomes recorded yet."""

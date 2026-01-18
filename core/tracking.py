@@ -451,6 +451,53 @@ class PredictionTracker:
 
             return stats
 
+    def get_stats_by_mode(self) -> dict:
+        """
+        Get performance statistics grouped by mode (normal vs promo_bonus).
+
+        Returns:
+            Dict of mode -> stats
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            rows = conn.execute("""
+                SELECT
+                    mode,
+                    pick_type,
+                    COUNT(*) as total,
+                    SUM(won) as wins,
+                    SUM(placed) as places,
+                    AVG(odds) as avg_odds,
+                    SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
+                FROM predictions
+                WHERE outcome_recorded = 1
+                GROUP BY mode, pick_type
+            """).fetchall()
+
+            stats = {}
+            for row in rows:
+                mode, pick_type, total, wins, places, avg_odds, total_returns = row
+                wins = wins or 0
+                places = places or 0
+                total_returns = total_returns or 0
+
+                # Calculate ROI
+                roi = (total_returns - total) / total if total > 0 else 0
+
+                key = f"{mode}:{pick_type}"
+                stats[key] = {
+                    "mode": mode,
+                    "pick_type": pick_type,
+                    "total": total,
+                    "wins": wins,
+                    "places": places,
+                    "win_rate": wins / total if total > 0 else 0,
+                    "place_rate": places / total if total > 0 else 0,
+                    "avg_odds": avg_odds,
+                    "roi": roi,
+                }
+
+            return stats
+
     def get_stats_by_race_confidence(self) -> dict:
         """
         Get performance statistics grouped by race-level confidence.
