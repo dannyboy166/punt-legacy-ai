@@ -25,6 +25,7 @@ load_dotenv()
 
 from core.race_data import RaceDataPipeline
 from core.predictor import Predictor
+from core.tracking import PredictionTracker
 from api.puntingform import PuntingFormAPI
 
 app = FastAPI(
@@ -50,6 +51,7 @@ app.add_middleware(
 pipeline = RaceDataPipeline()
 predictor = Predictor()
 pf_api = PuntingFormAPI()
+tracker = PredictionTracker()
 
 
 # =============================================================================
@@ -101,6 +103,7 @@ class Contender(BaseModel):
     place_odds: Optional[float]
     tag: str
     analysis: str
+    confidence: int = 5  # 1-10 scale
 
 
 class PromoBonusPick(BaseModel):
@@ -124,6 +127,8 @@ class PredictionResponse(BaseModel):
     bonus_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     promo_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     summary: str
+    race_confidence: int = 5  # 1-10 overall confidence
+    confidence_reason: str = ""  # Why confidence is high/low
 
 
 class MeetingResponse(BaseModel):
@@ -315,6 +320,12 @@ def predict(req: PredictionRequest):
                     detail="Could not generate promo/bonus picks. Odds may not be available yet."
                 )
 
+            # Store prediction for tracking
+            try:
+                tracker.store_prediction(result, race_data, req.date)
+            except Exception as e:
+                print(f"Warning: Failed to store prediction: {e}")
+
             return PredictionResponse(
                 mode="promo_bonus",
                 track=race_data.track,
@@ -326,7 +337,9 @@ def predict(req: PredictionRequest):
                 contenders=[],
                 bonus_pick=bonus_pick_response,
                 promo_pick=promo_pick_response,
-                summary=result.summary
+                summary=result.summary,
+                race_confidence=result.race_confidence,
+                confidence_reason=result.confidence_reason
             )
 
         else:
@@ -346,7 +359,8 @@ def predict(req: PredictionRequest):
                     odds=c.odds,
                     place_odds=place_odds,
                     tag=c.tag,
-                    analysis=c.analysis
+                    analysis=c.analysis,
+                    confidence=c.confidence
                 ))
 
             # Check we got at least one contender with odds
@@ -355,6 +369,13 @@ def predict(req: PredictionRequest):
                     status_code=503,
                     detail="Could not generate predictions. Odds may not be available yet."
                 )
+
+            # Store prediction for tracking
+            try:
+                tracker.store_prediction(result, race_data, req.date)
+            except Exception as e:
+                # Don't fail the request if tracking fails
+                print(f"Warning: Failed to store prediction: {e}")
 
             return PredictionResponse(
                 mode="normal",
@@ -365,13 +386,165 @@ def predict(req: PredictionRequest):
                 condition=race_data.condition,
                 class_=race_data.class_,
                 contenders=contenders,
-                summary=result.summary
+                summary=result.summary,
+                race_confidence=result.race_confidence,
+                confidence_reason=result.confidence_reason
             )
 
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# =============================================================================
+# TRACKING ENDPOINTS
+# =============================================================================
+
+class OutcomeRequest(BaseModel):
+    track: str
+    race_number: int
+    race_date: str
+    results: dict[str, int]  # {horse_name: finishing_position}
+
+
+@app.get("/stats/summary")
+def get_stats_summary():
+    """Get overall prediction statistics."""
+    return tracker.get_summary()
+
+
+@app.get("/stats/by-tag")
+def get_stats_by_tag():
+    """Get performance statistics grouped by tag (e.g., 'Value pick' vs 'The one to beat')."""
+    return tracker.get_stats_by_tag()
+
+
+@app.get("/stats/by-confidence")
+def get_stats_by_confidence():
+    """Get performance statistics grouped by confidence level."""
+    return tracker.get_stats_by_confidence()
+
+
+@app.get("/stats/by-race-confidence")
+def get_stats_by_race_confidence():
+    """Get performance statistics grouped by race-level confidence."""
+    return tracker.get_stats_by_race_confidence()
+
+
+@app.get("/predictions/pending")
+def get_pending_outcomes(race_date: Optional[str] = None):
+    """Get predictions that haven't had outcomes recorded yet."""
+    return tracker.get_pending_outcomes(race_date)
+
+
+@app.get("/predictions/recent")
+def get_recent_predictions(limit: int = 50):
+    """Get recent predictions for display."""
+    return tracker.get_recent_predictions(limit)
+
+
+@app.post("/outcomes")
+def record_outcomes(req: OutcomeRequest):
+    """
+    Record race outcomes for predictions.
+
+    Args:
+        track: Track name
+        race_number: Race number
+        race_date: Race date in format dd-MMM-yyyy
+        results: Dict mapping horse names to finishing positions
+
+    Returns:
+        Number of predictions updated
+    """
+    count = tracker.record_outcomes_bulk(
+        req.track,
+        req.race_number,
+        req.race_date,
+        req.results
+    )
+    return {"updated": count, "message": f"Recorded {count} outcomes"}
+
+
+@app.post("/outcomes/sync")
+def sync_outcomes(race_date: str):
+    """
+    Auto-fetch results from PuntingForm for all pending predictions on a date.
+
+    Call this after races finish to automatically update outcomes.
+
+    Args:
+        race_date: Date in format dd-MMM-yyyy
+
+    Returns:
+        Summary of synced outcomes
+    """
+    validate_date(race_date)
+
+    # Get pending predictions for this date
+    pending = tracker.get_pending_outcomes(race_date)
+    if not pending:
+        return {"synced": 0, "message": "No pending predictions for this date"}
+
+    # Group by track
+    tracks = {}
+    for p in pending:
+        track = p["track"]
+        if track not in tracks:
+            tracks[track] = set()
+        tracks[track].add(p["race_number"])
+
+    # Fetch results for each track
+    synced = 0
+    errors = []
+
+    for track, race_numbers in tracks.items():
+        try:
+            # Find meeting ID for track
+            meetings = pf_api.get_meetings(race_date)
+            meeting_id = None
+            for m in meetings:
+                m_track = m.get("track", {}).get("name", "")
+                if m_track.lower() == track.lower() or track.lower() in m_track.lower():
+                    meeting_id = m.get("meetingId")
+                    break
+
+            if not meeting_id:
+                errors.append(f"Track not found: {track}")
+                continue
+
+            # Fetch results for this meeting
+            results_data = pf_api.get_results(meeting_id, 0)  # 0 = all races
+
+            # Process each race
+            for race in results_data:
+                race_num = race.get("raceNumber")
+                if race_num not in race_numbers:
+                    continue
+
+                # Build results dict {horse_name: position}
+                results = {}
+                for runner in race.get("runners", []):
+                    position = runner.get("position", 0)
+                    horse_name = runner.get("runner", "")
+                    if position > 0 and horse_name:  # 0 = scratched
+                        results[horse_name] = position
+
+                if results:
+                    count = tracker.record_outcomes_bulk(
+                        track, race_num, race_date, results
+                    )
+                    synced += count
+
+        except Exception as e:
+            errors.append(f"{track}: {str(e)}")
+
+    return {
+        "synced": synced,
+        "errors": errors if errors else None,
+        "message": f"Synced {synced} prediction outcomes"
+    }
 
 
 if __name__ == "__main__":

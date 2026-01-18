@@ -51,6 +51,7 @@ class Contender:
     odds: float
     tag: str  # Natural description like "The one to beat", "Value pick", etc.
     analysis: str  # Natural language analysis of the horse and price
+    confidence: int = 5  # 1-10 scale (10 = very confident)
 
     def to_dict(self) -> dict:
         return {
@@ -59,6 +60,7 @@ class Contender:
             "odds": self.odds,
             "tag": self.tag,
             "analysis": self.analysis,
+            "confidence": self.confidence,
         }
 
 
@@ -99,6 +101,10 @@ class PredictionOutput:
     # Overall summary
     summary: str = ""
 
+    # Race-level confidence (1-10) - how confident in predictions overall
+    race_confidence: int = 5
+    confidence_reason: str = ""  # Why confidence is high/low
+
     # Race context
     track: str = ""
     race_number: int = 0
@@ -113,6 +119,8 @@ class PredictionOutput:
             "mode": self.mode,
             "contenders": [c.to_dict() for c in self.contenders],
             "summary": self.summary,
+            "race_confidence": self.race_confidence,
+            "confidence_reason": self.confidence_reason,
             "track": self.track,
             "race_number": self.race_number,
             "model": self.model,
@@ -138,7 +146,7 @@ Your task is to identify 1-3 horses that you think will WIN this race and give y
 
 **Speed Ratings** (MOST IMPORTANT): Normalized performance measure (1.000 = average for that distance/condition).
 - Compare ratings WITHIN THIS FIELD - the highest-rated horse has faster normalized speed relative to competitors
-- Prioritize runs at similar distance and similar track condition
+- Prioritize runs at similar distance and similar track condition to the race being predicted
 - More recent runs are more relevant than older runs
 
 **Prep Run**: The "Prep" column shows which run in the current preparation (1 = first-up, 2 = second-up, etc.)
@@ -147,6 +155,8 @@ Your task is to identify 1-3 horses that you think will WIN this race and give y
 **A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations (>1.0 = beats market, <1.0 = underperforms)
 
 **Other factors to consider**: Class changes, weight, barrier, track/distance form
+
+**Race Warnings**: Pay attention to any warnings about the race (e.g., many first-uppers, limited form data). These make predictions harder - adjust your confidence accordingly.
 
 ## Output Format
 
@@ -159,20 +169,29 @@ Return 1-3 contenders as JSON:
       "horse": "Horse Name",
       "tab_no": number,
       "odds": number,
-      "tag": "short phrase - e.g. The one to beat, Value pick, Main danger",
-      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price."
+      "tag": "short phrase - e.g. The one to beat, Value pick, Rough chance, Each-way, ect.",
+      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price.",
+      "confidence": number (1-10, how confident you are in THIS horse winning)
     }
   ],
+  "race_confidence": number (1-10, overall confidence in your predictions for this race),
+  "confidence_reason": "Brief reason for confidence level (e.g., 'Strong form data, clear top pick' or 'Many first-uppers, limited form makes this unpredictable')",
   "summary": "1-2 sentences summarizing the race"
 }
 ```
+
+## Confidence Scale
+- 8-10: Very confident - clear form standouts, reliable data
+- 5-7: Moderate - decent form indicators but some uncertainty
+- 1-4: Low confidence - many first-uppers, limited form, wide-open race
 
 ## Guidelines
 
 - Pick based on who you think wins
 - Quality over quantity - if only 1 horse stands out, just pick 1
 - Only suggest each-way if place odds are $1.80+
-- Your summary should align with your picks"""
+- Your summary should align with your picks
+- Be honest about confidence - low confidence races are harder to pick"""
 
 
 PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
@@ -202,6 +221,8 @@ Your task is to identify picks for bonus bets and/or promo plays in this race (i
 
 **Other factors to consider**: Class changes, weight, barrier, track/distance form, place odds
 
+**Race Warnings**: Pay attention to any warnings about the race (e.g., many first-uppers, limited form data). These make predictions harder - adjust your confidence accordingly.
+
 ## Output Format
 
 Return both picks as JSON:
@@ -212,14 +233,18 @@ Return both picks as JSON:
     "horse": "Horse Name",
     "tab_no": number,
     "odds": number,
-    "analysis": "2-3 sentences: why this horse is good for a bonus bet (genuine chance + good odds)"
+    "analysis": "2-3 sentences: why this horse is good for a bonus bet (genuine chance + good odds)",
+    "confidence": number (1-10)
   },
   "promo_pick": {
     "horse": "Horse Name",
     "tab_no": number,
     "odds": number,
-    "analysis": "2-3 sentences: why this horse is a strong chance based on form"
+    "analysis": "2-3 sentences: why this horse is a strong chance based on form",
+    "confidence": number (1-10)
   },
+  "race_confidence": number (1-10, overall confidence in your predictions),
+  "confidence_reason": "Brief reason for confidence level",
   "summary": "1-2 sentences summarizing both picks"
 }
 ```
@@ -232,7 +257,8 @@ Return both picks as JSON:
 - They can be the same horse if one horse fits both criteria well
 - For bonus_pick: prioritize odds $5.00+ with genuine winning chance
 - For promo_pick: prioritize consistent, reliable form over odds
-- Be realistic - don't pick hopeless outsiders just for high odds"""
+- Be realistic - don't pick hopeless outsiders just for high odds
+- Be honest about confidence - low confidence races are harder to pick"""
 
 
 USER_PROMPT_TEMPLATE = """Analyze this race and identify the contenders.
@@ -466,22 +492,41 @@ class Predictor:
                     logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
 
             if horse and tab_no and odds:
+                # Parse confidence (default to 5 if not provided)
+                confidence = c.get("confidence", 5)
+                try:
+                    confidence = int(confidence)
+                    confidence = max(1, min(10, confidence))  # Clamp to 1-10
+                except (ValueError, TypeError):
+                    confidence = 5
+
                 contenders.append(Contender(
                     horse=horse,
                     tab_no=tab_no,
                     odds=odds,
                     tag=c.get("tag", "Contender"),
                     analysis=c.get("analysis", ""),
+                    confidence=confidence,
                 ))
             elif horse and tab_no and not odds:
                 logger.warning(f"Skipping contender {horse}: no odds available")
             elif horse:
                 logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no}")
 
+        # Parse race-level confidence
+        race_confidence = data.get("race_confidence", 5)
+        try:
+            race_confidence = int(race_confidence)
+            race_confidence = max(1, min(10, race_confidence))
+        except (ValueError, TypeError):
+            race_confidence = 5
+
         return PredictionOutput(
             mode="normal",
             contenders=contenders,
             summary=data.get("summary", ""),
+            race_confidence=race_confidence,
+            confidence_reason=data.get("confidence_reason", ""),
             track=race_data.track,
             race_number=race_data.race_number,
             model=self.model,
@@ -515,11 +560,21 @@ class Predictor:
                 "promo_play",
             )
 
+        # Parse race-level confidence
+        race_confidence = data.get("race_confidence", 5)
+        try:
+            race_confidence = int(race_confidence)
+            race_confidence = max(1, min(10, race_confidence))
+        except (ValueError, TypeError):
+            race_confidence = 5
+
         return PredictionOutput(
             mode="promo_bonus",
             bonus_pick=bonus_pick,
             promo_pick=promo_pick,
             summary=data.get("summary", ""),
+            race_confidence=race_confidence,
+            confidence_reason=data.get("confidence_reason", ""),
             track=race_data.track,
             race_number=race_data.race_number,
             model=self.model,

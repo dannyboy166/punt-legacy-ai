@@ -208,10 +208,20 @@ class RaceData:
             f"# {self.track} Race {self.race_number}: {self.race_name}",
             f"Distance: {self.distance}m | Condition: {self.condition} | Class: {self.class_}",
             f"Field Size: {len(self.runners)} | Pace: {self.pace_scenario} ({self.leaders_count} leaders)",
+        ]
+
+        # Add warnings if any exist
+        if self.warnings:
+            lines.append("")
+            lines.append("## ⚠️ Warnings")
+            for warning in self.warnings:
+                lines.append(f"- {warning}")
+
+        lines.extend([
             "",
             "## Runners",
             "",
-        ]
+        ])
 
         for r in sorted(self.runners, key=lambda x: x.tab_no):
             lines.append(f"### {r.tab_no}. {r.name}")
