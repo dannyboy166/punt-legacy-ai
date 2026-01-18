@@ -547,6 +547,114 @@ def sync_outcomes(race_date: str):
     }
 
 
+class BackfillPrediction(BaseModel):
+    track: str
+    race_number: int
+    race_date: str  # dd-MMM-yyyy format
+    horse: str
+    tab_no: int
+    odds: float
+    place_odds: Optional[float] = None
+    tag: str
+    mode: str  # "normal" or "promo_bonus"
+    pick_type: str  # "contender", "bonus_bet", "promo_play"
+    analysis: str = ""
+    confidence: int = 5
+    race_confidence: int = 5
+
+
+class BackfillRequest(BaseModel):
+    predictions: list[BackfillPrediction]
+
+
+@app.post("/backfill")
+def backfill_predictions(req: BackfillRequest):
+    """
+    Backfill predictions from external source (e.g., Prisma database).
+
+    Used to import historical predictions for tracking.
+    Duplicates are automatically handled (same track/race/date/horse/mode = one entry).
+    """
+    import sqlite3
+    from datetime import datetime
+    from pathlib import Path
+
+    db_path = Path(__file__).parent / "data" / "predictions.db"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    imported = 0
+    skipped = 0
+
+    with sqlite3.connect(db_path) as conn:
+        # Ensure table exists
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS predictions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                track TEXT NOT NULL,
+                race_number INTEGER NOT NULL,
+                race_date TEXT NOT NULL,
+                horse TEXT NOT NULL,
+                tab_no INTEGER NOT NULL,
+                odds REAL NOT NULL,
+                place_odds REAL,
+                tag TEXT NOT NULL,
+                confidence INTEGER NOT NULL,
+                race_confidence INTEGER NOT NULL,
+                confidence_reason TEXT,
+                mode TEXT NOT NULL,
+                pick_type TEXT NOT NULL,
+                analysis TEXT,
+                won INTEGER,
+                placed INTEGER,
+                finishing_position INTEGER,
+                outcome_recorded INTEGER DEFAULT 0,
+                UNIQUE(track, race_number, race_date, horse, mode, pick_type)
+            )
+        """)
+
+        for pred in req.predictions:
+            try:
+                conn.execute("""
+                    INSERT OR IGNORE INTO predictions
+                    (timestamp, track, race_number, race_date, horse, tab_no,
+                     odds, place_odds, tag, confidence, race_confidence,
+                     confidence_reason, mode, pick_type, analysis)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    datetime.now().isoformat(),
+                    pred.track,
+                    pred.race_number,
+                    pred.race_date,
+                    pred.horse,
+                    pred.tab_no,
+                    pred.odds,
+                    pred.place_odds,
+                    pred.tag,
+                    pred.confidence,
+                    pred.race_confidence,
+                    "",
+                    pred.mode,
+                    pred.pick_type,
+                    pred.analysis,
+                ))
+                if conn.total_changes > 0:
+                    imported += 1
+                else:
+                    skipped += 1
+            except Exception as e:
+                skipped += 1
+
+        conn.commit()
+
+    return {
+        "imported": imported,
+        "skipped": skipped,
+        "total": len(req.predictions),
+        "message": f"Imported {imported} predictions ({skipped} duplicates skipped)"
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
