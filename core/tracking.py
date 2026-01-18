@@ -405,7 +405,7 @@ class PredictionTracker:
                     SUM(won) as wins,
                     SUM(placed) as places,
                     AVG(odds) as avg_odds,
-                    AVG(CASE WHEN won = 1 THEN odds ELSE 0 END) as avg_winning_odds
+                    SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
                 FROM predictions
                 WHERE outcome_recorded = 1
                 GROUP BY tag
@@ -414,13 +414,13 @@ class PredictionTracker:
 
             stats = {}
             for row in rows:
-                tag, total, wins, places, avg_odds, avg_winning_odds = row
+                tag, total, wins, places, avg_odds, total_returns = row
                 wins = wins or 0
                 places = places or 0
+                total_returns = total_returns or 0
 
                 # Calculate ROI (assuming $1 bets)
                 # ROI = (total_returns - total_staked) / total_staked
-                total_returns = wins * avg_winning_odds if avg_winning_odds else 0
                 roi = (total_returns - total) / total if total > 0 else 0
 
                 stats[tag] = {
