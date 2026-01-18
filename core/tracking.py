@@ -285,7 +285,10 @@ class PredictionTracker:
         Returns:
             True if outcome was recorded, False if prediction not found
         """
+        from core.normalize import normalize_horse_name
+
         with sqlite3.connect(self.db_path) as conn:
+            # First try exact match
             cursor = conn.execute("""
                 UPDATE predictions
                 SET won = ?, placed = ?, finishing_position = ?, outcome_recorded = 1
@@ -304,6 +307,28 @@ class PredictionTracker:
             if cursor.rowcount > 0:
                 logger.info(f"Recorded outcome for {horse}: pos={finishing_position}")
                 return True
+
+            # Try case-insensitive match using LOWER()
+            cursor = conn.execute("""
+                UPDATE predictions
+                SET won = ?, placed = ?, finishing_position = ?, outcome_recorded = 1
+                WHERE track = ? AND race_number = ? AND race_date = ?
+                AND LOWER(REPLACE(REPLACE(horse, '''', ''), ' ', '')) = LOWER(REPLACE(REPLACE(?, '''', ''), ' ', ''))
+            """, (
+                1 if won else 0,
+                1 if placed else 0,
+                finishing_position,
+                track,
+                race_number,
+                race_date,
+                horse,
+            ))
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                logger.info(f"Recorded outcome for {horse} (fuzzy match): pos={finishing_position}")
+                return True
+
             return False
 
     def record_outcomes_bulk(

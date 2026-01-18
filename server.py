@@ -491,7 +491,18 @@ def sync_outcomes(race_date: str):
     # Get pending predictions for this date
     pending = tracker.get_pending_outcomes(race_date)
     if not pending:
-        return {"synced": 0, "message": "No pending predictions for this date"}
+        # Check if there are any pending at all (debug info)
+        all_pending = tracker.get_pending_outcomes()
+        unique_dates = set(p["race_date"] for p in all_pending)
+        return {
+            "synced": 0,
+            "message": f"No pending predictions for {race_date}",
+            "debug": {
+                "requested_date": race_date,
+                "total_pending": len(all_pending),
+                "available_dates": sorted(list(unique_dates))[:10]  # Show first 10 dates
+            }
+        }
 
     # Group by track
     tracks = {}
@@ -549,7 +560,11 @@ def sync_outcomes(race_date: str):
     return {
         "synced": synced,
         "errors": errors if errors else None,
-        "message": f"Synced {synced} prediction outcomes"
+        "message": f"Synced {synced} prediction outcomes",
+        "debug": {
+            "tracks_processed": list(tracks.keys()),
+            "pending_count": len(pending)
+        }
     }
 
 
