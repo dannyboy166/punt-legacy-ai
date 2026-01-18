@@ -534,8 +534,15 @@ def sync_outcomes(race_date: str):
             # Fetch results for this meeting
             results_data = pf_api.get_results(meeting_id, 0)  # 0 = all races
 
+            # PuntingForm returns [{meetingId, raceResults: [...]}]
+            # Extract the actual race results
+            races = []
+            if results_data and len(results_data) > 0:
+                meeting_data = results_data[0]
+                races = meeting_data.get("raceResults", [])
+
             # Process each race
-            for race in results_data:
+            for race in races:
                 race_num = race.get("raceNumber")
                 if race_num not in race_numbers:
                     continue
