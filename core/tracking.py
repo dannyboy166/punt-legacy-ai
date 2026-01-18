@@ -153,8 +153,9 @@ class PredictionTracker:
                             break
 
                     try:
+                        # Use INSERT OR IGNORE to avoid overwriting outcome data
                         cursor = conn.execute("""
-                            INSERT OR REPLACE INTO predictions
+                            INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
                              confidence_reason, mode, pick_type, analysis)
@@ -176,7 +177,8 @@ class PredictionTracker:
                             "contender",
                             contender.analysis,
                         ))
-                        inserted_ids.append(cursor.lastrowid)
+                        if cursor.rowcount > 0:
+                            inserted_ids.append(cursor.lastrowid)
                     except sqlite3.IntegrityError:
                         logger.debug(f"Prediction already exists: {contender.horse}")
 
@@ -191,8 +193,9 @@ class PredictionTracker:
                             break
 
                     try:
+                        # Use INSERT OR IGNORE to avoid overwriting outcome data
                         cursor = conn.execute("""
-                            INSERT OR REPLACE INTO predictions
+                            INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
                              confidence_reason, mode, pick_type, analysis)
@@ -214,7 +217,8 @@ class PredictionTracker:
                             "bonus_bet",
                             pick.analysis,
                         ))
-                        inserted_ids.append(cursor.lastrowid)
+                        if cursor.rowcount > 0:
+                            inserted_ids.append(cursor.lastrowid)
                     except sqlite3.IntegrityError:
                         pass
 
@@ -228,8 +232,9 @@ class PredictionTracker:
                             break
 
                     try:
+                        # Use INSERT OR IGNORE to avoid overwriting outcome data
                         cursor = conn.execute("""
-                            INSERT OR REPLACE INTO predictions
+                            INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
                              confidence_reason, mode, pick_type, analysis)
@@ -251,7 +256,8 @@ class PredictionTracker:
                             "promo_play",
                             pick.analysis,
                         ))
-                        inserted_ids.append(cursor.lastrowid)
+                        if cursor.rowcount > 0:
+                            inserted_ids.append(cursor.lastrowid)
                     except sqlite3.IntegrityError:
                         pass
 
@@ -453,7 +459,8 @@ class PredictionTracker:
                     COUNT(*) as total,
                     SUM(won) as wins,
                     SUM(placed) as places,
-                    AVG(odds) as avg_odds
+                    AVG(odds) as avg_odds,
+                    SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
                 FROM predictions
                 WHERE outcome_recorded = 1
                 GROUP BY confidence_range
@@ -461,9 +468,12 @@ class PredictionTracker:
 
             stats = {}
             for row in rows:
-                conf_range, total, wins, places, avg_odds = row
+                conf_range, total, wins, places, avg_odds, total_returns = row
                 wins = wins or 0
                 places = places or 0
+                total_returns = total_returns or 0
+
+                roi = (total_returns - total) / total if total > 0 else 0
 
                 stats[conf_range] = {
                     "total": total,
@@ -472,6 +482,7 @@ class PredictionTracker:
                     "win_rate": wins / total if total > 0 else 0,
                     "place_rate": places / total if total > 0 else 0,
                     "avg_odds": avg_odds,
+                    "roi": roi,
                 }
 
             return stats
@@ -541,7 +552,8 @@ class PredictionTracker:
                     COUNT(*) as total,
                     SUM(won) as wins,
                     SUM(placed) as places,
-                    AVG(odds) as avg_odds
+                    AVG(odds) as avg_odds,
+                    SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
                 FROM predictions
                 WHERE outcome_recorded = 1
                 GROUP BY confidence_range
@@ -549,9 +561,12 @@ class PredictionTracker:
 
             stats = {}
             for row in rows:
-                conf_range, total, wins, places, avg_odds = row
+                conf_range, total, wins, places, avg_odds, total_returns = row
                 wins = wins or 0
                 places = places or 0
+                total_returns = total_returns or 0
+
+                roi = (total_returns - total) / total if total > 0 else 0
 
                 stats[conf_range] = {
                     "total": total,
@@ -560,6 +575,7 @@ class PredictionTracker:
                     "win_rate": wins / total if total > 0 else 0,
                     "place_rate": places / total if total > 0 else 0,
                     "avg_odds": avg_odds,
+                    "roi": roi,
                 }
 
             return stats
