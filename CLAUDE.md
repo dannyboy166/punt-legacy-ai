@@ -98,6 +98,9 @@ punt-legacy-ai/
 │   ├── puntingform_api.md      # Full PF API docs ✅
 │   ├── ladbrokes_api.md        # Full LB API docs ✅
 │   └── puntingform_odds_issue.md  # Known issue ✅
+├── experiments/           # Experimental features
+│   ├── bet_type_predictor.py   # v2 predictor (0-3 picks, skips bad races) ✅
+│   └── backtest.py             # Backtesting script ✅
 └── data/                  # Example responses, test data
 ```
 
@@ -218,9 +221,12 @@ Scratched horses are automatically filtered out using multiple checks:
 
 1. **PuntingForm `scratched` field** - Primary check
 2. **Ladbrokes `is_scratched` field** - Secondary check (note: uses `is_scratched` not `scratched`)
-3. **Blank jockey** - Late scratching indicator (if jockey field is empty, horse is likely scratched)
+3. **Blank jockey** - Late scratching indicator (if jockey field is empty/whitespace, horse is likely scratched)
+4. **SP = $0** - PuntingForm sets Starting Price to 0 for scratched horses
 
 This ensures late scratchings are caught even if APIs haven't updated their `scratched` flags yet.
+
+**Note:** For backtesting, PuntingForm often removes scratched horses entirely from the runners list rather than marking them as scratched.
 
 ---
 
@@ -517,8 +523,88 @@ Set `PREDICTOR_API_URL` in racing-tips-platform to the deployed URL.
 
 ---
 
+## Experimental Predictor (v2)
+
+A simplified predictor in `experiments/bet_type_predictor.py` with cleaner logic:
+
+### Key Differences from Live Predictor
+
+| Feature | Live (`core/predictor.py`) | Experimental (`experiments/`) |
+|---------|---------------------------|-------------------------------|
+| Picks | 1-3 contenders always | 0-3 contenders |
+| Skip races | Never | Yes - if 50%+ have no race form |
+| Tags | Free-form | 3 fixed: "The one to beat", "Each-way chance", "Value bet" |
+| Trial handling | Shown but counted | Explicitly excluded from analysis |
+| Prompt style | Detailed instructions | Minimal - lets AI decide |
+
+### Usage
+
+```bash
+# Single race
+python experiments/bet_type_predictor.py --track "Randwick" --race 4 --date "19-Jan-2026"
+
+# Backtesting (uses PuntingForm SP odds for finished races)
+python experiments/backtest.py "Rosehill" 2 "17-Jan-2026"
+```
+
+### When It Skips a Race (0 Contenders)
+
+The predictor will return 0 contenders when:
+- **50%+ of field has no race form** - only barrier trials, can't compare unknowns
+- Field is too even with no standouts
+- Insufficient data to make confident assessment
+
+Example: Rosehill R1 on 17-Jan-2026 had only 3/9 runners with actual race form (rest were first starters with only trial form). The predictor correctly returned 0 contenders.
+
+### Prompt Philosophy
+
+```
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar
+distance and conditions. More recent runs are more relevant.
+
+**Critical:**
+- Barrier trials (marked TRIAL) don't count as form - horses don't always try
+- If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
+- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
+```
+
+The prompt is intentionally minimal - tells Claude what data it has and what to focus on, but doesn't dictate specific thresholds or rules.
+
+### Scratching Detection
+
+The experimental predictor checks 3 things:
+1. PuntingForm `scratched` field
+2. Blank jockey name (with whitespace strip)
+3. SP = $0
+
+This catches late scratchings that APIs haven't formally flagged yet.
+
+### Backtest Script
+
+`experiments/backtest.py` allows backtesting on historical races:
+- Uses PuntingForm Starting Price (SP) instead of Ladbrokes (finished races have no live odds)
+- Verifies form data is from BEFORE race day (not cheating)
+- Filters scratched horses properly
+
+```bash
+# Example backtest output
+python experiments/backtest.py "Flemington" 2 "17-Jan-2026"
+
+# BACKTEST: Flemington R2 - 17-Jan-2026
+# Distance: 2520m | Condition: G4
+# Form: 10/10 have race runs
+#
+# PREDICTION:
+#   Tarvue (#6) $4.20 - "The one to beat"
+#   Navy Heart (#9) $10.00 - "Each-way chance"
+#   Scintillante (#5) $11.00 - "Value bet"
+```
+
+---
+
 ## Next Steps
 
-1. Historical backtesting
+1. ~~Historical backtesting~~ ✅ Done (experiments/backtest.py)
 2. Prediction accuracy tracking
-3. User customization options
+3. Switch live predictor to v2 approach
+4. User customization options

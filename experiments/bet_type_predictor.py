@@ -1,19 +1,30 @@
 """
-Experimental Bet Type Predictor.
+Experimental Bet Type Predictor (v2).
 
-This is a research module to test a different approach:
-Instead of "pick the contenders", we ask "would you bet? if so, what type?"
+A simplified predictor that:
+- Picks 0-3 contenders per race (not forced to always pick)
+- Skips races where 50%+ of field has no race form (only trials)
+- Uses 3 fixed tags for clarity
+- Focuses on normalized speed ratings from RACE runs (not trials)
 
-Bet types:
-- WIN: Clear standout horse with good value
-- EACH-WAY: Horse likely to place but not necessarily win
-- EXACTA: Two horses clearly above the rest
-- TRIFECTA: Three horses clearly above the rest
-- QUINELLA: Two horses above rest, either could win
-- NO BET: Race too open, not enough form, or no value
+Tags:
+- "The one to beat" - Clear standout
+- "Each-way chance" - Could win, should place, place odds worth it
+- "Value bet" - Odds better than form suggests
+
+When it returns 0 picks:
+- Too many first starters (50%+ with no race form)
+- Field too even, no standouts
+- Insufficient data to assess
 
 Usage:
+    # Single race (live)
     python experiments/bet_type_predictor.py --track "Randwick" --race 4 --date "19-Jan-2026"
+
+    # All races at a track
+    python experiments/bet_type_predictor.py --track "Randwick" --race 1 --date "19-Jan-2026" --all
+
+For backtesting finished races, use experiments/backtest.py instead.
 """
 
 import os
@@ -42,112 +53,72 @@ DEFAULT_MODEL = "claude-sonnet-4-20250514"
 
 
 @dataclass
+class Contender:
+    """A single contender pick."""
+    horse: str
+    tab_no: int
+    odds: float
+    place_odds: float
+    tag: str  # "The one to beat", "Each-way chance", "Value bet"
+    analysis: str
+
+
+@dataclass
 class BetRecommendation:
-    """The AI's bet recommendation for a race."""
-
-    would_bet: bool
-    bet_type: Optional[str]  # WIN, EACH_WAY, EXACTA, TRIFECTA, QUINELLA, or None
-
-    # Selections (depends on bet type)
-    selections: list[dict]  # [{horse, tab_no, odds, role}] - role = "win", "place", "1st leg", etc.
-
-    # Reasoning
-    reasoning: str  # Why this bet type (or why no bet)
-    form_analysis: str  # Key form factors that led to decision
-
-    # Confidence
-    confidence: int  # 1-10
-
-    # Raw data
+    """The AI's recommendation for a race."""
+    contenders: list[Contender]  # 0-3 contenders
+    summary: str  # Brief race overview
     raw_response: str = ""
 
 
-SYSTEM_PROMPT = """You are an expert horse racing analyst and betting strategist.
+SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
-Your task: Analyze this race and decide IF you would bet, and if so, WHAT TYPE of bet.
+Pick 0-3 contenders for this race. For each, assign a tag:
+- **"The one to beat"** - Clear standout
+- **"Each-way chance"** - Could win, should place, place odds worth it
+- **"Value bet"** - Odds better than their form suggests
 
-## Bet Types to Consider
+**Pick 0 contenders (no bet) when:**
+- A lot of field has no race form (only trials) - you can't compare unknowns
+- Field is too even with no standouts
+- Insufficient data to make confident assessment
 
-1. **WIN**: Use when ONE horse clearly stands out
-   - Superior speed ratings at similar distance/conditions
-   - Strong recent form, good prep pattern
-   - Suitable conditions for this horse
+## Key Analysis
 
-2. **EACH-WAY**: Use when a horse should place but winning is uncertain
-   - Consistent placer with good speed ratings
-   - Place odds offer value ($1.80+)
-   - Might face one or two superior horses but will run top 3
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions. More recent runs are more relevant.
 
-3. **EXACTA**: Use when TWO horses are clearly above the rest
-   - Both have superior ratings at similar conditions
-   - Clear gap between these two and the rest of field
-   - Order uncertain - could go either way
+**Critical:**
+- Barrier trials (marked TRIAL) don't count as form - horses don't always try
+- If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
+- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
 
-4. **QUINELLA**: Similar to exacta but when order truly doesn't matter
-   - Two standouts, genuinely can't split them
-   - Better value than exacta if odds are similar
+You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight.
 
-5. **TRIFECTA**: Use when THREE horses are clearly above the rest
-   - Top 3 are obvious, order is the question
-   - Clear form gap to 4th and beyond
-
-6. **NO BET**: Use when you SHOULDN'T bet
-   - Too many first-uppers with no form
-   - Field too even, no standouts
-   - Insufficient data to make confident assessment
-   - No value in the market
-
-## How to Analyze
-
-Focus on these factors (in order of importance):
-
-1. **Speed Ratings at Similar Conditions**: Ratings from runs at similar distance (within 200m) and track condition are MOST predictive
-2. **Recent Form**: Last 2-3 runs matter more than older runs
-3. **Prep Pattern**: Where is horse in its campaign? First-up, second-up, third-up?
-4. **Class Level**: Is horse up or down in class from recent runs?
-5. **Distance Suitability**: Has horse proven at this distance?
-6. **Track/Condition Form**: How does horse perform on this track condition?
-
-DO NOT just look at odds to decide bet type. A $2 favorite could be NO BET if form doesn't support it.
-
-## Output Format
+## Output
 
 ```json
 {
-  "would_bet": true/false,
-  "bet_type": "WIN" | "EACH_WAY" | "EXACTA" | "QUINELLA" | "TRIFECTA" | null,
-  "selections": [
+  "contenders": [
     {
       "horse": "Horse Name",
       "tab_no": number,
       "odds": number,
-      "role": "win" | "place" | "1st leg" | "2nd leg" | "3rd leg"
+      "place_odds": number,
+      "tag": "The one to beat" | "Each-way chance" | "Value bet",
+      "analysis": "1-2 sentences referencing RACE form"
     }
   ],
-  "reasoning": "2-3 sentences on why this bet type (or why no bet)",
-  "form_analysis": "Key form factors: mention specific runs, ratings, conditions that support your decision",
-  "confidence": number (1-10)
+  "summary": "Brief overview or reason for 0 picks"
 }
 ```
-
-## Guidelines
-
-- Be HONEST - if you wouldn't bet, say so
-- Back up decisions with SPECIFIC form references
-- Don't force exotic bets - WIN is fine if one horse stands out
-- EACH-WAY requires $1.80+ place odds
-- For exotics, you need CLEAR separation between your picks and the rest
-- Confidence should reflect how certain you are in the bet type AND selections
 """
 
 
-USER_PROMPT_TEMPLATE = """Analyze this race and tell me: Would you bet? If so, what type of bet?
+USER_PROMPT_TEMPLATE = """Analyze this race and pick your contenders (0-3).
 
 {race_data}
 
-Remember: Focus on form analysis, not just odds. Only recommend a bet if the form genuinely supports it.
-
-Respond with valid JSON only."""
+Respond with JSON only."""
 
 
 class BetTypePredictor:
@@ -184,12 +155,8 @@ class BetTypePredictor:
         except Exception as e:
             logger.error(f"API error: {e}")
             return BetRecommendation(
-                would_bet=False,
-                bet_type=None,
-                selections=[],
-                reasoning=f"Error: {e}",
-                form_analysis="",
-                confidence=0,
+                contenders=[],
+                summary=f"Error: {e}",
                 raw_response=""
             )
 
@@ -203,25 +170,28 @@ class BetTypePredictor:
             else:
                 raise ValueError("No JSON found")
 
+            contenders = []
+            for c in data.get("contenders", []):
+                contenders.append(Contender(
+                    horse=c.get("horse", ""),
+                    tab_no=c.get("tab_no", 0),
+                    odds=c.get("odds", 0),
+                    place_odds=c.get("place_odds", 0),
+                    tag=c.get("tag", ""),
+                    analysis=c.get("analysis", "")
+                ))
+
             return BetRecommendation(
-                would_bet=data.get("would_bet", False),
-                bet_type=data.get("bet_type"),
-                selections=data.get("selections", []),
-                reasoning=data.get("reasoning", ""),
-                form_analysis=data.get("form_analysis", ""),
-                confidence=data.get("confidence", 5),
+                contenders=contenders,
+                summary=data.get("summary", ""),
                 raw_response=raw_response
             )
 
         except Exception as e:
             logger.warning(f"Parse error: {e}")
             return BetRecommendation(
-                would_bet=False,
-                bet_type=None,
-                selections=[],
-                reasoning=f"Parse error: {raw_response[:200]}",
-                form_analysis="",
-                confidence=0,
+                contenders=[],
+                summary=f"Parse error: {raw_response[:200]}",
                 raw_response=raw_response
             )
 
@@ -233,21 +203,19 @@ def print_recommendation(rec: BetRecommendation, track: str, race_num: int):
     print(f"  {track} RACE {race_num}")
     print("=" * 60)
 
-    if not rec.would_bet:
-        print("\n  ❌ NO BET")
-        print(f"\n  Reason: {rec.reasoning}")
+    if not rec.contenders:
+        print("\n  ❌ NO CONTENDERS")
+        print(f"\n  {rec.summary}")
     else:
-        print(f"\n  ✅ BET TYPE: {rec.bet_type}")
-        print(f"  Confidence: {rec.confidence}/10")
+        print(f"\n  {len(rec.contenders)} CONTENDER(S):\n")
+        for c in rec.contenders:
+            print(f"  {c.horse} (#{c.tab_no})")
+            print(f"    ${c.odds:.2f} win / ${c.place_odds:.2f} place")
+            print(f"    \"{c.tag}\"")
+            print(f"    {c.analysis}\n")
 
-        print("\n  SELECTIONS:")
-        for sel in rec.selections:
-            role = sel.get('role', '')
-            print(f"    • {sel['horse']} (#{sel['tab_no']}) @ ${sel['odds']:.2f} [{role}]")
+        print(f"  SUMMARY: {rec.summary}")
 
-        print(f"\n  REASONING: {rec.reasoning}")
-
-    print(f"\n  FORM ANALYSIS: {rec.form_analysis}")
     print("=" * 60)
 
 
