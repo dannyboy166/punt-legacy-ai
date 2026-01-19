@@ -101,9 +101,9 @@ class Contender(BaseModel):
     tab_no: int
     odds: float
     place_odds: Optional[float]
-    tag: str
+    tag: str  # "The one to beat", "Each-way chance", or "Value bet"
     analysis: str
-    confidence: int = 5  # 1-10 scale
+    confidence: Optional[int] = None  # Deprecated - not used in new model
 
 
 class PromoBonusPick(BaseModel):
@@ -123,12 +123,12 @@ class PredictionResponse(BaseModel):
     distance: int
     condition: str
     class_: str
-    contenders: list[Contender] = []  # Used in normal mode
+    contenders: list[Contender] = []  # Used in normal mode (can be empty = no picks)
     bonus_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     promo_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     summary: str
-    race_confidence: int = 5  # 1-10 overall confidence
-    confidence_reason: str = ""  # Why confidence is high/low
+    race_confidence: Optional[int] = None  # Deprecated - not used in new model
+    confidence_reason: Optional[str] = None  # Deprecated - not used in new model
 
 
 class MeetingResponse(BaseModel):
@@ -343,15 +343,16 @@ def predict(req: PredictionRequest):
             )
 
         else:
-            # Normal mode response
+            # Normal mode response (0-3 contenders)
             contenders = []
             for c in result.contenders:
-                # Get place odds from race data
-                place_odds = None
-                for r in race_data.runners:
-                    if r.tab_no == c.tab_no:
-                        place_odds = r.place_odds
-                        break
+                # Get place odds from race data (fallback if not in response)
+                place_odds = c.place_odds
+                if not place_odds:
+                    for r in race_data.runners:
+                        if r.tab_no == c.tab_no:
+                            place_odds = r.place_odds
+                            break
 
                 contenders.append(Contender(
                     horse=c.horse,
@@ -360,23 +361,17 @@ def predict(req: PredictionRequest):
                     place_odds=place_odds,
                     tag=c.tag,
                     analysis=c.analysis,
-                    confidence=c.confidence
+                    confidence=c.confidence  # Will be None in new model
                 ))
 
-            # Check we got at least one contender with odds
-            if not contenders:
-                raise HTTPException(
-                    status_code=503,
-                    detail="Could not generate predictions. Odds may not be available yet."
-                )
-
-            # Store prediction for tracking
+            # Store prediction for tracking (even if 0 contenders)
             try:
                 tracker.store_prediction(result, race_data, req.date)
             except Exception as e:
                 # Don't fail the request if tracking fails
                 print(f"Warning: Failed to store prediction: {e}")
 
+            # Return response (contenders can be empty = no picks for this race)
             return PredictionResponse(
                 mode="normal",
                 track=race_data.track,

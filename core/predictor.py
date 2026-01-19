@@ -49,19 +49,23 @@ class Contender:
     horse: str
     tab_no: int
     odds: float
-    tag: str  # Natural description like "The one to beat", "Value pick", etc.
+    tag: str  # "The one to beat", "Each-way chance", or "Value bet"
     analysis: str  # Natural language analysis of the horse and price
-    confidence: int = 5  # 1-10 scale (10 = very confident)
+    place_odds: Optional[float] = None  # Place odds for each-way bets
+    confidence: Optional[int] = None  # Deprecated - not used in new model
 
     def to_dict(self) -> dict:
-        return {
+        result = {
             "horse": self.horse,
             "tab_no": self.tab_no,
             "odds": self.odds,
+            "place_odds": self.place_odds,
             "tag": self.tag,
             "analysis": self.analysis,
-            "confidence": self.confidence,
         }
+        if self.confidence is not None:
+            result["confidence"] = self.confidence
+        return result
 
 
 @dataclass
@@ -101,9 +105,9 @@ class PredictionOutput:
     # Overall summary
     summary: str = ""
 
-    # Race-level confidence (1-10) - how confident in predictions overall
-    race_confidence: int = 5
-    confidence_reason: str = ""  # Why confidence is high/low
+    # Race-level confidence (1-10) - deprecated, not used in new model
+    race_confidence: Optional[int] = None
+    confidence_reason: Optional[str] = None
 
     # Race context
     track: str = ""
@@ -138,29 +142,30 @@ class PredictionOutput:
 # PROMPTS
 # =============================================================================
 
-SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
+SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
-Your task is to identify 1-3 horses that you think will WIN this race and give your thoughts on each.
+Pick 0-3 contenders for this race. For each, assign a tag:
+- **"The one to beat"** - Clear standout
+- **"Each-way chance"** - Could win, should place, place odds worth it
+- **"Value bet"** - Odds better than their form suggests
 
-## Understanding the Data
+**Pick 0 contenders (no bet) when:**
+- A lot of field has no race form (only trials) - you can't compare unknowns
+- Field is too even with no standouts
+- Insufficient data to make confident assessment
 
-**Speed Ratings** (MOST IMPORTANT): Normalized performance measure (1.000 = average for that distance/condition).
-- Compare ratings WITHIN THIS FIELD - the highest-rated horse has faster normalized speed relative to competitors
-- Prioritize runs at similar distance and similar track condition to the race being predicted
-- More recent runs are more relevant than older runs
+## Key Analysis
 
-**Prep Run**: The "Prep" column shows which run in the current preparation (1 = first-up, 2 = second-up, etc.)
-- Horses marked **FIRST UP** or **SECOND UP** show their career record in that state
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions. More recent runs are more relevant.
 
-**A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations (>1.0 = beats market, <1.0 = underperforms)
+**Critical:**
+- Barrier trials (marked TRIAL) don't count as form - horses don't always try
+- If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
+- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
 
-**Other factors to consider**: Class changes, weight, barrier, track/distance form
+You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight.
 
-**Race Warnings**: Pay attention to any warnings about the race (e.g., many first-uppers, limited form data). These make predictions harder - adjust your confidence accordingly.
-
-## Output Format
-
-Return 1-3 contenders as JSON:
+## Output
 
 ```json
 {
@@ -169,29 +174,14 @@ Return 1-3 contenders as JSON:
       "horse": "Horse Name",
       "tab_no": number,
       "odds": number,
-      "tag": "short phrase - e.g. The one to beat, Value pick, Rough chance, Each-way, ect.",
-      "analysis": "2-3 sentences: why this horse can win, and your thoughts on the price.",
-      "confidence": number (1-10, how confident you are in THIS horse winning)
+      "place_odds": number,
+      "tag": "The one to beat" | "Each-way chance" | "Value bet",
+      "analysis": "1-2 sentences referencing RACE form"
     }
   ],
-  "race_confidence": number (1-10, overall confidence in your predictions for this race),
-  "confidence_reason": "Brief reason for confidence level (e.g., 'Strong form data, clear top pick' or 'Many first-uppers, limited form makes this unpredictable')",
-  "summary": "1-2 sentences summarizing the race"
+  "summary": "Brief overview or reason for 0 picks"
 }
-```
-
-## Confidence Scale
-- 8-10: Very confident - clear form standouts, reliable data
-- 5-7: Moderate - decent form indicators but some uncertainty
-- 1-4: Low confidence - many first-uppers, limited form, wide-open race
-
-## Guidelines
-
-- Pick based on who you think wins
-- Quality over quantity - if only 1 horse stands out, just pick 1
-- Only suggest each-way if place odds are $1.80+
-- Your summary should align with your picks
-- Be honest about confidence - low confidence races are harder to pick"""
+```"""
 
 
 PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
@@ -261,11 +251,11 @@ Return both picks as JSON:
 - Be honest about confidence - low confidence races are harder to pick"""
 
 
-USER_PROMPT_TEMPLATE = """Analyze this race and identify the contenders.
+USER_PROMPT_TEMPLATE = """Analyze this race and pick your contenders (0-3).
 
 {race_data}
 
-Respond with valid JSON only."""
+Respond with JSON only."""
 
 
 PROMO_BONUS_USER_PROMPT_TEMPLATE = """Analyze this race and identify a bonus bet pick and a promo pick.
@@ -461,29 +451,39 @@ class Predictor:
         race_data: RaceData,
         raw_response: str,
     ) -> PredictionOutput:
-        """Parse normal mode response with contenders."""
+        """Parse normal mode response with contenders (0-3)."""
 
-        # Parse contenders
+        # Parse contenders (can be empty array)
         contenders = []
         for c in data.get("contenders", []):
             horse = c.get("horse")
             tab_no = c.get("tab_no")
             odds = c.get("odds")
+            place_odds = c.get("place_odds")
 
             # Check if odds is a valid number
             if odds is not None:
                 try:
                     odds = float(odds)
                 except (ValueError, TypeError):
-                    odds = None  # Invalid odds like "Not available"
+                    odds = None
 
-            # Look up odds from race data if not provided or invalid
-            if horse and not odds:
+            # Check if place_odds is a valid number
+            if place_odds is not None:
+                try:
+                    place_odds = float(place_odds)
+                except (ValueError, TypeError):
+                    place_odds = None
+
+            # Look up from race data if not provided or invalid
+            if horse:
                 normalized_horse = normalize_horse_name(horse)
                 for runner in race_data.runners:
-                    # Match by normalized name or tab number
                     if normalize_horse_name(runner.name) == normalized_horse or runner.tab_no == tab_no:
-                        odds = runner.odds
+                        if not odds:
+                            odds = runner.odds
+                        if not place_odds:
+                            place_odds = runner.place_odds
                         tab_no = runner.tab_no
                         horse = runner.name  # Canonical name
                         break
@@ -492,41 +492,25 @@ class Predictor:
                     logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
 
             if horse and tab_no and odds:
-                # Parse confidence (default to 5 if not provided)
-                confidence = c.get("confidence", 5)
-                try:
-                    confidence = int(confidence)
-                    confidence = max(1, min(10, confidence))  # Clamp to 1-10
-                except (ValueError, TypeError):
-                    confidence = 5
-
                 contenders.append(Contender(
                     horse=horse,
                     tab_no=tab_no,
                     odds=odds,
                     tag=c.get("tag", "Contender"),
                     analysis=c.get("analysis", ""),
-                    confidence=confidence,
+                    place_odds=place_odds,
+                    confidence=None,  # Not used in new model
                 ))
             elif horse and tab_no and not odds:
                 logger.warning(f"Skipping contender {horse}: no odds available")
             elif horse:
                 logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no}")
 
-        # Parse race-level confidence
-        race_confidence = data.get("race_confidence", 5)
-        try:
-            race_confidence = int(race_confidence)
-            race_confidence = max(1, min(10, race_confidence))
-        except (ValueError, TypeError):
-            race_confidence = 5
-
+        # Return output (contenders can be empty)
         return PredictionOutput(
             mode="normal",
             contenders=contenders,
             summary=data.get("summary", ""),
-            race_confidence=race_confidence,
-            confidence_reason=data.get("confidence_reason", ""),
             track=race_data.track,
             race_number=race_data.race_number,
             model=self.model,
