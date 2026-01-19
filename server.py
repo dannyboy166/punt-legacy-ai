@@ -10,7 +10,13 @@ Endpoints:
     GET  /meetings?date=09-Jan-2026     - List tracks racing on date
     GET  /races?track=Gosford&date=X    - List races at track
     POST /predict                        - Generate prediction for race
+    POST /backtest                       - Run backtest on historical races
     GET  /health                         - Health check
+
+Backtest Example:
+    curl -X POST http://localhost:8000/backtest \\
+        -H "Content-Type: application/json" \\
+        -d '{"track": "Canterbury", "date": "16-Jan-2026", "race_start": 1, "race_end": 7}'
 """
 
 from fastapi import FastAPI, HTTPException
@@ -26,6 +32,7 @@ load_dotenv()
 from core.race_data import RaceDataPipeline
 from core.predictor import Predictor
 from core.tracking import PredictionTracker
+from core.backtest import run_backtest, run_backtest_meeting, get_race_results
 from api.puntingform import PuntingFormAPI
 
 app = FastAPI(
@@ -143,6 +150,78 @@ class RaceResponse(BaseModel):
     distance: int
     start_time: str
     runners_count: int
+
+
+# =============================================================================
+# BACKTEST MODELS
+# =============================================================================
+
+class BacktestRequest(BaseModel):
+    """Request to run a backtest on historical races."""
+    track: str
+    date: str  # Format: dd-MMM-yyyy
+    race_start: int = 1
+    race_end: int = 12
+    auto_sync: bool = True  # Automatically sync outcomes after backtest
+
+    @field_validator('track')
+    @classmethod
+    def track_not_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Track name cannot be empty')
+        return v.strip()
+
+    @field_validator('date')
+    @classmethod
+    def date_format_valid(cls, v: str) -> str:
+        if not DATE_PATTERN.match(v):
+            raise ValueError('Date must be in format dd-MMM-yyyy (e.g., 16-Jan-2026)')
+        return v
+
+    @field_validator('race_start', 'race_end')
+    @classmethod
+    def race_number_valid(cls, v: int) -> int:
+        if v < 1 or v > 12:
+            raise ValueError('Race number must be between 1 and 12')
+        return v
+
+
+class BacktestContenderResponse(BaseModel):
+    """A contender from a backtest."""
+    horse: str
+    tab_no: int
+    odds: float
+    place_odds: float
+    tag: str
+    analysis: str
+
+
+class BacktestRaceResult(BaseModel):
+    """Result of a single race backtest."""
+    track: str
+    race_number: int
+    date: str
+    race_name: str
+    distance: int
+    condition: str
+    field_size: int
+    horses_with_form: int
+    scratched_count: int
+    contenders: list[BacktestContenderResponse]
+    summary: str
+    results: Optional[dict] = None  # {horse: position} - actual race results
+    error: Optional[str] = None
+
+
+class BacktestResponse(BaseModel):
+    """Response from running a backtest."""
+    track: str
+    date: str
+    races: list[BacktestRaceResult]
+    total_races: int
+    total_contenders: int
+    outcomes_synced: int
+    stats: Optional[dict] = None  # Performance stats by tag
 
 
 # =============================================================================
@@ -433,6 +512,20 @@ def get_stats_by_mode():
     return tracker.get_stats_by_mode()
 
 
+@app.get("/stats/by-tag-staking")
+def get_stats_by_tag_with_staking():
+    """
+    Get performance statistics grouped by tag with staking calculations.
+
+    Returns for each tag:
+    - total, wins, places, win_rate, place_rate
+    - flat_bet: 1u each horse ROI
+    - fixed_return: $100 target return per bet ROI
+    - each_way: 1u win + 2u place ROI (best for "Each-way chance" tag)
+    """
+    return tracker.get_stats_by_tag_with_staking(min_samples=1)
+
+
 @app.get("/predictions/pending")
 def get_pending_outcomes(race_date: Optional[str] = None):
     """Get predictions that haven't had outcomes recorded yet."""
@@ -568,6 +661,160 @@ def sync_outcomes(race_date: str):
             "pending_count": len(pending)
         }
     }
+
+
+# =============================================================================
+# BACKTEST ENDPOINT
+# =============================================================================
+
+@app.post("/backtest", response_model=BacktestResponse)
+def run_backtest_endpoint(req: BacktestRequest):
+    """
+    Run backtest on historical races.
+
+    This endpoint:
+    1. Runs predictions on finished races using Starting Prices (SP)
+    2. Stores predictions in the tracking database
+    3. Auto-syncs actual race outcomes from PuntingForm
+    4. Returns results and performance stats by tag
+
+    Args:
+        track: Track name (e.g., "Canterbury")
+        date: Date in dd-MMM-yyyy format (e.g., "16-Jan-2026")
+        race_start: First race number (default 1)
+        race_end: Last race number (default 12)
+        auto_sync: Whether to auto-sync outcomes (default True)
+
+    Returns:
+        Backtest results with contenders, outcomes, and stats
+    """
+    from datetime import datetime
+    import sqlite3
+    from pathlib import Path
+
+    try:
+        # Run backtests
+        results = run_backtest_meeting(
+            track=req.track,
+            date=req.date,
+            race_start=req.race_start,
+            race_end=req.race_end
+        )
+
+        if not results:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No races found at {req.track} on {req.date}"
+            )
+
+        race_results = []
+        total_contenders = 0
+        outcomes_synced = 0
+
+        # Process each race result
+        for result in results:
+            contenders_response = []
+
+            for c in result.contenders:
+                contenders_response.append(BacktestContenderResponse(
+                    horse=c.horse,
+                    tab_no=c.tab_no,
+                    odds=c.odds,
+                    place_odds=c.place_odds,
+                    tag=c.tag,
+                    analysis=c.analysis
+                ))
+                total_contenders += 1
+
+            # Store predictions in tracking DB
+            if result.contenders:
+                db_path = Path(__file__).parent / "data" / "predictions.db"
+                db_path.parent.mkdir(parents=True, exist_ok=True)
+
+                with sqlite3.connect(db_path) as conn:
+                    for c in result.contenders:
+                        try:
+                            conn.execute("""
+                                INSERT OR IGNORE INTO predictions
+                                (timestamp, track, race_number, race_date, horse, tab_no,
+                                 odds, place_odds, tag, confidence, race_confidence,
+                                 confidence_reason, mode, pick_type, analysis)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            """, (
+                                datetime.now().isoformat(),
+                                result.track,
+                                result.race_number,
+                                result.date,
+                                c.horse,
+                                c.tab_no,
+                                c.odds,
+                                c.place_odds,
+                                c.tag,
+                                5,  # Default confidence
+                                5,  # Default race confidence
+                                "",
+                                "backtest",  # Mark as backtest
+                                "contender",
+                                c.analysis,
+                            ))
+                        except Exception as e:
+                            print(f"Warning: Failed to store prediction: {e}")
+                    conn.commit()
+
+            # Get actual race results if auto_sync enabled
+            actual_results = None
+            if req.auto_sync:
+                actual_results = get_race_results(result.track, result.race_number, result.date)
+                if actual_results:
+                    # Record outcomes for our contenders
+                    for c in result.contenders:
+                        # Find the horse in results (fuzzy match)
+                        for horse_name, position in actual_results.items():
+                            if horse_name.lower() == c.horse.lower() or \
+                               c.horse.lower() in horse_name.lower() or \
+                               horse_name.lower() in c.horse.lower():
+                                won = position == 1
+                                placed = position <= 3
+                                if tracker.record_outcome(
+                                    result.track, result.race_number, result.date,
+                                    c.horse, won, placed, position
+                                ):
+                                    outcomes_synced += 1
+                                break
+
+            race_results.append(BacktestRaceResult(
+                track=result.track,
+                race_number=result.race_number,
+                date=result.date,
+                race_name=result.race_name,
+                distance=result.distance,
+                condition=result.condition,
+                field_size=result.total_horses,
+                horses_with_form=result.horses_with_form,
+                scratched_count=result.scratched_count,
+                contenders=contenders_response,
+                summary=result.summary,
+                results=actual_results,
+                error=result.error
+            ))
+
+        # Get updated stats by tag with staking calculations
+        stats = tracker.get_stats_by_tag_with_staking(min_samples=1) if req.auto_sync else None
+
+        return BacktestResponse(
+            track=req.track,
+            date=req.date,
+            races=race_results,
+            total_races=len(race_results),
+            total_contenders=total_contenders,
+            outcomes_synced=outcomes_synced,
+            stats=stats
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 class BackfillPrediction(BaseModel):

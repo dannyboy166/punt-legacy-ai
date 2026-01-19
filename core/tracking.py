@@ -672,3 +672,134 @@ class PredictionTracker:
             """, (limit,)).fetchall()
 
             return [dict(row) for row in rows]
+
+    def get_stats_by_tag_with_staking(self, min_samples: int = 1) -> dict:
+        """
+        Get performance statistics grouped by tag with staking calculations.
+
+        Returns for each tag:
+        - total, wins, places, win_rate, place_rate
+        - flat_bet: 1u each horse
+        - fixed_return: $100 target return per bet
+        - each_way: 1u win + 2u place (for "Each-way chance" tag)
+
+        Args:
+            min_samples: Minimum samples required to include tag
+
+        Returns:
+            Dict of tag -> stats including staking ROI
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    tag,
+                    odds,
+                    place_odds,
+                    won,
+                    placed
+                FROM predictions
+                WHERE outcome_recorded = 1
+            """).fetchall()
+
+            # Group by tag
+            by_tag = {}
+            for row in rows:
+                tag = row['tag']
+                if tag not in by_tag:
+                    by_tag[tag] = []
+                by_tag[tag].append({
+                    'odds': row['odds'],
+                    'place_odds': row['place_odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            stats = {}
+            for tag, predictions in by_tag.items():
+                if len(predictions) < min_samples:
+                    continue
+
+                total = len(predictions)
+                wins = sum(1 for p in predictions if p['won'])
+                places = sum(1 for p in predictions if p['placed'])
+
+                # ============================================
+                # FLAT BET: 1 unit each horse
+                # ============================================
+                flat_profit = 0
+                flat_staked = 0
+                for p in predictions:
+                    flat_staked += 1
+                    if p['won']:
+                        flat_profit += p['odds'] - 1
+                    else:
+                        flat_profit -= 1
+                flat_roi = (flat_profit / flat_staked * 100) if flat_staked > 0 else 0
+
+                # ============================================
+                # FIXED RETURN: $100 target return per bet
+                # ============================================
+                fixed_profit = 0
+                fixed_staked = 0
+                for p in predictions:
+                    # Stake to win $100
+                    stake = 100 / (p['odds'] - 1) if p['odds'] > 1 else 100
+                    fixed_staked += stake
+                    if p['won']:
+                        fixed_profit += 100  # Won $100
+                    else:
+                        fixed_profit -= stake  # Lost stake
+                fixed_roi = (fixed_profit / fixed_staked * 100) if fixed_staked > 0 else 0
+
+                # ============================================
+                # EACH-WAY: 1u win + 2u place
+                # (Only meaningful for "Each-way chance" tag)
+                # ============================================
+                ew_profit = 0
+                ew_staked = 0
+                for p in predictions:
+                    ew_staked += 3  # 1u win + 2u place
+
+                    # Win component: 1u @ win odds
+                    if p['won']:
+                        ew_profit += p['odds'] - 1
+                    else:
+                        ew_profit -= 1
+
+                    # Place component: 2u @ place odds
+                    place_odds = p['place_odds'] or (1 + (p['odds'] - 1) * 0.35)
+                    if p['placed']:
+                        ew_profit += 2 * (place_odds - 1)
+                    else:
+                        ew_profit -= 2
+
+                ew_roi = (ew_profit / ew_staked * 100) if ew_staked > 0 else 0
+
+                stats[tag] = {
+                    "total": total,
+                    "wins": wins,
+                    "places": places,
+                    "win_rate": wins / total if total > 0 else 0,
+                    "place_rate": places / total if total > 0 else 0,
+                    "avg_odds": sum(p['odds'] for p in predictions) / total,
+
+                    # Staking results
+                    "flat_bet": {
+                        "staked": round(flat_staked, 2),
+                        "profit": round(flat_profit, 2),
+                        "roi": round(flat_roi, 1)
+                    },
+                    "fixed_return": {
+                        "staked": round(fixed_staked, 2),
+                        "profit": round(fixed_profit, 2),
+                        "roi": round(fixed_roi, 1)
+                    },
+                    "each_way": {
+                        "staked": round(ew_staked, 2),
+                        "profit": round(ew_profit, 2),
+                        "roi": round(ew_roi, 1)
+                    }
+                }
+
+            return stats
