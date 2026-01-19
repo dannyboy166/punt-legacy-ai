@@ -451,10 +451,27 @@ class RaceDataPipeline:
             else:
                 condition_record = runner.get("heavyRecord")
 
-            # Determine first-up/second-up
-            prep_runs = runner.get("prepRuns", 0)
-            first_up = prep_runs == 0
-            second_up = prep_runs == 1
+            # Determine first-up/second-up from form data (more reliable than prepRuns field)
+            # prepRuns in form = which run of the prep it was (0 = first-up, 1 = second-up, etc)
+            # So if last run had prepRuns=0, they were first-up then, now they're second-up
+            # If last run had prepRuns=1, they were second-up then, now they're third-up
+            runner_form_raw = form_by_runner.get(runner_id, [])
+            if runner_form_raw:
+                last_prep = runner_form_raw[0].get("prepRuns", 0)
+                # Today's run = last_prep + 1
+                current_prep = last_prep + 1
+                first_up = current_prep == 0  # Would only happen if prepRuns was -1 (not possible)
+                second_up = current_prep == 1  # Last run was prepRuns=0 (first-up), now second-up
+                # Actually - prepRuns=0 means first-up at that time
+                # So if most recent was prepRuns=0, they're NOW second-up
+                # If most recent was prepRuns=1, they're NOW third-up
+                # True first-up = no recent form (long spell)
+                first_up = False  # They have recent form, so not first-up
+                second_up = last_prep == 0  # Last run was first-up, now second-up
+            else:
+                # No form = first starter or resuming (true first-up)
+                first_up = True
+                second_up = False
 
             # Get first-up/second-up career records
             first_up_record = runner.get("firstUpRecord")
