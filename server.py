@@ -526,6 +526,85 @@ def get_stats_by_tag_with_staking():
     return tracker.get_stats_by_tag_with_staking(min_samples=1)
 
 
+@app.post("/fix-place-odds")
+def fix_place_odds():
+    """
+    Fix place odds in database by fetching real Ladbrokes place odds.
+
+    This corrects place_odds that were previously estimated with a formula
+    by replacing them with actual Ladbrokes fixed_place prices.
+    """
+    from core.backtest import get_ladbrokes_place_odds
+    from core.normalize import normalize_horse_name
+    import sqlite3
+    from pathlib import Path
+
+    db_path = Path(__file__).parent / "data" / "predictions.db"
+
+    if not db_path.exists():
+        return {"fixed": 0, "error": "Database not found"}
+
+    fixed_count = 0
+    errors = []
+
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+
+        # Get all unique track/race/date combinations
+        races = conn.execute("""
+            SELECT DISTINCT track, race_number, race_date
+            FROM predictions
+            WHERE mode = 'backtest'
+        """).fetchall()
+
+        for race in races:
+            track = race['track']
+            race_num = race['race_number']
+            date = race['race_date']
+
+            try:
+                # Fetch real Ladbrokes place odds
+                lb_place_odds = get_ladbrokes_place_odds(track, race_num, date)
+
+                if not lb_place_odds:
+                    errors.append(f"No Ladbrokes data for {track} R{race_num} {date}")
+                    continue
+
+                # Get predictions for this race
+                predictions = conn.execute("""
+                    SELECT id, horse, place_odds
+                    FROM predictions
+                    WHERE track = ? AND race_number = ? AND race_date = ? AND mode = 'backtest'
+                """, (track, race_num, date)).fetchall()
+
+                for pred in predictions:
+                    horse = pred['horse']
+                    old_place = pred['place_odds']
+                    normalized = normalize_horse_name(horse)
+
+                    if normalized in lb_place_odds:
+                        new_place = lb_place_odds[normalized]
+
+                        if abs(new_place - old_place) > 0.01:  # Only update if different
+                            conn.execute("""
+                                UPDATE predictions
+                                SET place_odds = ?
+                                WHERE id = ?
+                            """, (new_place, pred['id']))
+                            fixed_count += 1
+
+            except Exception as e:
+                errors.append(f"Error processing {track} R{race_num}: {str(e)}")
+
+        conn.commit()
+
+    return {
+        "fixed": fixed_count,
+        "races_processed": len(races),
+        "errors": errors if errors else None
+    }
+
+
 @app.get("/predictions/pending")
 def get_pending_outcomes(race_date: Optional[str] = None):
     """Get predictions that haven't had outcomes recorded yet."""

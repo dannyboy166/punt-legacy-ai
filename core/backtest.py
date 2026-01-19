@@ -3,6 +3,7 @@ Backtest module for historical race predictions.
 
 Provides API-friendly backtest functionality:
 - Runs predictions on finished races using Starting Prices (SP)
+- Fetches REAL place odds from Ladbrokes (not estimated)
 - Filters scratched horses (3 methods)
 - Stores results in tracking database
 - Auto-syncs outcomes from PuntingForm
@@ -19,6 +20,7 @@ Usage:
 
 import json
 import re
+from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass
 
@@ -26,13 +28,76 @@ import anthropic
 from dotenv import load_dotenv
 
 from api.puntingform import PuntingFormAPI
+from api.ladbrokes import LadbrokeAPI
 from core.speed import calculate_speed_rating
 from core.predictor import SYSTEM_PROMPT
+from core.normalize import normalize_horse_name
 from core.logging import get_logger
 
 load_dotenv()
 
 logger = get_logger(__name__)
+
+
+def convert_date_format(date_str: str) -> str:
+    """Convert dd-MMM-yyyy to yyyy-mm-dd for Ladbrokes API."""
+    try:
+        dt = datetime.strptime(date_str, "%d-%b-%Y")
+        return dt.strftime("%Y-%m-%d")
+    except ValueError:
+        return date_str
+
+
+def get_ladbrokes_place_odds(track: str, race_number: int, date: str) -> dict[str, float]:
+    """
+    Fetch actual place odds from Ladbrokes for a finished race.
+
+    Args:
+        track: Track name (e.g., "Canterbury")
+        race_number: Race number
+        date: Date in dd-MMM-yyyy format
+
+    Returns:
+        Dict mapping normalized horse names to place odds
+    """
+    try:
+        lb_api = LadbrokeAPI()
+        lb_date = convert_date_format(date)
+
+        meetings = lb_api.get_meetings(date_from=lb_date, category="T", country="AUS")
+
+        # Find matching track
+        for meeting in meetings:
+            meeting_name = meeting.get('name', '')
+            if track.lower() in meeting_name.lower() or meeting_name.lower() in track.lower():
+                # Find the race
+                for race in meeting.get('races', []):
+                    if race.get('race_number') == race_number:
+                        race_id = race.get('id')
+                        race_data = lb_api.get_race(race_id)
+
+                        if not race_data:
+                            return {}
+
+                        place_odds = {}
+                        for runner in race_data.get('runners', []):
+                            name = runner.get('name', '')
+                            odds = runner.get('odds', {})
+                            fixed_place = odds.get('fixed_place')
+
+                            if name and fixed_place:
+                                normalized = normalize_horse_name(name)
+                                place_odds[normalized] = fixed_place
+
+                        logger.debug(f"Got {len(place_odds)} place odds from Ladbrokes for {track} R{race_number}")
+                        return place_odds
+
+        logger.debug(f"Track {track} not found in Ladbrokes for {date}")
+        return {}
+
+    except Exception as e:
+        logger.warning(f"Failed to fetch Ladbrokes place odds: {e}")
+        return {}
 
 
 @dataclass
@@ -134,6 +199,14 @@ def get_backtest_prompt(track: str, race_number: int, date: str, api: Optional[P
 
     form_by_id = {r.get('runnerId'): r.get('forms', []) for r in form_data}
 
+    # Fetch REAL place odds from Ladbrokes
+    lb_place_odds = get_ladbrokes_place_odds(track, race_number, date)
+    using_real_place_odds = len(lb_place_odds) > 0
+    if using_real_place_odds:
+        logger.info(f"Using REAL Ladbrokes place odds for {track} R{race_number}")
+    else:
+        logger.warning(f"No Ladbrokes place odds for {track} R{race_number}, using estimates")
+
     race_run_counts = []
     scratched_count = 0
 
@@ -175,7 +248,14 @@ def get_backtest_prompt(track: str, race_number: int, date: str, api: Optional[P
 
         barrier = r.get('barrier', 0)
         weight = r.get('weight', 0)
-        place_odds = round(1 + (sp - 1) * 0.35, 2) if sp > 1 else 1.10
+
+        # Use REAL Ladbrokes place odds if available, otherwise estimate
+        normalized_name = normalize_horse_name(name)
+        if normalized_name in lb_place_odds:
+            place_odds = lb_place_odds[normalized_name]
+        else:
+            # Fallback to estimate (shouldn't happen often for Aus races)
+            place_odds = round(1 + (sp - 1) * 0.25, 2) if sp > 1 else 1.10
 
         jockey = jockey_name
         trainer = r.get('trainer', {}).get('fullName', '')
