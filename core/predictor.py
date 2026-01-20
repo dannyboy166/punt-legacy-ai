@@ -53,6 +53,7 @@ class Contender:
     analysis: str  # Natural language analysis of the horse and price
     place_odds: Optional[float] = None  # Place odds for each-way bets
     confidence: Optional[int] = None  # Deprecated - not used in new model
+    tipsheet_pick: bool = False  # True if Claude would genuinely bet on this
 
     def to_dict(self) -> dict:
         result = {
@@ -62,6 +63,7 @@ class Contender:
             "place_odds": self.place_odds,
             "tag": self.tag,
             "analysis": self.analysis,
+            "tipsheet_pick": self.tipsheet_pick,
         }
         if self.confidence is not None:
             result["confidence"] = self.confidence
@@ -187,12 +189,18 @@ Use win/place odds to assess value - is the horse better than the market thinks?
       "odds": number,
       "place_odds": number,
       "tag": "The one to beat" | "Each-way chance" | "Value bet",
-      "analysis": "1-2 sentences referencing RACE form"
+      "analysis": "1-2 sentences referencing RACE form",
+      "tipsheet_pick": true | false
     }
   ],
   "summary": "Brief overview or reason for 0 picks"
 }
-```"""
+```
+
+**tipsheet_pick = true** when you would genuinely bet on this horse yourself:
+- Speed ratings clearly support this horse vs the field at this distance/condition
+- The odds represent real value (not just "best of a bad bunch")
+- You're confident in the pick, not just filling a slot"""
 
 
 PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
@@ -511,6 +519,7 @@ class Predictor:
                     analysis=c.get("analysis", ""),
                     place_odds=place_odds,
                     confidence=None,  # Not used in new model
+                    tipsheet_pick=c.get("tipsheet_pick", False),
                 ))
             elif horse and tab_no and not odds:
                 logger.warning(f"Skipping contender {horse}: no odds available")

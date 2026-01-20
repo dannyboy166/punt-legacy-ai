@@ -111,6 +111,7 @@ class Contender(BaseModel):
     tag: str  # "The one to beat", "Each-way chance", or "Value bet"
     analysis: str
     confidence: Optional[int] = None  # Deprecated - not used in new model
+    tipsheet_pick: bool = False  # True if Claude would genuinely bet on this (admin only)
 
 
 class PromoBonusPick(BaseModel):
@@ -440,7 +441,8 @@ def predict(req: PredictionRequest):
                     place_odds=place_odds,
                     tag=c.tag,
                     analysis=c.analysis,
-                    confidence=c.confidence  # Will be None in new model
+                    confidence=c.confidence,  # Will be None in new model
+                    tipsheet_pick=c.tipsheet_pick,
                 ))
 
             # Store prediction for tracking (even if 0 contenders)
