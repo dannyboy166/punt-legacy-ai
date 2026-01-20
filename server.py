@@ -542,6 +542,18 @@ def get_stats_by_meeting():
     return tracker.get_stats_by_meeting()
 
 
+@app.get("/stats/by-tipsheet")
+def get_stats_by_tipsheet():
+    """
+    Get performance statistics comparing tipsheet_pick=true vs false.
+
+    Returns dict with:
+    - tipsheet: stats for picks where Claude would genuinely bet
+    - non_tipsheet: stats for other picks
+    """
+    return tracker.get_stats_by_tipsheet()
+
+
 @app.post("/fix-place-odds")
 def fix_place_odds():
     """

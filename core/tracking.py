@@ -95,6 +95,7 @@ class PredictionTracker:
                     mode TEXT NOT NULL,
                     pick_type TEXT NOT NULL,
                     analysis TEXT,
+                    tipsheet_pick INTEGER DEFAULT 0,  -- 1 if Claude would genuinely bet
 
                     -- Outcome (filled in after race)
                     won INTEGER,  -- 0 or 1
@@ -120,6 +121,14 @@ class PredictionTracker:
                 CREATE INDEX IF NOT EXISTS idx_predictions_outcome
                 ON predictions(outcome_recorded)
             """)
+
+            # Migration: Add tipsheet_pick column if it doesn't exist
+            cursor = conn.execute("PRAGMA table_info(predictions)")
+            columns = [row[1] for row in cursor.fetchall()]
+            if 'tipsheet_pick' not in columns:
+                conn.execute("ALTER TABLE predictions ADD COLUMN tipsheet_pick INTEGER DEFAULT 0")
+                logger.info("Added tipsheet_pick column to predictions table")
+
             conn.commit()
 
     def store_prediction(
@@ -158,8 +167,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -176,6 +185,7 @@ class PredictionTracker:
                             "normal",
                             "contender",
                             contender.analysis,
+                            1 if getattr(contender, 'tipsheet_pick', False) else 0,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -198,8 +208,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -216,6 +226,7 @@ class PredictionTracker:
                             "promo_bonus",
                             "bonus_bet",
                             pick.analysis,
+                            0,  # tipsheet_pick not applicable for promo/bonus
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -237,8 +248,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -255,6 +266,7 @@ class PredictionTracker:
                             "promo_bonus",
                             "promo_play",
                             pick.analysis,
+                            0,  # tipsheet_pick not applicable for promo/bonus
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -897,5 +909,48 @@ class PredictionTracker:
                         for tag, s in by_tag.items()
                     }
                 })
+
+            return result
+
+    def get_stats_by_tipsheet(self) -> dict:
+        """
+        Get performance statistics comparing tipsheet_pick=true vs tipsheet_pick=false.
+
+        Returns dict with 'tipsheet' and 'non_tipsheet' stats.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    tipsheet_pick,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN won = 1 THEN 1 ELSE 0 END) as wins,
+                    SUM(CASE WHEN placed = 1 THEN 1 ELSE 0 END) as places,
+                    AVG(odds) as avg_odds,
+                    SUM(CASE WHEN won = 1 THEN odds - 1 ELSE -1 END) as flat_profit
+                FROM predictions
+                WHERE outcome_recorded = 1
+                  AND mode = 'normal'
+                GROUP BY tipsheet_pick
+            """).fetchall()
+
+            result = {}
+            for row in rows:
+                key = 'tipsheet' if row['tipsheet_pick'] == 1 else 'non_tipsheet'
+                total = row['total']
+                wins = row['wins'] or 0
+                places = row['places'] or 0
+                flat_profit = row['flat_profit'] or 0
+
+                result[key] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': wins / total if total > 0 else 0,
+                    'place_rate': places / total if total > 0 else 0,
+                    'avg_odds': row['avg_odds'] or 0,
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round((flat_profit / total) * 100, 1) if total > 0 else 0,
+                }
 
             return result
