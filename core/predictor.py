@@ -158,15 +158,17 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 ## Key Analysis
 
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions. More recent runs are more relevant.
+**Primary factor:** Normalized speed ratings from RACE runs (not trials) at similar distance and conditions. Recent runs are more relevant.
 For first/second-up horses, check if their past fresh runs show better ratings than mid-prep runs.
+
+**Secondary factors:** Jockey/trainer A/E ratios (>1.0 = beats market expectations), barrier, weight, career record, first-up/second-up records.
+
+Use win/place odds to assess value - is the horse better than the market thinks?
 
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
 - If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
 - Limited form (1-3 runs) is still usable data - don't skip these races
-
-You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight.
 
 ## Output
 
