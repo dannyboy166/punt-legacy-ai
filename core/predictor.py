@@ -150,9 +150,11 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 - **"Value bet"** - Genuine winning chance based on speed ratings, but odds better than their form suggests
 
 **Pick 0 contenders (no bet) when:**
-- A lot of field has no race form (only trials) - you can't compare unknowns
+- 50%+ of field has ZERO race runs (first starters/only trials) - can't compare unknowns
 - Field is too even with no standouts
-- Insufficient data to make confident assessment
+
+**Lower confidence (but still pick) when:**
+- Many horses have limited form (1-3 runs) - assess with caution but still make picks
 
 ## Key Analysis
 
@@ -162,7 +164,7 @@ For first/second-up horses, check if their past fresh runs show better ratings t
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
 - If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
-- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
+- Limited form (1-3 runs) is still usable data - don't skip these races
 
 You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight.
 
