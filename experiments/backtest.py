@@ -67,12 +67,18 @@ You also have: win/place odds, jockey/trainer A/E ratios, career record, first-u
       "odds": number,
       "place_odds": number,
       "tag": "The one to beat" | "Each-way chance" | "Value bet",
-      "analysis": "1-2 sentences referencing RACE form"
+      "analysis": "1-2 sentences referencing RACE form",
+      "tipsheet_pick": true | false
     }
   ],
   "summary": "Brief overview or reason for 0 picks"
 }
 ```
+
+**tipsheet_pick = true** when you would genuinely bet on this horse yourself:
+- Speed ratings clearly support this horse vs the field at this distance/condition
+- The odds represent real value (not just "best of a bad bunch")
+- You're confident in the pick, not just filling a slot
 """
 
 def parse_time(time_str):
@@ -300,7 +306,9 @@ if __name__ == "__main__":
         else:
             print(f"\n  {len(contenders)} CONTENDER(S):\n")
             for c in contenders:
-                print(f"  {c['horse']} (#{c['tab_no']})")
+                tipsheet = c.get('tipsheet_pick', False)
+                tipsheet_badge = " ⭐ TIPSHEET" if tipsheet else ""
+                print(f"  {c['horse']} (#{c['tab_no']}){tipsheet_badge}")
                 print(f"    ${c['odds']:.2f} win / ${c['place_odds']:.2f} place")
                 print(f'    "{c["tag"]}"')
                 print(f"    {c['analysis']}\n")
