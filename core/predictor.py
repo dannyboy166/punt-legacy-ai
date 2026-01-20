@@ -157,6 +157,7 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 ## Key Analysis
 
 Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions. More recent runs are more relevant.
+For first/second-up horses, check if their past fresh runs show better ratings than mid-prep runs.
 
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
