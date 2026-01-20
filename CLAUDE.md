@@ -477,10 +477,49 @@ racing-tips-platform (Next.js)     punt-legacy-ai (Python FastAPI)
 cd punt-legacy-ai
 uvicorn server:app --host 0.0.0.0 --port 8000
 
-# Endpoints
+# Core Endpoints
 GET  /meetings?date=09-Jan-2026     # List tracks
 GET  /races?track=Gosford&date=X    # List races at track
 POST /predict                        # Generate prediction
+POST /backtest                       # Run backtest on historical races
+
+# Stats Endpoints
+GET  /stats/summary                  # Overall prediction stats
+GET  /stats/by-tag                   # Performance by tag
+GET  /stats/by-tag-staking           # Performance by tag with staking ROI
+GET  /stats/by-meeting               # Performance by meeting (track + date)
+GET  /stats/by-confidence            # Performance by confidence level
+GET  /stats/by-race-confidence       # Performance by race-level confidence
+GET  /stats/by-mode                  # Performance by mode (normal vs promo)
+
+# Tracking Endpoints
+GET  /predictions/pending            # Predictions awaiting outcomes
+GET  /predictions/recent?limit=50    # Recent predictions
+POST /outcomes                       # Record race outcomes
+POST /outcomes/sync?race_date=X      # Auto-sync outcomes from PuntingForm
+POST /backfill                       # Import historical predictions
+```
+
+#### Stats by Meeting Response
+```json
+GET /stats/by-meeting
+[
+  {
+    "track": "Canterbury",
+    "date": "16-Jan-2026",
+    "total_picks": 5,
+    "wins": 1,
+    "places": 2,
+    "win_rate": 0.2,
+    "place_rate": 0.4,
+    "flat_profit": -2.5,
+    "by_tag": {
+      "The one to beat": {"total": 2, "wins": 1, "places": 1, "profit": 1.5},
+      "Each-way chance": {"total": 2, "wins": 0, "places": 1, "profit": -2.0},
+      "Value bet": {"total": 1, "wins": 0, "places": 0, "profit": -1.0}
+    }
+  }
+]
 ```
 
 ### Modifying Claude Prompts
