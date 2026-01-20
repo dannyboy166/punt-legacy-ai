@@ -811,3 +811,91 @@ class PredictionTracker:
                 }
 
             return stats
+
+    def get_stats_by_meeting(self) -> list[dict]:
+        """
+        Get performance statistics grouped by meeting (track + date).
+
+        Returns list of meetings with stats per tag and overall profit/loss.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    track,
+                    race_date,
+                    tag,
+                    odds,
+                    place_odds,
+                    won,
+                    placed
+                FROM predictions
+                WHERE outcome_recorded = 1
+                ORDER BY race_date DESC, track
+            """).fetchall()
+
+            # Group by meeting (track + date)
+            meetings = {}
+            for row in rows:
+                key = f"{row['track']}|{row['race_date']}"
+                if key not in meetings:
+                    meetings[key] = {
+                        'track': row['track'],
+                        'date': row['race_date'],
+                        'picks': [],
+                    }
+                meetings[key]['picks'].append({
+                    'tag': row['tag'],
+                    'odds': row['odds'],
+                    'place_odds': row['place_odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            # Calculate stats for each meeting
+            result = []
+            for key, meeting in meetings.items():
+                picks = meeting['picks']
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+
+                # Overall flat bet profit
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+
+                # Stats by tag
+                by_tag = {}
+                for p in picks:
+                    tag = p['tag']
+                    if tag not in by_tag:
+                        by_tag[tag] = {'total': 0, 'wins': 0, 'places': 0, 'profit': 0}
+                    by_tag[tag]['total'] += 1
+                    if p['won']:
+                        by_tag[tag]['wins'] += 1
+                        by_tag[tag]['profit'] += p['odds'] - 1
+                    else:
+                        by_tag[tag]['profit'] -= 1
+                    if p['placed']:
+                        by_tag[tag]['places'] += 1
+
+                result.append({
+                    'track': meeting['track'],
+                    'date': meeting['date'],
+                    'total_picks': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': wins / total if total > 0 else 0,
+                    'place_rate': places / total if total > 0 else 0,
+                    'flat_profit': round(flat_profit, 2),
+                    'by_tag': {
+                        tag: {
+                            'total': s['total'],
+                            'wins': s['wins'],
+                            'places': s['places'],
+                            'profit': round(s['profit'], 2)
+                        }
+                        for tag, s in by_tag.items()
+                    }
+                })
+
+            return result

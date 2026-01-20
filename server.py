@@ -526,6 +526,20 @@ def get_stats_by_tag_with_staking():
     return tracker.get_stats_by_tag_with_staking(min_samples=1)
 
 
+@app.get("/stats/by-meeting")
+def get_stats_by_meeting():
+    """
+    Get performance statistics grouped by meeting (track + date).
+
+    Returns a list of meetings with:
+    - track, date
+    - total_picks, wins, places, win_rate, place_rate
+    - flat_profit (1u per pick)
+    - by_tag: breakdown by tag with wins/places/profit for each
+    """
+    return tracker.get_stats_by_meeting()
+
+
 @app.post("/fix-place-odds")
 def fix_place_odds():
     """
