@@ -150,7 +150,7 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 - **"Value bet"** - Genuine winning chance based on speed ratings, but odds better than their form suggests
 
 **Pick 0 contenders (no bet) when:**
-- 50%+ of field has ZERO race runs (first starters/only trials) - can't compare unknowns
+- Multiple runners in the field has ZERO race runs (first starters/only trials) - can't compare unknowns
 - Field is too even with no standouts
 
 **Lower confidence (but still pick) when:**
