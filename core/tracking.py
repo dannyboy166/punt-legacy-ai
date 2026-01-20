@@ -357,9 +357,17 @@ class PredictionTracker:
             Number of outcomes recorded
         """
         count = 0
+        # Australian rules: 8+ runners = 1st/2nd/3rd pay place
+        #                   5-7 runners = 1st/2nd only
+        field_size = len(results)
+
         for horse, position in results.items():
             won = position == 1
-            placed = position <= 3
+            # Place only pays 3rd if 8+ runners
+            if field_size >= 8:
+                placed = position <= 3
+            else:
+                placed = position <= 2  # Only 1st/2nd pay place
             if self.record_outcome(track, race_number, race_date, horse, won, placed, position):
                 count += 1
         return count

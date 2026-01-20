@@ -146,7 +146,7 @@ SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
 Pick 0-3 contenders for this race. For each, assign a tag:
 - **"The one to beat"** - Clear standout
-- **"Each-way chance"** - Could win, should place, place odds worth it
+- **"Each-way chance"** - Could win, should place, good value, place odds greater than $1.7
 - **"Value bet"** - Odds better than their form suggests
 
 **Pick 0 contenders (no bet) when:**
@@ -193,9 +193,9 @@ Your task is to identify picks for bonus bets and/or promo plays in this race (i
    - Must have a genuine winning chance (don't just pick any longshot)
    - Higher odds = better value since you only keep the profit, not the stake
 
-2. **PROMO PICK**: A horse with strong, consistent form that you're confident will run well
+2. **PROMO PICK**: A horse with strong, consistent speed ratings that you're confident will run well
    - Reliability and consistency matter more than odds
-   - Look for horses with proven form and solid recent runs
+   - Look for horses with proven recent speed ratings at similar conditions/distance to the race being predicted
 
 ## Understanding the Data
 

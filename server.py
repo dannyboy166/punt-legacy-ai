@@ -845,6 +845,11 @@ def run_backtest_endpoint(req: BacktestRequest):
             if req.auto_sync:
                 actual_results = get_race_results(result.track, result.race_number, result.date)
                 if actual_results:
+                    # Determine place paying positions based on field size
+                    # Australian rules: 8+ runners = 1st/2nd/3rd pay place
+                    #                   5-7 runners = 1st/2nd only
+                    actual_field_size = len(actual_results)
+
                     # Record outcomes for our contenders
                     for c in result.contenders:
                         # Find the horse in results (fuzzy match)
@@ -853,7 +858,11 @@ def run_backtest_endpoint(req: BacktestRequest):
                                c.horse.lower() in horse_name.lower() or \
                                horse_name.lower() in c.horse.lower():
                                 won = position == 1
-                                placed = position <= 3
+                                # Place only pays 3rd if 8+ runners
+                                if actual_field_size >= 8:
+                                    placed = position <= 3
+                                else:
+                                    placed = position <= 2  # Only 1st/2nd pay place
                                 if tracker.record_outcome(
                                     result.track, result.race_number, result.date,
                                     c.horse, won, placed, position
