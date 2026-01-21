@@ -157,6 +157,62 @@ class RaceResponse(BaseModel):
 # BACKTEST MODELS
 # =============================================================================
 
+class MeetingPredictionRequest(BaseModel):
+    """Request to generate predictions for an entire meeting."""
+    track: str
+    date: str  # Format: dd-MMM-yyyy
+    race_start: int = 1
+    race_end: int = 12
+
+    @field_validator('track')
+    @classmethod
+    def track_not_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError('Track name cannot be empty')
+        return v.strip()
+
+    @field_validator('date')
+    @classmethod
+    def date_format_valid(cls, v: str) -> str:
+        if not DATE_PATTERN.match(v):
+            raise ValueError('Date must be in format dd-MMM-yyyy (e.g., 21-Jan-2026)')
+        return v
+
+
+class MeetingRaceResult(BaseModel):
+    """Result of a single race prediction within a meeting."""
+    race_number: int
+    race_name: str
+    distance: int
+    condition: str
+    class_: str
+    contenders: list[Contender]
+    summary: str
+    error: Optional[str] = None
+
+
+class TipsheetPick(BaseModel):
+    """A tipsheet-worthy pick from the meeting."""
+    race_number: int
+    horse: str
+    tab_no: int
+    odds: float
+    place_odds: Optional[float]
+    tag: str
+    analysis: str
+
+
+class MeetingPredictionResponse(BaseModel):
+    """Response from generating predictions for an entire meeting."""
+    track: str
+    date: str
+    races: list[MeetingRaceResult]
+    tipsheet_picks: list[TipsheetPick]
+    total_races: int
+    races_with_picks: int
+    estimated_cost: float
+
+
 class BacktestRequest(BaseModel):
     """Request to run a backtest on historical races."""
     track: str
@@ -466,6 +522,174 @@ def predict(req: PredictionRequest):
                 race_confidence=result.race_confidence,
                 confidence_reason=result.confidence_reason
             )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict-meeting", response_model=MeetingPredictionResponse)
+def predict_meeting(req: MeetingPredictionRequest):
+    """
+    Generate predictions for all races at a meeting.
+
+    This is an admin-only convenience endpoint that runs the same prediction
+    logic as /predict for each race sequentially. Useful for building tipsheets.
+
+    Args:
+        track: Track name
+        date: Date in format dd-MMM-yyyy
+        race_start: First race to predict (default 1)
+        race_end: Last race to predict (default 12)
+
+    Returns:
+        All race predictions plus a summary of tipsheet_pick horses
+    """
+    try:
+        # Get races at this track
+        meetings = pf_api.get_meetings(req.date)
+
+        # Find meeting ID for track
+        meeting_id = None
+        actual_track_name = req.track
+        for m in meetings:
+            m_track = m.get("track", {}).get("name", "")
+            if m_track.lower() == req.track.lower() or req.track.lower() in m_track.lower():
+                meeting_id = m.get("meetingId")
+                actual_track_name = m_track
+                break
+
+        if not meeting_id:
+            raise HTTPException(status_code=404, detail=f"Track '{req.track}' not found on {req.date}")
+
+        # Get all races
+        fields = pf_api.get_fields(meeting_id, 0)
+        all_races = fields.get("races", [])
+
+        # Filter to requested range
+        race_numbers = [r.get("number") for r in all_races
+                       if req.race_start <= r.get("number", 0) <= req.race_end]
+        race_numbers.sort()
+
+        if not race_numbers:
+            raise HTTPException(status_code=404, detail=f"No races found in range R{req.race_start}-R{req.race_end}")
+
+        # Run predictions for each race
+        race_results = []
+        tipsheet_picks = []
+        races_with_picks = 0
+
+        for race_num in race_numbers:
+            try:
+                # Get race data (same as /predict)
+                race_data, error = pipeline.get_race_data(actual_track_name, race_num, req.date)
+
+                if error:
+                    race_results.append(MeetingRaceResult(
+                        race_number=race_num,
+                        race_name="",
+                        distance=0,
+                        condition="",
+                        class_="",
+                        contenders=[],
+                        summary="",
+                        error=error
+                    ))
+                    continue
+
+                # Check if odds are available
+                runners_with_odds = sum(1 for r in race_data.runners if r.odds)
+                if runners_with_odds == 0:
+                    race_results.append(MeetingRaceResult(
+                        race_number=race_num,
+                        race_name=race_data.race_name,
+                        distance=race_data.distance,
+                        condition=race_data.condition,
+                        class_=race_data.class_,
+                        contenders=[],
+                        summary="",
+                        error="Odds not available yet"
+                    ))
+                    continue
+
+                # Generate prediction (same logic as /predict)
+                result = predictor.predict(race_data, mode="normal")
+
+                # Build contenders list
+                contenders = []
+                for c in result.contenders:
+                    place_odds = c.place_odds
+                    if not place_odds:
+                        for r in race_data.runners:
+                            if r.tab_no == c.tab_no:
+                                place_odds = r.place_odds
+                                break
+
+                    contender = Contender(
+                        horse=c.horse,
+                        tab_no=c.tab_no,
+                        odds=c.odds,
+                        place_odds=place_odds,
+                        tag=c.tag,
+                        analysis=c.analysis,
+                        tipsheet_pick=c.tipsheet_pick,
+                    )
+                    contenders.append(contender)
+
+                    # Collect tipsheet picks
+                    if c.tipsheet_pick:
+                        tipsheet_picks.append(TipsheetPick(
+                            race_number=race_num,
+                            horse=c.horse,
+                            tab_no=c.tab_no,
+                            odds=c.odds,
+                            place_odds=place_odds,
+                            tag=c.tag,
+                            analysis=c.analysis
+                        ))
+
+                if contenders:
+                    races_with_picks += 1
+
+                # Store prediction for tracking
+                try:
+                    tracker.store_prediction(result, race_data, req.date)
+                except Exception as e:
+                    print(f"Warning: Failed to store prediction for R{race_num}: {e}")
+
+                race_results.append(MeetingRaceResult(
+                    race_number=race_num,
+                    race_name=race_data.race_name,
+                    distance=race_data.distance,
+                    condition=race_data.condition,
+                    class_=race_data.class_,
+                    contenders=contenders,
+                    summary=result.summary,
+                    error=None
+                ))
+
+            except Exception as e:
+                race_results.append(MeetingRaceResult(
+                    race_number=race_num,
+                    race_name="",
+                    distance=0,
+                    condition="",
+                    class_="",
+                    contenders=[],
+                    summary="",
+                    error=str(e)
+                ))
+
+        return MeetingPredictionResponse(
+            track=actual_track_name,
+            date=req.date,
+            races=race_results,
+            tipsheet_picks=tipsheet_picks,
+            total_races=len(race_results),
+            races_with_picks=races_with_picks,
+            estimated_cost=len(race_numbers) * 0.025
+        )
 
     except HTTPException:
         raise
