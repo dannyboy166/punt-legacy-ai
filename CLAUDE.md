@@ -46,11 +46,13 @@ A subscription product where users can:
 - [x] Natural language tags (not forced categories)
 - [x] Place odds consideration for each-way ($1.80+ threshold)
 
-### Phase 5: Product
-- [ ] Build frontend to display predictions
-- [ ] User accounts
-- [ ] Usage tracking
-- [ ] Billing integration
+### Phase 5: Product ✅ COMPLETE
+- [x] Build frontend to display predictions
+- [x] User accounts (NextAuth)
+- [x] Usage tracking (per-user daily limits)
+- [x] Billing integration (Stripe)
+- [x] Tipsheet generator (admin feature)
+- [x] Auto-skip races with insufficient form data
 
 ---
 
@@ -449,6 +451,37 @@ Compare within the field only. If everyone is 0.98 and one horse is 0.99, that h
 - 50 races/day = ~$1.25/day
 - Uses Claude Sonnet 4 by default
 
+### Cost-Saving Features
+
+**Auto-skip for insufficient form data:**
+- If >50% of runners have 0 race runs (only trials or first starters), the race is skipped
+- Returns a friendly message without calling Claude API
+- Skipped races don't count against user's daily limit
+- Saves ~$0.025 per skipped race
+
+**User tier limits:**
+| Tier | Daily Limit |
+|------|-------------|
+| Free | 2 predictions |
+| Basic ($9.99/mo) | 6 predictions |
+| Pro ($29.99/mo) | 50 predictions |
+
+---
+
+## Tipsheet Pick Flag
+
+Each contender includes a `tipsheet_pick: bool` field indicating whether Claude would genuinely bet on this horse.
+
+**When `tipsheet_pick = true`:**
+- Speed ratings clearly support this horse vs the field
+- The odds represent real value (not just "best of a bad bunch")
+- Claude is confident in the pick
+
+**Usage:**
+- Frontend shows ⭐ star icon next to tipsheet picks
+- Admin tipsheet generator highlights these for daily tipsheet creation
+- Useful for filtering "must-back" picks from "worth considering" picks
+
 ---
 
 ## Integration with racing-tips-platform
@@ -480,7 +513,8 @@ uvicorn server:app --host 0.0.0.0 --port 8000
 # Core Endpoints
 GET  /meetings?date=09-Jan-2026     # List tracks
 GET  /races?track=Gosford&date=X    # List races at track
-POST /predict                        # Generate prediction
+POST /predict                        # Generate prediction for single race
+POST /predict-meeting                # Generate predictions for entire meeting (admin)
 POST /backtest                       # Run backtest on historical races
 
 # Stats Endpoints
@@ -641,9 +675,33 @@ python experiments/backtest.py "Flemington" 2 "17-Jan-2026"
 
 ---
 
+## Tipsheet Generator (Admin Feature)
+
+Generate predictions for an entire meeting at once via `POST /predict-meeting`:
+
+```bash
+curl -X POST http://localhost:8000/predict-meeting \
+  -H "Content-Type: application/json" \
+  -d '{"track": "Randwick", "date": "22-Jan-2026", "race_start": 1, "race_end": 8}'
+```
+
+**Response includes:**
+- All race predictions (same format as `/predict`)
+- `tipsheet_picks[]` - Just the ⭐ picks across all races
+- `total_races`, `races_with_picks`, `estimated_cost`
+
+**Frontend features (`/admin/tipsheet`):**
+- Saves generated tipsheets to localStorage (persists 7 days)
+- Load/delete previous tipsheets without regenerating
+- Copy button formats tipsheet for Instagram/social
+
+---
+
 ## Next Steps
 
 1. ~~Historical backtesting~~ ✅ Done (experiments/backtest.py)
-2. Prediction accuracy tracking
-3. Switch live predictor to v2 approach
-4. User customization options
+2. ~~Prediction accuracy tracking~~ ✅ Done (tracking endpoints)
+3. ~~Switch live predictor to v2 approach~~ ✅ Done (auto-skip, tipsheet_pick)
+4. ~~Tipsheet generator~~ ✅ Done (/admin/tipsheet)
+5. Performance dashboard improvements
+6. User customization options
