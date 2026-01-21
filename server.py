@@ -137,6 +137,8 @@ class PredictionResponse(BaseModel):
     summary: str
     race_confidence: Optional[int] = None  # Deprecated - not used in new model
     confidence_reason: Optional[str] = None  # Deprecated - not used in new model
+    skipped: bool = False  # True if race was skipped due to insufficient form data
+    skip_reason: Optional[str] = None  # Reason for skipping (shown to user)
 
 
 class MeetingResponse(BaseModel):
@@ -406,6 +408,28 @@ def predict(req: PredictionRequest):
             raise HTTPException(
                 status_code=503,
                 detail="Odds not available yet. Please wait for the market to open and try again."
+            )
+
+        # Check if >50% of field has no race form (only trials or first starters)
+        # If so, skip the Claude API call - predictions would be unreliable
+        total_runners = len(race_data.runners)
+        runners_with_no_form = sum(1 for r in race_data.runners if r.race_runs_count == 0)
+        no_form_percentage = (runners_with_no_form / total_runners * 100) if total_runners > 0 else 0
+
+        if no_form_percentage > 50:
+            # Return skipped response - doesn't call Claude, doesn't count against limit
+            return PredictionResponse(
+                mode=req.mode,
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=race_data.condition,
+                class_=race_data.class_,
+                contenders=[],
+                summary=f"This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
+                skipped=True,
+                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history"
             )
 
         # Generate prediction with specified mode
