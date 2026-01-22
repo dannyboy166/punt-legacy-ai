@@ -311,20 +311,48 @@ def get_meetings(date: str):
         date: Date in format dd-MMM-yyyy (e.g., "09-Jan-2026")
 
     Returns:
-        List of tracks with meeting IDs
+        List of tracks with meeting IDs and race counts
     """
     validate_date(date)
     try:
         meetings = pf_api.get_meetings(date)
+
+        # Filter to Australian meetings only
+        aus_meetings = [
+            m for m in meetings
+            if m.get("track", {}).get("name")
+            and m.get("track", {}).get("country") == "AUS"
+        ]
+
+        # Fetch race counts in parallel for all meetings
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        def get_race_count(meeting_id: int) -> int:
+            """Get race count for a meeting by fetching fields."""
+            try:
+                fields = pf_api.get_fields(meeting_id, 0)
+                races = fields.get("races", [])
+                return len(races) if races else 0
+            except Exception:
+                return 0
+
+        race_counts = {}
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            future_to_meeting = {
+                executor.submit(get_race_count, int(m.get("meetingId", 0))): m.get("meetingId")
+                for m in aus_meetings
+            }
+            for future in as_completed(future_to_meeting):
+                meeting_id = future_to_meeting[future]
+                race_counts[meeting_id] = future.result()
+
         return [
             MeetingResponse(
                 track=m.get("track", {}).get("name", "Unknown"),
-                meeting_id=m.get("meetingId", 0),
-                race_count=m.get("numberOfRaces", 0)
+                meeting_id=int(m.get("meetingId", 0)),
+                race_count=race_counts.get(m.get("meetingId"), 0)
             )
-            for m in meetings
-            if m.get("track", {}).get("name")
-            and m.get("track", {}).get("country") == "AUS"  # Australian races only
+            for m in aus_meetings
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
