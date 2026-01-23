@@ -139,6 +139,7 @@ class PredictionResponse(BaseModel):
     confidence_reason: Optional[str] = None  # Deprecated - not used in new model
     skipped: bool = False  # True if race was skipped due to insufficient form data
     skip_reason: Optional[str] = None  # Reason for skipping (shown to user)
+    warnings: list[str] = []  # Form/data warnings (e.g., "5/8 runners have limited form")
 
 
 class MeetingResponse(BaseModel):
@@ -527,7 +528,8 @@ def predict(req: PredictionRequest):
                 promo_pick=promo_pick_response,
                 summary=result.summary,
                 race_confidence=result.race_confidence,
-                confidence_reason=result.confidence_reason
+                confidence_reason=result.confidence_reason,
+                warnings=race_data.warnings
             )
 
         else:
@@ -572,7 +574,8 @@ def predict(req: PredictionRequest):
                 contenders=contenders,
                 summary=result.summary,
                 race_confidence=result.race_confidence,
-                confidence_reason=result.confidence_reason
+                confidence_reason=result.confidence_reason,
+                warnings=race_data.warnings
             )
 
     except HTTPException:
