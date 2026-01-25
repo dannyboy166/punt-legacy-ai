@@ -1068,7 +1068,7 @@ def sync_outcomes(race_date: str):
         "message": f"Synced {synced} prediction outcomes",
         "debug": {
             "tracks_processed": list(tracks.keys()),
-            "pending_count": len(pending)
+            "pending_count": len(all_pending)
         }
     }
 
