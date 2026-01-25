@@ -1013,23 +1013,17 @@ def sync_outcomes(race_date: str):
 
     for track, race_numbers in tracks.items():
         try:
-            # Try to find meeting - check original date, then +1 day, then -1 day
-            # (handles timezone issues where stored date might be off by 1)
+            # Try to find meeting - check original date, then +/- 1-2 days
+            # (handles timezone issues where stored date might be off)
             meeting_id = None
             actual_date = race_date
 
-            # Try original date first
-            meeting_id, actual_date = find_meeting(track, race_date)
-
-            # Try next day if not found
-            if not meeting_id:
-                next_day = adjust_date(race_date, 1)
-                meeting_id, actual_date = find_meeting(track, next_day)
-
-            # Try previous day if still not found
-            if not meeting_id:
-                prev_day = adjust_date(race_date, -1)
-                meeting_id, actual_date = find_meeting(track, prev_day)
+            # Try original date first, then adjacent dates
+            for day_offset in [0, 1, -1, 2, -2]:
+                check_date = adjust_date(race_date, day_offset) if day_offset != 0 else race_date
+                meeting_id, actual_date = find_meeting(track, check_date)
+                if meeting_id:
+                    break
 
             if not meeting_id:
                 errors.append(f"Track not found: {track}")
