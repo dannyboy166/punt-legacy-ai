@@ -1257,6 +1257,38 @@ class BackfillRequest(BaseModel):
     predictions: list[BackfillPrediction]
 
 
+@app.post("/backfill/update-tipsheet")
+def update_tipsheet_picks(req: BackfillRequest):
+    """
+    Update tipsheet_pick field for existing predictions.
+
+    Use this after backfill to sync tipsheet picks that were added later.
+    """
+    import sqlite3
+    from pathlib import Path
+
+    db_path = Path(__file__).parent / "data" / "predictions.db"
+
+    updated = 0
+    with sqlite3.connect(db_path) as conn:
+        for pred in req.predictions:
+            if pred.tipsheet_pick:
+                cursor = conn.execute("""
+                    UPDATE predictions
+                    SET tipsheet_pick = 1
+                    WHERE track = ? AND race_number = ? AND horse = ?
+                    AND tipsheet_pick = 0
+                """, (pred.track, pred.race_number, pred.horse))
+                updated += cursor.rowcount
+
+        conn.commit()
+
+    return {
+        "updated": updated,
+        "message": f"Updated {updated} predictions with tipsheet_pick=true"
+    }
+
+
 @app.post("/backfill")
 def backfill_predictions(req: BackfillRequest):
     """
