@@ -986,20 +986,50 @@ def sync_outcomes(race_date: str):
             tracks[track] = set()
         tracks[track].add(p["race_number"])
 
+    # Helper to parse and adjust dates
+    def adjust_date(date_str: str, days: int) -> str:
+        """Add/subtract days from dd-MMM-yyyy date string."""
+        from datetime import datetime, timedelta
+        months = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                  'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+        month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        parts = date_str.split('-')
+        dt = datetime(int(parts[2]), months[parts[1]], int(parts[0]))
+        dt = dt + timedelta(days=days)
+        return f"{dt.day:02d}-{month_names[dt.month-1]}-{dt.year}"
+
+    def find_meeting(track: str, date_str: str):
+        """Find meeting ID for track, returns (meeting_id, actual_date) or (None, None)."""
+        meetings = pf_api.get_meetings(date_str)
+        for m in meetings:
+            m_track = m.get("track", {}).get("name", "")
+            if m_track.lower() == track.lower() or track.lower() in m_track.lower():
+                return m.get("meetingId"), date_str
+        return None, None
+
     # Fetch results for each track
     synced = 0
     errors = []
 
     for track, race_numbers in tracks.items():
         try:
-            # Find meeting ID for track
-            meetings = pf_api.get_meetings(race_date)
+            # Try to find meeting - check original date, then +1 day, then -1 day
+            # (handles timezone issues where stored date might be off by 1)
             meeting_id = None
-            for m in meetings:
-                m_track = m.get("track", {}).get("name", "")
-                if m_track.lower() == track.lower() or track.lower() in m_track.lower():
-                    meeting_id = m.get("meetingId")
-                    break
+            actual_date = race_date
+
+            # Try original date first
+            meeting_id, actual_date = find_meeting(track, race_date)
+
+            # Try next day if not found
+            if not meeting_id:
+                next_day = adjust_date(race_date, 1)
+                meeting_id, actual_date = find_meeting(track, next_day)
+
+            # Try previous day if still not found
+            if not meeting_id:
+                prev_day = adjust_date(race_date, -1)
+                meeting_id, actual_date = find_meeting(track, prev_day)
 
             if not meeting_id:
                 errors.append(f"Track not found: {track}")
@@ -1226,6 +1256,7 @@ class BackfillPrediction(BaseModel):
     analysis: str = ""
     confidence: int = 5
     race_confidence: int = 5
+    tipsheet_pick: bool = False  # True if Claude would genuinely bet on this
 
 
 class BackfillRequest(BaseModel):
@@ -1270,6 +1301,7 @@ def backfill_predictions(req: BackfillRequest):
                 mode TEXT NOT NULL,
                 pick_type TEXT NOT NULL,
                 analysis TEXT,
+                tipsheet_pick INTEGER DEFAULT 0,
                 won INTEGER,
                 placed INTEGER,
                 finishing_position INTEGER,
@@ -1278,14 +1310,20 @@ def backfill_predictions(req: BackfillRequest):
             )
         """)
 
+        # Add tipsheet_pick column if it doesn't exist (for existing DBs)
+        try:
+            conn.execute("ALTER TABLE predictions ADD COLUMN tipsheet_pick INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
         for pred in req.predictions:
             try:
                 conn.execute("""
                     INSERT OR IGNORE INTO predictions
                     (timestamp, track, race_number, race_date, horse, tab_no,
                      odds, place_odds, tag, confidence, race_confidence,
-                     confidence_reason, mode, pick_type, analysis)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     confidence_reason, mode, pick_type, analysis, tipsheet_pick)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     datetime.now().isoformat(),
                     pred.track,
@@ -1302,6 +1340,7 @@ def backfill_predictions(req: BackfillRequest):
                     pred.mode,
                     pred.pick_type,
                     pred.analysis,
+                    1 if pred.tipsheet_pick else 0,
                 ))
                 if conn.total_changes > 0:
                     imported += 1
