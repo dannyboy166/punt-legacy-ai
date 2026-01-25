@@ -1054,9 +1054,16 @@ def sync_outcomes(race_date: str):
                         results[horse_name] = position
 
                 if results:
+                    # Try to record with actual date first (where meeting was found)
+                    # Then try original stored date as fallback
                     count = tracker.record_outcomes_bulk(
-                        track, race_num, race_date, results
+                        track, race_num, actual_date, results
                     )
+                    if count == 0 and actual_date != race_date:
+                        # Try original date if actual date didn't match any predictions
+                        count = tracker.record_outcomes_bulk(
+                            track, race_num, race_date, results
+                        )
                     synced += count
 
         except Exception as e:

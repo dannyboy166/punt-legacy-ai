@@ -347,6 +347,27 @@ class PredictionTracker:
                 logger.info(f"Recorded outcome for {horse} (fuzzy match): pos={finishing_position}")
                 return True
 
+            # Try matching without date (handles timezone issues where stored date is off)
+            # Only match pending predictions (outcome_recorded = 0) to avoid updating old races
+            cursor = conn.execute("""
+                UPDATE predictions
+                SET won = ?, placed = ?, finishing_position = ?, outcome_recorded = 1
+                WHERE track = ? AND race_number = ? AND outcome_recorded = 0
+                AND LOWER(REPLACE(REPLACE(horse, '''', ''), ' ', '')) = LOWER(REPLACE(REPLACE(?, '''', ''), ' ', ''))
+            """, (
+                1 if won else 0,
+                1 if placed else 0,
+                finishing_position,
+                track,
+                race_number,
+                horse,
+            ))
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                logger.info(f"Recorded outcome for {horse} (date-flexible match): pos={finishing_position}")
+                return True
+
             return False
 
     def record_outcomes_bulk(
