@@ -845,6 +845,72 @@ class PredictionTracker:
 
             return stats
 
+    def get_stats_by_tag_and_tipsheet(self) -> dict:
+        """
+        Get performance statistics grouped by tag, split by tipsheet_pick.
+
+        Returns dict of tag -> {starred: {...}, regular: {...}}
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    tag,
+                    tipsheet_pick,
+                    odds,
+                    won,
+                    placed
+                FROM predictions
+                WHERE outcome_recorded = 1
+            """).fetchall()
+
+            # Group by tag and tipsheet
+            by_tag: dict[str, dict[str, list]] = {}
+            for row in rows:
+                tag = row['tag']
+                is_star = row['tipsheet_pick'] == 1
+                key = 'starred' if is_star else 'regular'
+
+                if tag not in by_tag:
+                    by_tag[tag] = {'starred': [], 'regular': []}
+                by_tag[tag][key].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            stats = {}
+            for tag, groups in by_tag.items():
+                tag_stats = {}
+                for group_name, predictions in groups.items():
+                    if not predictions:
+                        continue
+
+                    total = len(predictions)
+                    wins = sum(1 for p in predictions if p['won'])
+                    places = sum(1 for p in predictions if p['placed'])
+                    avg_odds = sum(p['odds'] for p in predictions) / total
+
+                    # Flat bet ROI
+                    profit = sum(p['odds'] - 1 if p['won'] else -1 for p in predictions)
+                    roi = (profit / total * 100) if total > 0 else 0
+
+                    tag_stats[group_name] = {
+                        'total': total,
+                        'wins': wins,
+                        'places': places,
+                        'win_rate': round(wins / total * 100, 1) if total > 0 else 0,
+                        'place_rate': round(places / total * 100, 1) if total > 0 else 0,
+                        'avg_odds': round(avg_odds, 2),
+                        'profit': round(profit, 2),
+                        'roi': round(roi, 1)
+                    }
+
+                if tag_stats:
+                    stats[tag] = tag_stats
+
+            return stats
+
     def get_stats_by_meeting(self) -> list[dict]:
         """
         Get performance statistics grouped by meeting (track + date).

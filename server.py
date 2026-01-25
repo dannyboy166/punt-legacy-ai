@@ -833,6 +833,17 @@ def get_stats_by_tipsheet():
     return tracker.get_stats_by_tipsheet()
 
 
+@app.get("/stats/by-tag-tipsheet")
+def get_stats_by_tag_and_tipsheet():
+    """
+    Get performance statistics grouped by tag, split by tipsheet_pick.
+
+    Returns dict of tag -> {starred: {...}, regular: {...}}
+    Each contains: total, wins, places, win_rate, place_rate, avg_odds, profit, roi
+    """
+    return tracker.get_stats_by_tag_and_tipsheet()
+
+
 @app.post("/fix-place-odds")
 def fix_place_odds():
     """
