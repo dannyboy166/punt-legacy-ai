@@ -146,10 +146,10 @@ class PredictionOutput:
 
 SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
-Pick 0-2 contenders for this race:
+Pick 0-3 contenders for this race:
 
-- **"The one to beat"** - Your main bet. Clear standout with best chance to win
-- **"Value bet"** - Genuine winning chance, odds better than form suggests
+- **"The one to beat"** (0-1) - Your main bet. Clear standout with best chance to win
+- **"Value bet"** (0-2) - Genuine winning chance, odds better than form suggests
 
 Always list "The one to beat" first if selected.
 
