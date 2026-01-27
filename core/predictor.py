@@ -158,7 +158,7 @@ Always list "The one to beat" first if selected.
 - Field is too even with no standouts
 
 **Lower confidence (but still pick) when:**
-- Many horses have limited form (1-3 runs) - assess with caution but still make picks
+- Many horses have limited form (1-3 runs) - assess with caution, still make picks but comment on it in the summary
 
 ## Key Analysis
 
@@ -185,11 +185,11 @@ Use win/place odds to assess value - is the horse better/worse than the market t
       "tab_no": number,
       "odds": number,
       "tag": "The one to beat" | "Value bet",
-      "analysis": "1-2 sentences referencing RACE form",
+      "analysis": "1-3 sentences referencing RACE form",
       "tipsheet_pick": true | false
     }
   ],
-  "summary": "Brief overview or reason for 0 picks"
+  "summary": "Brief race overview if picks made, or reason for 0 picks"
 }
 ```
 
