@@ -49,7 +49,7 @@ class Contender:
     horse: str
     tab_no: int
     odds: float
-    tag: str  # "The one to beat", "Each-way chance", or "Value bet"
+    tag: str  # "The one to beat" or "Value bet"
     analysis: str  # Natural language analysis of the horse and price
     place_odds: Optional[float] = None  # Place odds for each-way bets
     confidence: Optional[int] = None  # Deprecated - not used in new model
@@ -146,16 +146,12 @@ class PredictionOutput:
 
 SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
-Pick 0-3 contenders for this race:
+Pick 0-2 contenders for this race:
 
-**PRIMARY PICK (0-1):**
-- **"The one to beat"** - Your main bet for this race. One clear standout with best chance to win, but note if their odds are short
+- **"The one to beat"** - Your main bet. Clear standout with best chance to win
+- **"Value bet"** - Genuine winning chance, odds better than form suggests
 
-**ADDITIONAL PICKS (0-2):**
-- **"Each-way chance"** - Could win, should place. ONLY use if place odds are $1.70 or higher (NEVER under $1.70)
-- **"Value bet"** - Genuine winning chance based on speed ratings, but odds better than their form suggests
-
-Always list "The one to beat" first if selected, then additional picks.
+Always list "The one to beat" first if selected.
 
 **Pick 0 contenders (no bet) when:**
 - Multiple runners in the field has ZERO race runs (first starters/only trials) - can't compare unknowns
@@ -188,8 +184,7 @@ Use win/place odds to assess value - is the horse better than the market thinks?
       "horse": "Horse Name",
       "tab_no": number,
       "odds": number,
-      "place_odds": number,
-      "tag": "The one to beat" | "Each-way chance" | "Value bet",
+      "tag": "The one to beat" | "Value bet",
       "analysis": "1-2 sentences referencing RACE form",
       "tipsheet_pick": true | false
     }
