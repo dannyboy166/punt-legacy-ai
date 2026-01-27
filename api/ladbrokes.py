@@ -223,6 +223,7 @@ class LadbrokeAPI:
         pf_track_name: str,
         race_number: int,
         date: str = "today",
+        allow_finished: bool = False,
     ) -> tuple[dict[str, dict], Optional[str]]:
         """
         Get odds for a PuntingForm track, handling name differences.
@@ -234,6 +235,7 @@ class LadbrokeAPI:
             pf_track_name: Track name from PuntingForm
             race_number: Race number
             date: Date for the race (YYYY-MM-DD, "today", or "tomorrow")
+            allow_finished: If True, return odds even for finished races (admin replay)
 
         Returns:
             Tuple of (odds_dict, error_message)
@@ -270,15 +272,19 @@ class LadbrokeAPI:
         race_status_clean = race_status.strip().lower() if race_status else None
         is_open = race_status_clean and race_status_clean.startswith("open")
         if race_status_clean and not is_open:
-            status_messages = {
-                "closed": "Race has started - betting is closed",
-                "final": "Race has finished",
-                "abandoned": "Race has been abandoned",
-                "interim": "Race has finished - results pending",
-            }
-            reason = status_messages.get(race_status_clean, f"Race is not available (status: {race_status})")
-            log_prediction_skip(logger, pf_track_name, race_number, reason)
-            return {}, reason
+            # Allow admin to replay finished races for marketing content
+            if allow_finished and race_status_clean in ("closed", "final", "interim"):
+                logger.info(f"Admin replay: bypassing status '{race_status_clean}' for {pf_track_name} R{race_number}")
+            else:
+                status_messages = {
+                    "closed": "Race has started - betting is closed",
+                    "final": "Race has finished",
+                    "abandoned": "Race has been abandoned",
+                    "interim": "Race has finished - results pending",
+                }
+                reason = status_messages.get(race_status_clean, f"Race is not available (status: {race_status})")
+                log_prediction_skip(logger, pf_track_name, race_number, reason)
+                return {}, reason
 
         if error:
             log_prediction_skip(logger, pf_track_name, race_number, error)

@@ -295,6 +295,7 @@ class RaceDataPipeline:
         track: str,
         race_number: int,
         date: str,
+        allow_finished: bool = False,
     ) -> tuple[Optional[RaceData], Optional[str]]:
         """
         Get complete race data for Claude.
@@ -343,10 +344,10 @@ class RaceDataPipeline:
         except ValueError:
             lb_date = "today"  # Fallback if date parsing fails
 
-        lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number, lb_date)
+        lb_odds, lb_error = self.lb_api.get_odds_for_pf_track(meeting_track, race_number, lb_date, allow_finished=allow_finished)
 
-        # Check if race is closed/finished - return error immediately
-        if lb_error and any(x in lb_error for x in ["has started", "has finished", "been abandoned", "not available"]):
+        # Check if race is closed/finished - return error immediately (unless admin replay)
+        if not allow_finished and lb_error and any(x in lb_error for x in ["has started", "has finished", "been abandoned", "not available"]):
             return None, lb_error
 
         # 4. Find the race in fields data

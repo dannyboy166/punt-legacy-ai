@@ -73,6 +73,7 @@ class PredictionRequest(BaseModel):
     race_number: int
     date: str  # Format: dd-MMM-yyyy (e.g., "09-Jan-2026")
     mode: str = "normal"  # "normal" or "promo_bonus"
+    allow_finished: bool = False  # Admin only: allow predictions on finished races
 
     @field_validator('track')
     @classmethod
@@ -426,7 +427,7 @@ def predict(req: PredictionRequest):
     """
     try:
         # Get race data
-        race_data, error = pipeline.get_race_data(req.track, req.race_number, req.date)
+        race_data, error = pipeline.get_race_data(req.track, req.race_number, req.date, allow_finished=req.allow_finished)
 
         if error:
             raise HTTPException(status_code=400, detail=error)
