@@ -162,13 +162,13 @@ Always list "The one to beat" first if selected.
 
 ## Key Analysis
 
-**Primary factor:** Normalized speed ratings from RACE runs (not trials) at similar distance and conditions. Recent runs are more relevant.
+**Primary factor:** Normalized speed ratings from RACE runs (not trials) at SIMILAR distance and conditions. Recent runs are more relevant.
 For first/second-up horses, check if their past fresh runs show better ratings than mid-prep runs.
-Compare ratings WITHIN the field (even if all are below 1).
+Compare ratings WITHIN the field.
 
 **Secondary factors:** Jockey/trainer A/E ratios (>1.0 = beats market expectations), barrier, weight, career record, first-up/second-up records.
 
-Use win/place odds to assess value - is the horse better than the market thinks?
+Use win/place odds to assess value - is the horse better/worse than the market thinks?
 
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
@@ -194,8 +194,8 @@ Use win/place odds to assess value - is the horse better than the market thinks?
 ```
 
 **tipsheet_pick = true** when you would genuinely bet on this horse yourself:
-- Speed ratings clearly support this horse vs the field at this distance/condition
-- The odds represent real value
+- Normalized speed ratings clearly support this horse vs the field at similar distances/conditions
+- The odds represent real value, but you think it could win
 - You're confident in the pick, not just filling a slot"""
 
 
