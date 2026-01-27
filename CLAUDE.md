@@ -513,7 +513,7 @@ uvicorn server:app --host 0.0.0.0 --port 8000
 # Core Endpoints
 GET  /meetings?date=09-Jan-2026     # List tracks
 GET  /races?track=Gosford&date=X    # List races at track
-POST /predict                        # Generate prediction for single race
+POST /predict                        # Generate prediction (accepts allow_finished for past races)
 POST /predict-meeting                # Generate predictions for entire meeting (admin)
 POST /backtest                       # Run backtest on historical races
 
@@ -593,6 +593,29 @@ Deploy FastAPI server to Railway/Render/Fly.io with:
 - Port 8000 exposed
 
 Set `PREDICTOR_API_URL` in racing-tips-platform to the deployed URL.
+
+---
+
+## Admin Replay (Marketing Videos)
+
+Admin can re-run the predictor on **past/finished races** for marketing content creation. Instead of recording every race live, admin can find a winner, re-run the predictor on that race, and screen-record the prediction appearing.
+
+**How it works:**
+- Admin uses `/ai-predictor` and picks any past date
+- The frontend sends `allow_finished: true` to the `/predict` endpoint (admin only)
+- The Ladbrokes race status check ("has started"/"has finished") is bypassed
+- Ladbrokes SP (Starting Price) odds are used instead of live pre-race odds
+- Everything else is identical: same form data, same prompt, same Claude model
+
+**Limitations:**
+- Only works if Ladbrokes still has the meeting data (typically a few weeks)
+- Odds shown will be SP (final starting prices), not pre-race prices — usually very close
+- Non-admin users are unaffected — they still can't predict finished races
+
+**Files:**
+- `api/ladbrokes.py` - `allow_finished` param on `get_odds_for_pf_track()`
+- `core/race_data.py` - `allow_finished` param on `get_race_data()`
+- `server.py` - `allow_finished` field on `PredictionRequest`
 
 ---
 
