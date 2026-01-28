@@ -513,6 +513,7 @@ uvicorn server:app --host 0.0.0.0 --port 8000
 # Core Endpoints
 GET  /meetings?date=09-Jan-2026     # List tracks
 GET  /races?track=Gosford&date=X    # List races at track
+GET  /odds?track=X&race_number=N&date=X  # Live Ladbrokes odds (for manual tip page)
 POST /predict                        # Generate prediction (accepts allow_finished for past races)
 POST /predict-meeting                # Generate predictions for entire meeting (admin)
 POST /backtest                       # Run backtest on historical races
