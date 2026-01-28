@@ -410,6 +410,35 @@ def get_races(track: str, date: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/odds")
+def get_odds(track: str, race_number: int, date: str):
+    """
+    Get live Ladbrokes odds for a race.
+
+    Args:
+        track: Track name from PuntingForm (e.g., "Randwick")
+        race_number: Race number
+        date: Date in format dd-MMM-yyyy
+
+    Returns:
+        Dict of runner odds keyed by lowercase horse name.
+    """
+    validate_date(date)
+    if not track or not track.strip():
+        raise HTTPException(status_code=400, detail="Track name cannot be empty")
+    if race_number < 1:
+        raise HTTPException(status_code=400, detail="Race number must be >= 1")
+
+    from api.ladbrokes import LadbrokeAPI
+    lb_api = LadbrokeAPI()
+    odds_dict, error = lb_api.get_odds_for_pf_track(track.strip(), race_number, date)
+
+    if error:
+        return {"runners": {}, "error": error}
+
+    return {"runners": odds_dict, "error": None}
+
+
 @app.post("/predict", response_model=PredictionResponse)
 def predict(req: PredictionRequest):
     """
