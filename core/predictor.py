@@ -214,7 +214,7 @@ Your task is to identify picks for bonus bets and/or promo plays in this race (i
 
 ## Understanding the Data
 
-**Speed Ratings** (MOST IMPORTANT): Normalized performance measure (1.000 = average for that distance/condition).
+**Speed Ratings** (MOST IMPORTANT): Normalized performance measure (100 = average for that distance/condition).
 - Compare ratings WITHIN THIS FIELD - the highest-rated horse has faster normalized speed relative to competitors
 - Prioritize runs at similar distance and similar track condition
 - More recent runs are more relevant than older runs

@@ -47,7 +47,7 @@ class TestFormRun:
         assert d["condition"] == "G4"
         assert d["position"] == 2
         assert d["margin"] == 1.5
-        assert d["rating"] == 1.0234
+        assert d["rating"] == 102.3
 
     def test_to_dict_none_rating(self):
         run = FormRun(
@@ -263,7 +263,7 @@ class TestRaceData:
         assert "J Smith" in text
         assert "G4" in text
         assert "1200m" in text
-        assert "1.015" in text  # Rating
+        assert "101.5" in text  # Rating
 
 
 # =============================================================================

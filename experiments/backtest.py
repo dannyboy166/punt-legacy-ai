@@ -226,7 +226,7 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
                     except:
                         pass
                 
-                rating_str = f"{rating:.3f}" if rating else "N/A"
+                rating_str = f"{rating * 100:.1f}" if rating else "N/A"
                 prep_str = str(f_prep) if f_prep else "-"
                 trial_str = "TRIAL" if is_trial else "-"
                 

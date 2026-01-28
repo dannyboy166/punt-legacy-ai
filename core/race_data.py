@@ -60,7 +60,7 @@ class FormRun:
             "starters": self.starters,
             "class": self.class_,
             "prize_money": self.prize_money,
-            "rating": round(self.rating, 4) if self.rating else None,
+            "rating": round(self.rating * 100, 1) if self.rating else None,
             "prep_run": self.prep_run,  # 1=1st up, 2=2nd up, etc.
             "is_barrier_trial": self.is_barrier_trial,
         }
@@ -262,7 +262,7 @@ class RaceData:
                 lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |")
                 lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
-                    rating_str = f"{f.rating:.3f}" if f.rating else "N/A"
+                    rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
                     lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} | {trial_str} |")
