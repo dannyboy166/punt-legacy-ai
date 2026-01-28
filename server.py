@@ -430,13 +430,21 @@ def get_odds(track: str, race_number: int, date: str):
         raise HTTPException(status_code=400, detail="Race number must be >= 1")
 
     from api.ladbrokes import LadbrokeAPI
-    lb_api = LadbrokeAPI()
-    odds_dict, error = lb_api.get_odds_for_pf_track(track.strip(), race_number, date)
+    from datetime import datetime as dt
+    try:
+        lb_api = LadbrokeAPI()
+        try:
+            lb_date = dt.strptime(date, "%d-%b-%Y").strftime("%Y-%m-%d")
+        except ValueError:
+            lb_date = "today"
+        odds_dict, error = lb_api.get_odds_for_pf_track(track.strip(), race_number, lb_date)
 
-    if error:
-        return {"runners": {}, "error": error}
+        if error:
+            return {"runners": {}, "error": error}
 
-    return {"runners": odds_dict, "error": None}
+        return {"runners": odds_dict, "error": None}
+    except Exception as e:
+        return {"runners": {}, "error": str(e)}
 
 
 @app.post("/predict", response_model=PredictionResponse)
