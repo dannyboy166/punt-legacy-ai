@@ -252,7 +252,7 @@ class BacktestContenderResponse(BaseModel):
     horse: str
     tab_no: int
     odds: float
-    place_odds: float
+    place_odds: Optional[float] = None
     tag: str
     analysis: str
 
@@ -666,6 +666,23 @@ def predict_meeting(req: MeetingPredictionRequest):
                         contenders=[],
                         summary="",
                         error="Odds not available yet"
+                    ))
+                    continue
+
+                # Check if >50% of field has no race form (auto-skip)
+                total_runners = len(race_data.runners)
+                runners_with_no_form = sum(1 for r in race_data.runners if r.race_runs_count == 0)
+                no_form_pct = (runners_with_no_form / total_runners * 100) if total_runners > 0 else 0
+                if no_form_pct > 50:
+                    race_results.append(MeetingRaceResult(
+                        race_number=race_num,
+                        race_name=race_data.race_name,
+                        distance=race_data.distance,
+                        condition=race_data.condition,
+                        class_=race_data.class_,
+                        contenders=[],
+                        summary=f"Skipped: {runners_with_no_form}/{total_runners} runners ({no_form_pct:.0f}%) have no race form.",
+                        error=None
                     ))
                     continue
 

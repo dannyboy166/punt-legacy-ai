@@ -162,7 +162,7 @@ Always list "The one to beat" first if selected.
 
 ## Key Analysis
 
-**Primary factor:** Normalized speed ratings from RACE runs (not trials) at SIMILAR distance and conditions. Recent runs are more relevant.
+**Primary factor:** Normalized speed ratings (100 = average for distance/condition) from RACE runs (not trials) at SIMILAR distance and conditions. Recent runs are more relevant.
 For first/second-up horses, check if their past fresh runs show better ratings than mid-prep runs.
 Compare ratings WITHIN the field. A win with a low rating means the horse beat a weak field - do not elevate it over horses with clearly superior ratings.
 
