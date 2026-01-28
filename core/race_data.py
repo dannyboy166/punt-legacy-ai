@@ -452,25 +452,35 @@ class RaceDataPipeline:
             else:
                 condition_record = runner.get("heavyRecord")
 
-            # Determine first-up/second-up from form data (more reliable than prepRuns field)
-            # prepRuns in form = which run of the prep it was (0 = first-up, 1 = second-up, etc)
-            # So if last run had prepRuns=0, they were first-up then, now they're second-up
-            # If last run had prepRuns=1, they were second-up then, now they're third-up
+            # Determine first-up/second-up from form history prepRuns + date gap
+            # Form prepRuns: 0 = first-up run, 1 = second-up run, etc.
+            # Fields endpoint prepRuns is always 0 (broken), so we use form data.
+            SPELL_DAYS = 45  # Gap >= 45 days = new prep (first-up)
             runner_form_raw = form_by_runner.get(runner_id, [])
-            if runner_form_raw:
-                last_prep = runner_form_raw[0].get("prepRuns", 0)
-                # Today's run = last_prep + 1
-                current_prep = last_prep + 1
-                first_up = current_prep == 0  # Would only happen if prepRuns was -1 (not possible)
-                second_up = current_prep == 1  # Last run was prepRuns=0 (first-up), now second-up
-                # Actually - prepRuns=0 means first-up at that time
-                # So if most recent was prepRuns=0, they're NOW second-up
-                # If most recent was prepRuns=1, they're NOW third-up
-                # True first-up = no recent form (long spell)
-                first_up = False  # They have recent form, so not first-up
-                second_up = last_prep == 0  # Last run was first-up, now second-up
+            # Filter to race runs only (not trials)
+            race_runs_raw = [f for f in runner_form_raw if not f.get("isBarrierTrial", False)]
+            if race_runs_raw:
+                last_run = race_runs_raw[0]
+                last_date_str = last_run.get("meetingDate", "")[:10]
+                last_prep = last_run.get("prepRuns", 0)
+                # Check date gap to detect new prep
+                try:
+                    last_date = datetime.fromisoformat(last_date_str)
+                    race_date = datetime.strptime(date, "%d-%b-%Y")
+                    days_gap = (race_date - last_date).days
+                except (ValueError, TypeError):
+                    days_gap = 0
+                if days_gap >= SPELL_DAYS:
+                    # Long gap = new prep, horse is first-up
+                    first_up = True
+                    second_up = False
+                else:
+                    # Same prep: today = last_prep + 1
+                    current_prep = last_prep + 1
+                    first_up = current_prep == 0  # Only if prepRuns was -1 (shouldn't happen)
+                    second_up = current_prep == 1  # Last run was first-up (prepRuns=0)
             else:
-                # No form = first starter or resuming (true first-up)
+                # No race form = first starter or only trials
                 first_up = True
                 second_up = False
 
