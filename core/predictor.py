@@ -164,7 +164,7 @@ Always list "The one to beat" first if selected.
 
 **Primary factor:** Normalized speed ratings from RACE runs (not trials) at SIMILAR distance and conditions. Recent runs are more relevant.
 For first/second-up horses, check if their past fresh runs show better ratings than mid-prep runs.
-Compare ratings WITHIN the field.
+Compare ratings WITHIN the field. A win with a low rating means the horse beat a weak field - do not elevate it over horses with clearly superior ratings.
 
 **Secondary factors:** Jockey/trainer A/E ratios (>1.0 = beats market expectations), barrier, weight, career record, first-up/second-up records.
 
