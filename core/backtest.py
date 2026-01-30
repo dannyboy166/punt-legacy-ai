@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 
 from api.puntingform import PuntingFormAPI
 from api.ladbrokes import LadbrokeAPI
-from core.speed import calculate_speed_rating
+from core.speed import calculate_speed_rating, calculate_run_rating
 from core.predictor import SYSTEM_PROMPT
 from core.normalize import normalize_horse_name
 from core.logging import get_logger
@@ -305,36 +305,31 @@ def get_backtest_prompt(track: str, race_number: int, date: str, api: Optional[P
             lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
 
             for f in forms[:10]:
-                f_date = f.get('meetingDate', '')[:10]
+                # Parse date to match live pipeline format (dd-Mon)
+                f_date_raw = f.get('meetingDate', '')
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(f_date_raw.replace("Z", "+00:00"))
+                    f_date = dt.strftime("%d-%b")
+                except:
+                    f_date = f_date_raw[:10]
                 f_track = f.get('track', {}).get('name', '')[:10]
                 f_dist = f.get('distance', 0)
                 f_cond = f.get('trackCondition', '')
                 f_pos = f.get('position', 0)
                 f_starters = f.get('starters', 0)
                 f_margin = f.get('margin', 0)
-                f_prep = f.get('prepRuns', 0)
                 is_trial = f.get('isBarrierTrial', False)
 
-                rating = None
-                time_secs = parse_time(f.get('officialRaceTime'))
-                if time_secs and f_dist and f_pos and not is_trial:
-                    try:
-                        if f_pos == 1:
-                            winner_time = time_secs
-                        else:
-                            winner_time = time_secs - (f_margin * 0.17)
+                # Prep number: API is 0-indexed, convert to 1-indexed
+                f_prep = f.get('prepRuns')
+                if f_prep is not None:
+                    f_prep = f_prep + 1
 
-                        rating = calculate_speed_rating(
-                            distance=f_dist,
-                            winner_time=winner_time,
-                            margin=f_margin,
-                            position=f_pos,
-                            condition=f_cond or 'G4'
-                        )
-                    except:
-                        pass
+                # Use same rating calculation as live pipeline
+                rating = calculate_run_rating(f)
 
-                rating_str = f"{rating:.3f}" if rating else "N/A"
+                rating_str = f"{rating * 100:.1f}" if rating else "N/A"
                 prep_str = str(f_prep) if f_prep else "-"
                 trial_str = "TRIAL" if is_trial else "-"
 
