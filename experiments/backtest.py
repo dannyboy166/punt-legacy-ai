@@ -23,6 +23,7 @@ Note: For live races, use bet_type_predictor.py instead (uses Ladbrokes odds).
 import sys
 sys.path.insert(0, '/Users/danielsamus/punt-legacy-ai')
 
+from datetime import datetime
 from api.puntingform import PuntingFormAPI
 from core.speed import calculate_speed_rating, calculate_run_rating
 import anthropic
@@ -103,17 +104,27 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
     meeting_id = meeting.get('meetingId')
     fields_data = api.get_fields(meeting_id, race_number)
     form_data = api.get_form(meeting_id, race_number, runs=10)
-    
+    speedmap_data = api.get_speedmaps(meeting_id, race_number)
+
     races = fields_data.get('races', [])
     if not races:
         return None, "No race data", None
-    
+
     race = races[0]
     distance = race.get('distance', 0)
     condition = race.get('trackCondition') or 'G4'
     race_name = race.get('raceName', '')
-    
+
     form_by_id = {r.get('runnerId'): r.get('forms', []) for r in form_data}
+
+    # Index speedmap by tab number (runner IDs differ between fields and speedmap APIs)
+    speedmap_by_tab = {}
+    if isinstance(speedmap_data, list):
+        for sm_entry in speedmap_data:
+            for item in sm_entry.get('items', []):
+                tab_no = item.get('tabNo')
+                if tab_no is not None:
+                    speedmap_by_tab[tab_no] = item
     
     race_run_counts = []
     
@@ -151,14 +162,21 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         
         jockey = jockey_name
         trainer = r.get('trainer', {}).get('fullName', '')
-        jockey_ae = r.get('jockeyA2E_Last100', 0)
-        trainer_ae = r.get('trainerA2E_Last100', 0)
-        
+        jockey_ae_data = r.get('jockeyA2E_Last100') or {}
+        trainer_ae_data = r.get('trainerA2E_Last100') or {}
+        jt_ae_data = r.get('trainerJockeyA2E_Last100') or {}
+        jockey_ae = round(jockey_ae_data['a2E'], 2) if jockey_ae_data.get('a2E') else None
+        trainer_ae = round(trainer_ae_data['a2E'], 2) if trainer_ae_data.get('a2E') else None
+        jt_ae = round(jt_ae_data['a2E'], 2) if jt_ae_data.get('a2E') else None
+
         career = f"{r.get('careerStarts', 0)}: {r.get('careerWins', 0)}-{r.get('careerSeconds', 0)}-{r.get('careerThirds', 0)}"
         win_pct = r.get('winPct', 0)
-        
+        place_pct = r.get('placePct', 0) or 0
+
         first_up_rec = r.get('firstUpRecord', {})
         first_up_str = f"{first_up_rec.get('starts', 0)}: {first_up_rec.get('firsts', 0)}-{first_up_rec.get('seconds', 0)}-{first_up_rec.get('thirds', 0)}"
+        second_up_rec = r.get('secondUpRecord', {})
+        second_up_str = f"{second_up_rec.get('starts', 0)}: {second_up_rec.get('firsts', 0)}-{second_up_rec.get('seconds', 0)}-{second_up_rec.get('thirds', 0)}"
         
         runners_data.append({'tab': tab, 'name': name, 'sp': sp})
         
@@ -167,21 +185,46 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         lines.append(f"Odds: ${sp:.2f} win / ${place_odds:.2f} place")
         lines.append(f"Jockey: {jockey} (A/E: {jockey_ae or 'N/A'})")
         lines.append(f"Trainer: {trainer} (A/E: {trainer_ae or 'N/A'})")
-        lines.append(f"Career: {career} ({win_pct:.0f}% win)")
-        
+        lines.append(f"Career: {career} ({win_pct:.0f}% win, {place_pct:.0f}% place)")
+
         runner_id = r.get('runnerId')
         forms = form_by_id.get(runner_id, [])
-        
+
         race_runs = [f for f in forms if not f.get('isBarrierTrial')]
         trial_runs = [f for f in forms if f.get('isBarrierTrial')]
         race_run_counts.append(len(race_runs))
-        
+
+        # First-up/second-up detection (matching live pipeline logic)
+        SPELL_DAYS = 45
         if not forms:
             lines.append("**FIRST STARTER** (no form)")
         elif len(race_runs) == 0:
             lines.append("**FIRST STARTER** (trials only, no race form)")
-        elif race_runs[0].get('prepRuns', 0) == 0:
-            lines.append(f"**SECOND UP** (career 1st-up record: {first_up_str})")
+        else:
+            last_race_run = race_runs[0]
+            last_date_str = last_race_run.get('meetingDate', '')[:10]
+            last_prep = last_race_run.get('prepRuns', 0)
+            try:
+                last_date = datetime.fromisoformat(last_date_str.replace("Z", "+00:00"))
+                race_date = datetime.strptime(date, "%d-%b-%Y")
+                days_gap = (race_date - last_date).days
+            except (ValueError, TypeError):
+                days_gap = 0
+
+            if days_gap >= SPELL_DAYS:
+                # Long gap = new prep, horse is first-up
+                lines.append(f"**FIRST UP** (career 1st-up record: {first_up_str})")
+            elif last_prep + 1 == 1:
+                # Last run was first-up (prepRuns=0), so today is second-up
+                lines.append(f"**SECOND UP** (career 2nd-up record: {second_up_str})")
+
+        # Speedmap data
+        sm = speedmap_by_tab.get(tab)
+        if sm:
+            speed_rank = sm.get('speed')
+            settle_pos = sm.get('settle')
+            if speed_rank is not None:
+                lines.append(f"Speed Rank: {speed_rank} | Settles: {settle_pos}")
         
         if forms:
             form_summary = f"Form: {len(race_runs)} race runs"
@@ -200,7 +243,6 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
                 # Parse date to match live pipeline format (dd-Mon)
                 f_date_raw = f.get('meetingDate', '')
                 try:
-                    from datetime import datetime
                     dt = datetime.fromisoformat(f_date_raw.replace("Z", "+00:00"))
                     f_date = dt.strftime("%d-%b")
                 except:
@@ -231,16 +273,28 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         
         lines.append("")
     
+    # Calculate pace scenario from speedmap data
+    leaders = sum(1 for tab_no, sm in speedmap_by_tab.items() if sm.get('speed') and sm['speed'] <= 2)
+    if leaders >= 3:
+        pace = "hot"
+    elif leaders <= 1:
+        pace = "soft"
+    else:
+        pace = "moderate"
+
+    # Update race header with field size and pace
+    lines[1] = f"Distance: {distance}m | Condition: {condition} | Field Size: {len(runners_data)} | Pace: {pace} ({leaders} leaders)"
+
     # Add field summary
     horses_with_form = sum(1 for c in race_run_counts if c > 0)
     total_horses = len(race_run_counts)
-    
+
     warning = f"⚠️ FIELD ANALYSIS: {horses_with_form}/{total_horses} horses have race form"
     if horses_with_form < total_horses / 2:
         warning += " - MAJORITY UNPROVEN (recommend 0 picks)"
     lines.insert(3, warning)
     lines.insert(4, "")
-    
+
     return "\n".join(lines), runners_data, {'distance': distance, 'condition': condition, 'name': race_name, 'with_form': horses_with_form, 'total': total_horses}
 
 
