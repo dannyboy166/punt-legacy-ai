@@ -29,6 +29,7 @@ _TRACK_MAPPINGS = [
     ("Murray Bridge GH", "Murray Bridge"),
     ("Geelong", "Ladbrokes Geelong"),
     ("Fannie Bay", "Darwin"),
+    ("Beaumont", "Newcastle"),
 ]
 
 # Build normalized lookup dictionaries
@@ -61,7 +62,7 @@ PF_ONLY_TRACKS = {
 
 LB_ONLY_TRACKS = {
     normalize_track_name(t) for t in [
-        "Newcastle",  # Not in PuntingForm data
+        # Newcastle is now mapped to Beaumont (PF name)
     ]
 }
 

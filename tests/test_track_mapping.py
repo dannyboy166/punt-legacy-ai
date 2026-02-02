@@ -106,8 +106,8 @@ class TestIsLbOnlyTrack:
     """Tests for is_lb_only_track()."""
 
     def test_newcastle(self):
-        """Newcastle is LB only (not in PuntingForm data)."""
-        assert is_lb_only_track("Newcastle") is True
+        """Newcastle is now mapped to Beaumont (PF name), so not LB only."""
+        assert is_lb_only_track("Newcastle") is False
 
     def test_normal_tracks(self):
         """Normal tracks are NOT LB only."""
