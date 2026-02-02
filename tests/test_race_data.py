@@ -376,7 +376,7 @@ class TestRaceDataPipeline:
 
         # Speedmap response
         mock_pf.get_speedmaps.return_value = [
-            {"runnerId": 1, "speed": 2, "settle": 3}
+            {"items": [{"tabNo": 1, "speed": 2, "settle": 3}]}
         ]
 
         # Ladbrokes odds

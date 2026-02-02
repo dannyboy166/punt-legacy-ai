@@ -212,7 +212,7 @@ Your task is to identify the CONTENDERS (0-3 horses that could realistically win
 
 ## Your Approach
 
-**Step 1: Identify contenders.** Which horses could realistically WIN this race? Could be 0, 1, 2, or 3.
+**Step 1: Identify contenders.** Which horses could realistically WIN this race? Could be 0, 1, 2, or 3 picks.
 
 **Step 2: Rank them.** Who's the best horse? Who else has a genuine chance?
 
@@ -220,7 +220,9 @@ Your task is to identify the CONTENDERS (0-3 horses that could realistically win
 
 ## Key Analysis
 
-Compare each horse's speed ratings at SIMILAR distance and conditions to today's race. More recent ratings matter more. The horse(es) with the best ratings at similar distance/conditions are your contenders. 
+Compare each horse's speed ratings at SIMILAR distance and conditions to today's race. More recent ratings matter more. The horse(es) with the best ratings at similar distance/conditions are your contenders.
+
+**Condition matching:** Prioritise ratings on similar conditions to today's race (±1 step, e.g. if today is G4, focus on G3-S5 ratings).Also prioritise similar distance (±0-20%). If a horse's best ratings are only on very different conditions or distances, treat them with caution.
 
 **Secondary factors:** Jockey/trainer A/E ratios, weight changes, first/second-up patterns, barrier.
 
@@ -254,18 +256,22 @@ Return 0-3 contenders as JSON:
 - "best" = Your top pick, most likely winner (max 1)
 - For other picks, tag however you like - be descriptive
 
-**tipsheet_pick = true** when you would genuinely bet on this horse at these odds:
-- Speed ratings clearly support this horse vs the field at similar distances/conditions
-- The odds represent real value
-- You're confident in the pick, not just filling a slot
+**tipsheet_pick = true** Star your confident picks where:
+- Speed ratings at similar conditions/distance are clearly superior to the field
+- The odds represent genuine value
+- You'd put your own money on it at those odds.
 
 ## Important Rules
 
 1. Only include horses that could realistically WIN based on ratings at similar conditions / distance to the race being predicted
-2. Maximum 3 contenders, but 0, 1, or 2 is fine
-3. Be natural in your analysis - give your honest view on each horse and the price
-4. Don't use explicit percentages or rigid language
-5. Be honest: if no horse stands out, pick 0"""
+2. Don't use explicit percentages or rigid language
+3. Be honest: if no horse stands out, pick 0"""
+
+# ============================================================
+# VARIANT F: "Live predictor" — current production prompt from core/predictor.py
+# ============================================================
+from core.predictor import SYSTEM_PROMPT as LIVE_SYSTEM_PROMPT
+PROMPT_F = LIVE_SYSTEM_PROMPT
 
 # ============================================================
 # Variant lookup
@@ -276,6 +282,7 @@ VARIANTS = {
     'C': ('Ratings only', PROMPT_C),
     'D': ('Strict value', PROMPT_D),
     'E': ('OG free-form', PROMPT_E),
+    'F': ('Live predictor', PROMPT_F),
 }
 
 

@@ -181,8 +181,8 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         runners_data.append({'tab': tab, 'name': name, 'sp': sp})
         
         lines.append(f"### {tab}. {name}")
-        lines.append(f"Barrier: {barrier} | Weight: {weight}kg")
-        lines.append(f"Odds: ${sp:.2f} win / ${place_odds:.2f} place")
+        implied_prob = (100 / sp) if sp > 0 else 0
+        lines.append(f"Odds: ${sp:.2f} win / ${place_odds:.2f} place → {implied_prob:.1f}% implied")
         lines.append(f"Jockey: {jockey} (A/E: {jockey_ae or 'N/A'})")
         lines.append(f"Trainer: {trainer} (A/E: {trainer_ae or 'N/A'})")
         lines.append(f"Career: {career} ({win_pct:.0f}% win, {place_pct:.0f}% place)")
@@ -194,6 +194,34 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         trial_runs = [f for f in forms if f.get('isBarrierTrial')]
         race_run_counts.append(len(race_runs))
 
+        # Days since last run + weight change
+        days_since_last = None
+        weight_change_str = ""
+        if race_runs:
+            last_race_run = race_runs[0]
+            last_date_str = last_race_run.get('meetingDate', '')[:10]
+            try:
+                last_date = datetime.fromisoformat(last_date_str.replace("Z", "+00:00"))
+                race_date = datetime.strptime(date, "%d-%b-%Y")
+                days_since_last = (race_date - last_date).days
+            except (ValueError, TypeError):
+                pass
+            # Weight change from last race run
+            last_weight = last_race_run.get('weight', 0)
+            if last_weight and weight:
+                diff = weight - last_weight
+                if diff > 0:
+                    weight_change_str = f" (↑{diff:.1f}kg from last)"
+                elif diff < 0:
+                    weight_change_str = f" (↓{abs(diff):.1f}kg from last)"
+
+        lines.append(f"Barrier: {barrier} | Weight: {weight}kg{weight_change_str}")
+
+        # Gear changes
+        gear_changes = r.get('gearChanges')
+        if gear_changes and gear_changes.strip():
+            lines.append(f"Gear: {gear_changes.strip()}")
+
         # First-up/second-up detection (matching live pipeline logic)
         SPELL_DAYS = 45
         if not forms:
@@ -201,22 +229,17 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
         elif len(race_runs) == 0:
             lines.append("**FIRST STARTER** (trials only, no race form)")
         else:
-            last_race_run = race_runs[0]
-            last_date_str = last_race_run.get('meetingDate', '')[:10]
-            last_prep = last_race_run.get('prepRuns', 0)
-            try:
-                last_date = datetime.fromisoformat(last_date_str.replace("Z", "+00:00"))
-                race_date = datetime.strptime(date, "%d-%b-%Y")
-                days_gap = (race_date - last_date).days
-            except (ValueError, TypeError):
-                days_gap = 0
+            last_prep = race_runs[0].get('prepRuns', 0)
 
-            if days_gap >= SPELL_DAYS:
+            if days_since_last and days_since_last >= SPELL_DAYS:
                 # Long gap = new prep, horse is first-up
-                lines.append(f"**FIRST UP** (career 1st-up record: {first_up_str})")
+                lines.append(f"**FIRST UP** | {days_since_last} days since last run (career 1st-up record: {first_up_str})")
             elif last_prep + 1 == 1:
                 # Last run was first-up (prepRuns=0), so today is second-up
-                lines.append(f"**SECOND UP** (career 2nd-up record: {second_up_str})")
+                days_str = f" | {days_since_last} days since last run" if days_since_last else ""
+                lines.append(f"**SECOND UP**{days_str} (career 2nd-up record: {second_up_str})")
+            elif days_since_last:
+                lines.append(f"Days since last run: {days_since_last}")
 
         # Speedmap data
         sm = speedmap_by_tab.get(tab)
@@ -266,8 +289,11 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
                 rating_str = f"{rating * 100:.1f}" if rating else "N/A"
                 prep_str = str(f_prep) if f_prep else "-"
                 trial_str = "TRIAL" if is_trial else "-"
+                margin_str = f"{f_margin}L"
+                if not is_trial and f_margin and f_margin >= 8:
+                    margin_str += " ⚠️eased"
 
-                lines.append(f"| {f_date} | {f_track} | {f_dist}m | {f_cond} | {f_pos}/{f_starters} | {f_margin}L | {rating_str} | {prep_str} | {trial_str} |")
+                lines.append(f"| {f_date} | {f_track} | {f_dist}m | {f_cond} | {f_pos}/{f_starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
         else:
             lines.append("⚠️ NO FORM AVAILABLE - first starter")
         
@@ -282,8 +308,10 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
     else:
         pace = "moderate"
 
-    # Update race header with field size and pace
-    lines[1] = f"Distance: {distance}m | Condition: {condition} | Field Size: {len(runners_data)} | Pace: {pace} ({leaders} leaders)"
+    # Update race header with field size, class, and pace
+    race_class = race.get('raceClass', '')
+    class_str = f" | Class: {race_class}" if race_class else ""
+    lines[1] = f"Distance: {distance}m | Condition: {condition}{class_str} | Field Size: {len(runners_data)} | Pace: {pace} ({leaders} leaders)"
 
     # Add field summary
     horses_with_form = sum(1 for c in race_run_counts if c > 0)

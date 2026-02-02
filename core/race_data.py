@@ -113,6 +113,10 @@ class RunnerData:
     early_speed_rank: Optional[int] = None
     settling_position: Optional[int] = None
 
+    # Extra fields (synced with backtest pipeline)
+    days_since_last: Optional[int] = None
+    gear_changes: Optional[str] = None
+
 
     @property
     def race_runs_count(self) -> int:
@@ -225,7 +229,6 @@ class RaceData:
 
         for r in sorted(self.runners, key=lambda x: x.tab_no):
             lines.append(f"### {r.tab_no}. {r.name}")
-            lines.append(f"Barrier: {r.barrier} | Weight: {r.weight}kg")
 
             if r.odds:
                 place_str = f" / ${r.place_odds:.2f} place" if r.place_odds else ""
@@ -237,16 +240,38 @@ class RaceData:
             lines.append(f"Trainer: {r.trainer} (A/E: {r.trainer_a2e or 'N/A'})")
             lines.append(f"Career: {r.career_starts}: {r.career_wins}-{r.career_seconds}-{r.career_thirds} ({r.win_pct:.0f}% win)")
 
+            # Weight change from last race run
+            weight_change_str = ""
+            race_form_runs = [f for f in r.form if not f.is_barrier_trial]
+            if race_form_runs:
+                last_weight = race_form_runs[0].weight
+                if last_weight and r.weight:
+                    diff = r.weight - last_weight
+                    if diff > 0:
+                        weight_change_str = f" (↑{diff:.1f}kg from last)"
+                    elif diff < 0:
+                        weight_change_str = f" (↓{abs(diff):.1f}kg from last)"
+            lines.append(f"Barrier: {r.barrier} | Weight: {r.weight}kg{weight_change_str}")
+
+            # Gear changes
+            if r.gear_changes:
+                lines.append(f"Gear: {r.gear_changes}")
+
+            # Days since last run for first-up/second-up display
             if r.first_up:
                 record = r.first_up_record or {}
                 rec_str = f"{record.get('starts', 0)}: {record.get('firsts', 0)}-{record.get('seconds', 0)}-{record.get('thirds', 0)}"
-                lines.append(f"**FIRST UP** (career 1st-up record: {rec_str})")
+                days_str = f" | {r.days_since_last} days since last run" if r.days_since_last else ""
+                lines.append(f"**FIRST UP**{days_str} (career 1st-up record: {rec_str})")
             elif r.second_up:
                 record = r.second_up_record or {}
                 rec_str = f"{record.get('starts', 0)}: {record.get('firsts', 0)}-{record.get('seconds', 0)}-{record.get('thirds', 0)}"
-                lines.append(f"**SECOND UP** (career 2nd-up record: {rec_str})")
+                days_str = f" | {r.days_since_last} days since last run" if r.days_since_last else ""
+                lines.append(f"**SECOND UP**{days_str} (career 2nd-up record: {rec_str})")
+            elif r.days_since_last:
+                lines.append(f"Days since last run: {r.days_since_last}")
 
-            if r.early_speed_rank:
+            if r.early_speed_rank is not None:
                 lines.append(f"Speed Rank: {r.early_speed_rank} | Settles: {r.settling_position}")
 
             # Form table with prep run and barrier trial indicator
@@ -265,7 +290,10 @@ class RaceData:
                     rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
-                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {f.margin}L | {rating_str} | {prep_str} | {trial_str} |")
+                    margin_str = f"{f.margin}L"
+                    if not f.is_barrier_trial and f.margin and f.margin >= 8:
+                        margin_str += " ⚠️eased"
+                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
 
             else:
                 lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")
@@ -372,13 +400,15 @@ class RaceDataPipeline:
                 if runner_id:
                     form_by_runner[runner_id] = runner.get("forms", [])
 
-        # 6. Get speedmap data indexed by runner ID
-        speedmap_by_runner = {}
+        # 6. Get speedmap data indexed by tab number
+        # (runner IDs differ between fields and speedmap APIs, so match by tabNo)
+        speedmap_by_tab = {}
         if isinstance(speedmap_data, list):
-            for sm in speedmap_data:
-                runner_id = sm.get("runnerId")
-                if runner_id:
-                    speedmap_by_runner[runner_id] = sm
+            for sm_entry in speedmap_data:
+                for item in sm_entry.get("items", []):
+                    tab_no = item.get("tabNo")
+                    if tab_no is not None:
+                        speedmap_by_tab[tab_no] = item
 
         # 7. Get race-level info
         condition = fields_data.get("expectedCondition") or "G4"
@@ -489,7 +519,7 @@ class RaceDataPipeline:
             second_up_record = runner.get("secondUpRecord")
 
             # Get speedmap data
-            sm = speedmap_by_runner.get(runner_id, {})
+            sm = speedmap_by_tab.get(runner.get("tabNo", 0), {})
 
             # Process form history
             form_runs = []
@@ -538,6 +568,22 @@ class RaceDataPipeline:
                 )
                 form_runs.append(form_run)
 
+            # Calculate days since last run
+            days_since_last = None
+            race_form_only = [f for f in runner_form_raw if not f.get("isBarrierTrial", False)]
+            if race_form_only:
+                last_run_date_str = race_form_only[0].get("meetingDate", "")[:10]
+                try:
+                    last_run_dt = datetime.fromisoformat(last_run_date_str.replace("Z", "+00:00"))
+                    race_dt = datetime.strptime(date, "%d-%b-%Y")
+                    days_since_last = (race_dt - last_run_dt).days
+                except (ValueError, TypeError):
+                    pass
+
+            # Gear changes
+            gear_changes_raw = runner.get("gearChanges")
+            gear_changes = gear_changes_raw.strip() if gear_changes_raw and gear_changes_raw.strip() else None
+
             runner_data = RunnerData(
                 name=horse_name,
                 tab_no=runner.get("tabNo", 0),
@@ -570,12 +616,14 @@ class RaceDataPipeline:
                 form=form_runs,
                 early_speed_rank=sm.get("speed"),
                 settling_position=sm.get("settle"),
+                days_since_last=days_since_last,
+                gear_changes=gear_changes,
             )
 
             race_data.runners.append(runner_data)
 
         # 9. Calculate pace scenario
-        leaders = sum(1 for r in race_data.runners if r.early_speed_rank and r.early_speed_rank <= 2)
+        leaders = sum(1 for r in race_data.runners if r.early_speed_rank is not None and r.early_speed_rank <= 2)
         race_data.leaders_count = leaders
         if leaders >= 3:
             race_data.pace_scenario = "hot"
