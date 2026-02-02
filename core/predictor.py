@@ -148,7 +148,7 @@ SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
 Pick 0-3 contenders for this race. For each, assign a tag:
 - **"The one to beat"** - Clear standout
-- **"Each-way chance"** - Could win, should place, place odds worth it
+- **"Each-way chance"** - Could win, should place, place odds good value
 - **"Value bet"** - Odds better than their form suggests
 
 **Pick 0 contenders (no bet) when:**
@@ -177,7 +177,7 @@ You also have: win/place odds, jockey/trainer A/E ratios, career record, first-u
       "tab_no": number,
       "odds": number,
       "tag": "The one to beat" | "Each-way chance" | "Value bet",
-      "analysis": "1-2 sentences referencing RACE form",
+      "analysis": "1-3 sentences referencing RACE form",
       "tipsheet_pick": true | false
     }
   ],
@@ -196,9 +196,8 @@ PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializi
 Your task is to identify picks for bonus bets and/or promo plays in this race (if genuine value exists):
 
 1. **BONUS BET PICK**: A horse to use a bonus bet on (free bet where you only keep profits)
-   - Target odds of $5.00 or higher for maximum value
-   - Must have a genuine winning chance (don't just pick any longshot)
-   - Higher odds = better value since you only keep the profit, not the stake
+   - Target odds of $5.00 or higher because you only keep the profit, not the stake
+   - Must have a genuine winning chance
 
 2. **PROMO PICK**: A horse with strong, consistent speed ratings that you're confident will run well
    - Reliability and consistency matter more than odds
@@ -251,7 +250,6 @@ Return both picks as JSON:
 - Only provide picks you genuinely believe have a good chance
 - You may provide both picks, just one (bonus_pick OR promo_pick), or neither if no good options exist
 - Don't force a pick if there's no genuine value - it's OK to leave one blank
-- They can be the same horse if one horse fits both criteria well
 - For bonus_pick: prioritize odds $5.00+ with genuine winning chance
 - For promo_pick: prioritize consistent, reliable form over odds
 - Be realistic - don't pick hopeless outsiders just for high odds
