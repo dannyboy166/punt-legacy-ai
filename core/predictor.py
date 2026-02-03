@@ -158,7 +158,7 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 ## Key Analysis
 
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions. More recent runs are more relevant.
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant.
 
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
@@ -187,41 +187,33 @@ You also have: win/place odds, jockey/trainer A/E ratios, career record, first-u
 
 **tipsheet_pick = true** when you would genuinely bet on this horse yourself:
 - Speed ratings clearly support this horse vs the field at this distance/condition
-- The odds represent real value (not just "best of a bad bunch")
-- You're confident in the pick, not just filling a slot"""
+- The odds represent real value
+- You're confident in the pick (requires most of the field to have sufficient form data)"""
 
 
-PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst specializing in Australian thoroughbred racing.
+PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
-Your task is to identify picks for bonus bets and/or promo plays in this race (if genuine value exists):
+Identify a bonus bet pick and/or promo pick (if genuine value exists):
 
-1. **BONUS BET PICK**: A horse to use a bonus bet on (free bet where you only keep profits)
-   - Target odds of $5.00 or higher because you only keep the profit, not the stake
-   - Must have a genuine winning chance
+1. **BONUS BET**: Odds $5.00+ with genuine winning chance (you only keep profit, not stake)
+2. **PROMO PICK**: Consistent, reliable speed ratings — confidence matters more than odds
 
-2. **PROMO PICK**: A horse with strong, consistent speed ratings that you're confident will run well
-   - Reliability and consistency matter more than odds
-   - Look for horses with proven recent speed ratings at similar conditions/distance to the race being predicted
+**Skip both picks when:**
+- Too many unknowns (50%+ have no race form)
+- Field too even, no standouts
+- Insufficient data for confident assessment
 
-## Understanding the Data
+## Key Analysis
 
-**Speed Ratings** (MOST IMPORTANT): Normalized performance measure (100 = average for that distance/condition).
-- Compare ratings WITHIN THIS FIELD - the highest-rated horse has faster normalized speed relative to competitors
-- Prioritize runs at similar distance and similar track condition
-- More recent runs are more relevant than older runs
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant.
 
-**Prep Run**: The "Prep" column shows which run in the current preparation (1 = first-up, 2 = second-up, etc.)
-- Horses marked **FIRST UP** or **SECOND UP** show their career record in that state
+**Critical:**
+- Barrier trials (marked TRIAL) don't count as form — horses don't always try
+- If a horse has 0 race runs, they are UNKNOWN — could be brilliant or useless
 
-**A/E (Actual vs Expected)**: Measures if jockey/trainer outperforms market expectations (>1.0 = beats market, <1.0 = underperforms)
+You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
 
-**Other factors to consider**: Class changes, weight, barrier, track/distance form, place odds
-
-**Race Warnings**: Pay attention to any warnings about the race (e.g., many first-uppers, limited form data). These make predictions harder - adjust your confidence accordingly.
-
-## Output Format
-
-Return both picks as JSON:
+## Output
 
 ```json
 {
@@ -229,31 +221,19 @@ Return both picks as JSON:
     "horse": "Horse Name",
     "tab_no": number,
     "odds": number,
-    "analysis": "2-3 sentences: why this horse is good for a bonus bet (genuine chance + good odds)",
-    "confidence": number (1-10)
+    "analysis": "1-2 sentences"
   },
   "promo_pick": {
     "horse": "Horse Name",
     "tab_no": number,
     "odds": number,
-    "analysis": "2-3 sentences: why this horse is a strong chance based on form",
-    "confidence": number (1-10)
+    "analysis": "1-2 sentences"
   },
-  "race_confidence": number (1-10, overall confidence in your predictions),
-  "confidence_reason": "Brief reason for confidence level",
-  "summary": "1-2 sentences summarizing both picks"
+  "summary": "Brief overview or reason for skipped picks"
 }
 ```
 
-## Guidelines
-
-- Only provide picks you genuinely believe have a good chance
-- You may provide both picks, just one (bonus_pick OR promo_pick), or neither if no good options exist
-- Don't force a pick if there's no genuine value - it's OK to leave one blank
-- For bonus_pick: prioritize odds $5.00+ with genuine winning chance
-- For promo_pick: prioritize consistent, reliable form over odds
-- Be realistic - don't pick hopeless outsiders just for high odds
-- Be honest about confidence - low confidence races are harder to pick"""
+Either pick can be null if no genuine value exists."""
 
 
 USER_PROMPT_TEMPLATE = """Analyze this race and pick your contenders (0-3).
