@@ -982,9 +982,9 @@ def tracking_health():
 
             # Last 5 predictions (most recent first)
             cursor.execute("""
-                SELECT track, race_number, race_date, horse, tag, created_at
+                SELECT track, race_number, race_date, horse, tag, timestamp
                 FROM predictions
-                ORDER BY created_at DESC
+                ORDER BY timestamp DESC
                 LIMIT 5
             """)
             recent = cursor.fetchall()
@@ -995,13 +995,13 @@ def tracking_health():
                     "race_date": r[2],
                     "horse": r[3],
                     "tag": r[4],
-                    "created_at": r[5]
+                    "timestamp": r[5]
                 }
                 for r in recent
             ]
 
             if recent:
-                result["last_stored"] = recent[0]["created_at"]
+                result["last_stored"] = recent[0]["timestamp"]
 
             conn.close()
             result["status"] = "healthy"
