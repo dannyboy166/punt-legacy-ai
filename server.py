@@ -141,6 +141,8 @@ class PredictionResponse(BaseModel):
     skipped: bool = False  # True if race was skipped due to insufficient form data
     skip_reason: Optional[str] = None  # Reason for skipping (shown to user)
     warnings: list[str] = []  # Form/data warnings (e.g., "5/8 runners have limited form")
+    tracking_stored: bool = False  # True if prediction was stored to tracking DB
+    tracking_error: Optional[str] = None  # Error message if tracking failed
 
 
 class MeetingResponse(BaseModel):
@@ -548,10 +550,16 @@ def predict(req: PredictionRequest):
                 )
 
             # Store prediction for tracking
+            tracking_stored = False
+            tracking_error = None
             try:
                 tracker.store_prediction(result, race_data, req.date)
+                tracking_stored = True
             except Exception as e:
-                print(f"Warning: Failed to store prediction: {e}")
+                tracking_error = str(e)
+                print(f"WARNING: Failed to store prediction to tracking: {e}")
+                import traceback
+                traceback.print_exc()
 
             return PredictionResponse(
                 mode="promo_bonus",
@@ -567,7 +575,9 @@ def predict(req: PredictionRequest):
                 summary=result.summary,
                 race_confidence=result.race_confidence,
                 confidence_reason=result.confidence_reason,
-                warnings=race_data.warnings
+                warnings=race_data.warnings,
+                tracking_stored=tracking_stored,
+                tracking_error=tracking_error
             )
 
         else:
@@ -594,11 +604,17 @@ def predict(req: PredictionRequest):
                 ))
 
             # Store prediction for tracking (even if 0 contenders)
+            tracking_stored = False
+            tracking_error = None
             try:
                 tracker.store_prediction(result, race_data, req.date)
+                tracking_stored = True
             except Exception as e:
-                # Don't fail the request if tracking fails
-                print(f"Warning: Failed to store prediction: {e}")
+                # Don't fail the request if tracking fails, but capture the error
+                tracking_error = str(e)
+                print(f"WARNING: Failed to store prediction to tracking: {e}")
+                import traceback
+                traceback.print_exc()
 
             # Return response (contenders can be empty = no picks for this race)
             return PredictionResponse(
@@ -613,7 +629,9 @@ def predict(req: PredictionRequest):
                 summary=result.summary,
                 race_confidence=result.race_confidence,
                 confidence_reason=result.confidence_reason,
-                warnings=race_data.warnings
+                warnings=race_data.warnings,
+                tracking_stored=tracking_stored,
+                tracking_error=tracking_error
             )
 
     except HTTPException:
@@ -925,6 +943,77 @@ def get_picks_for_day(race_date: str):
     """
     validate_date(race_date)
     return tracker.get_picks_for_day(race_date)
+
+
+@app.get("/tracking/health")
+def tracking_health():
+    """
+    Health check for the tracking system.
+    Returns database status, file location, and recent activity.
+    """
+    import sqlite3
+    import os
+    from datetime import datetime
+
+    db_path = tracker.db_path
+
+    result = {
+        "status": "unknown",
+        "db_path": db_path,
+        "db_exists": os.path.exists(db_path),
+        "db_size_bytes": 0,
+        "total_predictions": 0,
+        "recent_predictions": [],
+        "last_stored": None,
+        "error": None,
+    }
+
+    try:
+        if os.path.exists(db_path):
+            result["db_size_bytes"] = os.path.getsize(db_path)
+
+            # Test connection and get counts
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+
+            # Total predictions
+            cursor.execute("SELECT COUNT(*) FROM predictions")
+            result["total_predictions"] = cursor.fetchone()[0]
+
+            # Last 5 predictions (most recent first)
+            cursor.execute("""
+                SELECT track, race_number, race_date, horse, tag, created_at
+                FROM predictions
+                ORDER BY created_at DESC
+                LIMIT 5
+            """)
+            recent = cursor.fetchall()
+            result["recent_predictions"] = [
+                {
+                    "track": r[0],
+                    "race_number": r[1],
+                    "race_date": r[2],
+                    "horse": r[3],
+                    "tag": r[4],
+                    "created_at": r[5]
+                }
+                for r in recent
+            ]
+
+            if recent:
+                result["last_stored"] = recent[0]["created_at"]
+
+            conn.close()
+            result["status"] = "healthy"
+        else:
+            result["status"] = "no_database"
+            result["error"] = f"Database file not found at {db_path}"
+
+    except Exception as e:
+        result["status"] = "error"
+        result["error"] = str(e)
+
+    return result
 
 
 @app.delete("/tracking/clear")
