@@ -1001,7 +1001,7 @@ def tracking_health():
             ]
 
             if recent:
-                result["last_stored"] = recent[0]["timestamp"]
+                result["last_stored"] = result["recent_predictions"][0]["timestamp"]
 
             conn.close()
             result["status"] = "healthy"
