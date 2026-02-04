@@ -999,6 +999,22 @@ class PredictionTracker:
 
             return result
 
+    def clear_all(self) -> int:
+        """
+        Delete all prediction records from the database.
+        WARNING: This permanently deletes all tracking data!
+
+        Returns:
+            Number of records deleted
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.execute("SELECT COUNT(*) FROM predictions")
+            count = cursor.fetchone()[0]
+            conn.execute("DELETE FROM predictions")
+            conn.commit()
+            logger.warning(f"Cleared all {count} predictions from tracking database")
+            return count
+
     def get_stats_by_tipsheet(self) -> dict:
         """
         Get performance statistics comparing tipsheet_pick=true vs tipsheet_pick=false.

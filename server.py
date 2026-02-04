@@ -899,6 +899,17 @@ def get_stats_by_tag_and_tipsheet():
     return tracker.get_stats_by_tag_and_tipsheet()
 
 
+@app.delete("/tracking/clear")
+def clear_tracking():
+    """
+    Delete all prediction records from the tracking database.
+    WARNING: This permanently deletes all tracking data!
+    Use this to reset and start fresh with new predictor version.
+    """
+    count = tracker.clear_all()
+    return {"success": True, "deleted_count": count, "message": f"Deleted {count} prediction records"}
+
+
 @app.post("/fix-place-odds")
 def fix_place_odds():
     """
