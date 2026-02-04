@@ -999,6 +999,145 @@ class PredictionTracker:
 
             return result
 
+    def get_stats_by_day(self) -> list[dict]:
+        """
+        Get performance statistics grouped by day (aggregated across all tracks).
+
+        Similar to get_stats_by_meeting() but aggregates ALL tracks for each date,
+        providing a per-day view of performance.
+
+        Returns list of days with:
+        - date
+        - total_picks, wins, places, win_rate, place_rate
+        - flat_profit (1u per pick)
+        - tracks: list of track names that had picks
+        - by_tag: breakdown by tag
+        - starred_picks: count of tipsheet_pick=1
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    race_date,
+                    track,
+                    tag,
+                    odds,
+                    place_odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1
+                ORDER BY race_date DESC
+            """).fetchall()
+
+            # Group by date
+            days: dict[str, dict] = {}
+            for row in rows:
+                date = row['race_date']
+                if date not in days:
+                    days[date] = {
+                        'date': date,
+                        'tracks': set(),
+                        'picks': [],
+                    }
+                days[date]['tracks'].add(row['track'])
+                days[date]['picks'].append({
+                    'track': row['track'],
+                    'tag': row['tag'],
+                    'odds': row['odds'],
+                    'place_odds': row['place_odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                })
+
+            # Calculate stats for each day
+            result = []
+            for date, day_data in days.items():
+                picks = day_data['picks']
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+
+                # Overall flat bet profit
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+
+                # Stats by tag
+                by_tag: dict[str, dict] = {}
+                for p in picks:
+                    tag = p['tag']
+                    if tag not in by_tag:
+                        by_tag[tag] = {'total': 0, 'wins': 0, 'places': 0, 'profit': 0}
+                    by_tag[tag]['total'] += 1
+                    if p['won']:
+                        by_tag[tag]['wins'] += 1
+                        by_tag[tag]['profit'] += p['odds'] - 1
+                    else:
+                        by_tag[tag]['profit'] -= 1
+                    if p['placed']:
+                        by_tag[tag]['places'] += 1
+
+                result.append({
+                    'date': date,
+                    'tracks': list(day_data['tracks']),
+                    'total_picks': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': wins / total if total > 0 else 0,
+                    'place_rate': places / total if total > 0 else 0,
+                    'flat_profit': round(flat_profit, 2),
+                    'starred_picks': starred,
+                    'by_tag': {
+                        tag: {
+                            'total': s['total'],
+                            'wins': s['wins'],
+                            'places': s['places'],
+                            'profit': round(s['profit'], 2)
+                        }
+                        for tag, s in by_tag.items()
+                    }
+                })
+
+            # Sort by date descending
+            result.sort(key=lambda x: x['date'], reverse=True)
+            return result
+
+    def get_picks_for_day(self, race_date: str) -> list[dict]:
+        """
+        Get all individual picks for a specific day.
+
+        Used to expand a day row and see the actual predictions.
+
+        Args:
+            race_date: Date in dd-MMM-yyyy format
+
+        Returns:
+            List of pick details with track, race, horse, odds, result
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    track,
+                    race_number,
+                    horse,
+                    tab_no,
+                    odds,
+                    place_odds,
+                    tag,
+                    tipsheet_pick,
+                    won,
+                    placed,
+                    finishing_position
+                FROM predictions
+                WHERE race_date = ?
+                ORDER BY track, race_number, tab_no
+            """, (race_date,)).fetchall()
+
+            return [dict(row) for row in rows]
+
     def clear_all(self) -> int:
         """
         Delete all prediction records from the database.

@@ -899,6 +899,34 @@ def get_stats_by_tag_and_tipsheet():
     return tracker.get_stats_by_tag_and_tipsheet()
 
 
+@app.get("/stats/by-day")
+def get_stats_by_day():
+    """
+    Get performance statistics grouped by day (aggregated across all tracks).
+
+    Returns a list of days with:
+    - date, tracks[], total_picks, wins, places
+    - win_rate, place_rate, flat_profit
+    - starred_picks, by_tag breakdown
+    """
+    return tracker.get_stats_by_day()
+
+
+@app.get("/picks/by-day")
+def get_picks_for_day(race_date: str):
+    """
+    Get all individual picks for a specific day.
+
+    Args:
+        race_date: Date in dd-MMM-yyyy format (e.g., "04-Feb-2026")
+
+    Returns:
+        List of picks with track, race, horse, odds, result
+    """
+    validate_date(race_date)
+    return tracker.get_picks_for_day(race_date)
+
+
 @app.delete("/tracking/clear")
 def clear_tracking():
     """
@@ -1147,6 +1175,71 @@ def sync_outcomes(race_date: str):
             "tracks_processed": list(tracks.keys()),
             "pending_count": len(all_pending)
         }
+    }
+
+
+@app.post("/outcomes/sync/all")
+def sync_all_outcomes():
+    """
+    Auto-fetch results for ALL dates with pending predictions.
+
+    Convenience endpoint that:
+    1. Gets all unique dates from pending predictions
+    2. Syncs each date sequentially
+    3. Returns summary of all syncs
+
+    Returns:
+        Summary with dates_synced, total_updated, per-date details
+    """
+    # Get all pending predictions
+    all_pending = tracker.get_pending_outcomes()
+    if not all_pending:
+        return {
+            "success": True,
+            "dates_synced": 0,
+            "total_updated": 0,
+            "message": "No pending predictions",
+            "details": []
+        }
+
+    # Extract unique dates
+    dates = set()
+    for p in all_pending:
+        if p.get("race_date"):
+            dates.add(p["race_date"])
+
+    dates_list = sorted(dates)
+
+    # Sync each date
+    details = []
+    total_updated = 0
+
+    for date in dates_list:
+        try:
+            # Call the existing sync function directly
+            result = sync_outcomes(date)
+
+            synced = result.get("synced", 0)
+            total_updated += synced
+
+            details.append({
+                "date": date,
+                "synced": synced,
+                "errors": result.get("errors")
+            })
+        except Exception as e:
+            details.append({
+                "date": date,
+                "synced": 0,
+                "errors": [str(e)]
+            })
+
+    return {
+        "success": True,
+        "dates_synced": len(dates_list),
+        "total_updated": total_updated,
+        "message": f"Synced {total_updated} predictions across {len(dates_list)} dates",
+        "details": details
     }
 
 
