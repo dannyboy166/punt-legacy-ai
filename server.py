@@ -341,6 +341,8 @@ def build_admin_data(race_data, contenders) -> dict:
                 "condition": run.condition,
                 "position": f"{run.position}/{run.starters}",
                 "margin": run.margin,
+                "weight": run.weight,
+                "barrier": run.barrier,
                 "rating": round(run.rating, 3) if run.rating else None,
                 "is_relevant": is_relevant,  # Highlight flag
             })
