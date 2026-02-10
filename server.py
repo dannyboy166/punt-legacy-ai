@@ -74,6 +74,7 @@ class PredictionRequest(BaseModel):
     date: str  # Format: dd-MMM-yyyy (e.g., "09-Jan-2026")
     mode: str = "normal"  # "normal" or "promo_bonus"
     allow_finished: bool = False  # Admin only: allow predictions on finished races
+    include_admin_data: bool = False  # Admin only: include raw form data for contenders
 
     @field_validator('track')
     @classmethod
@@ -143,6 +144,7 @@ class PredictionResponse(BaseModel):
     warnings: list[str] = []  # Form/data warnings (e.g., "5/8 runners have limited form")
     tracking_stored: bool = False  # True if prediction was stored to tracking DB
     tracking_error: Optional[str] = None  # Error message if tracking failed
+    admin_data: Optional[dict] = None  # Admin only: raw form data for contenders
 
 
 class MeetingResponse(BaseModel):
@@ -285,6 +287,92 @@ class BacktestResponse(BaseModel):
     total_contenders: int
     outcomes_synced: int
     stats: Optional[dict] = None  # Performance stats by tag
+
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+def build_admin_data(race_data, contenders) -> dict:
+    """
+    Build admin-only data showing recent ratings at similar distances/conditions.
+
+    For each contender, extracts form runs that are:
+    - Within ±20% of today's race distance
+    - Similar track condition (within ±2 condition levels)
+    - Actual race runs (not barrier trials)
+    """
+    from core.speed import parse_condition_number
+
+    today_distance = race_data.distance
+    today_condition_num = parse_condition_number(race_data.condition)
+    distance_tolerance = today_distance * 0.20  # ±20%
+
+    contender_form = {}
+
+    for c in contenders:
+        # Find the runner data
+        runner = None
+        for r in race_data.runners:
+            if r.tab_no == c.tab_no:
+                runner = r
+                break
+
+        if not runner:
+            continue
+
+        # Filter form runs to similar distance/condition (excluding trials)
+        relevant_runs = []
+        for run in runner.form:
+            if run.is_barrier_trial:
+                continue
+
+            # Check distance (within ±20%)
+            distance_diff = abs(run.distance - today_distance)
+            if distance_diff > distance_tolerance:
+                continue
+
+            # Check condition (within ±2 levels)
+            if today_condition_num is not None and run.condition_num is not None:
+                condition_diff = abs(run.condition_num - today_condition_num)
+                if condition_diff > 2:
+                    continue
+
+            relevant_runs.append({
+                "date": run.date,
+                "track": run.track,
+                "distance": run.distance,
+                "condition": run.condition,
+                "position": f"{run.position}/{run.starters}",
+                "margin": run.margin,
+                "rating": round(run.rating, 3) if run.rating else None,
+            })
+
+        # Also include all ratings regardless of conditions for context
+        all_ratings = []
+        for run in runner.form:
+            if not run.is_barrier_trial and run.rating:
+                all_ratings.append({
+                    "date": run.date,
+                    "distance": run.distance,
+                    "condition": run.condition,
+                    "rating": round(run.rating, 3),
+                })
+
+        contender_form[c.horse] = {
+            "tab_no": c.tab_no,
+            "total_form_runs": runner.race_runs_count,
+            "relevant_runs": relevant_runs,  # Runs at similar dist/cond
+            "all_ratings": all_ratings[:5],  # Last 5 rated runs for context
+        }
+
+    return {
+        "race_distance": today_distance,
+        "race_condition": race_data.condition,
+        "distance_tolerance": "±20%",
+        "condition_tolerance": "±2 levels",
+        "contenders": contender_form,
+    }
 
 
 # =============================================================================
@@ -616,6 +704,11 @@ def predict(req: PredictionRequest):
                 import traceback
                 traceback.print_exc()
 
+            # Build admin data if requested
+            admin_data = None
+            if req.include_admin_data and contenders:
+                admin_data = build_admin_data(race_data, result.contenders)
+
             # Return response (contenders can be empty = no picks for this race)
             return PredictionResponse(
                 mode="normal",
@@ -631,7 +724,8 @@ def predict(req: PredictionRequest):
                 confidence_reason=result.confidence_reason,
                 warnings=race_data.warnings,
                 tracking_stored=tracking_stored,
-                tracking_error=tracking_error
+                tracking_error=tracking_error,
+                admin_data=admin_data
             )
 
     except HTTPException:
