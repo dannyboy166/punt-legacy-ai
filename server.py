@@ -297,7 +297,7 @@ def build_admin_data(race_data, contenders) -> dict:
     """
     Build admin-only data showing recent ratings at similar distances/conditions.
 
-    For each contender, extracts form runs that are:
+    For ALL runners (not just contenders), extracts form runs that are:
     - Within ±20% of today's race distance
     - Similar track condition (within ±2 condition levels)
     - Actual race runs (not barrier trials)
@@ -308,19 +308,13 @@ def build_admin_data(race_data, contenders) -> dict:
     today_condition_num = parse_condition_number(race_data.condition)
     distance_tolerance = today_distance * 0.20  # ±20%
 
-    contender_form = {}
+    # Get contender tab numbers for highlighting
+    contender_tabs = {c.tab_no for c in contenders}
 
-    for c in contenders:
-        # Find the runner data
-        runner = None
-        for r in race_data.runners:
-            if r.tab_no == c.tab_no:
-                runner = r
-                break
+    all_runners_form = {}
 
-        if not runner:
-            continue
-
+    # Process ALL runners, not just contenders
+    for runner in race_data.runners:
         # Filter form runs to similar distance/condition (excluding trials)
         relevant_runs = []
         for run in runner.form:
@@ -359,9 +353,11 @@ def build_admin_data(race_data, contenders) -> dict:
                     "rating": round(run.rating, 3),
                 })
 
-        contender_form[c.horse] = {
-            "tab_no": c.tab_no,
+        all_runners_form[runner.name] = {
+            "tab_no": runner.tab_no,
+            "odds": runner.odds,
             "total_form_runs": runner.race_runs_count,
+            "is_contender": runner.tab_no in contender_tabs,
             "relevant_runs": relevant_runs,  # Runs at similar dist/cond
             "all_ratings": all_ratings[:5],  # Last 5 rated runs for context
         }
@@ -371,7 +367,7 @@ def build_admin_data(race_data, contenders) -> dict:
         "race_condition": race_data.condition,
         "distance_tolerance": "±20%",
         "condition_tolerance": "±2 levels",
-        "contenders": contender_form,
+        "runners": all_runners_form,
     }
 
 
