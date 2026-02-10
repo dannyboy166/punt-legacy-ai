@@ -295,12 +295,11 @@ class BacktestResponse(BaseModel):
 
 def build_admin_data(race_data, contenders) -> dict:
     """
-    Build admin-only data showing recent ratings at similar distances/conditions.
+    Build admin-only data showing ALL form runs for each runner.
 
-    For ALL runners (not just contenders), extracts form runs that are:
+    Marks runs as "relevant" if they match:
     - Within ±20% of today's race distance
     - Similar track condition (within ±2 condition levels)
-    - Actual race runs (not barrier trials)
     """
     from core.speed import parse_condition_number
 
@@ -313,26 +312,29 @@ def build_admin_data(race_data, contenders) -> dict:
 
     all_runners_form = {}
 
-    # Process ALL runners, not just contenders
+    # Process ALL runners
     for runner in race_data.runners:
-        # Filter form runs to similar distance/condition (excluding trials)
-        relevant_runs = []
+        all_runs = []
+
         for run in runner.form:
             if run.is_barrier_trial:
                 continue
 
+            # Check if this run is "relevant" (similar distance/condition)
+            is_relevant = True
+
             # Check distance (within ±20%)
             distance_diff = abs(run.distance - today_distance)
             if distance_diff > distance_tolerance:
-                continue
+                is_relevant = False
 
             # Check condition (within ±2 levels)
             if today_condition_num is not None and run.condition_num is not None:
                 condition_diff = abs(run.condition_num - today_condition_num)
                 if condition_diff > 2:
-                    continue
+                    is_relevant = False
 
-            relevant_runs.append({
+            all_runs.append({
                 "date": run.date,
                 "track": run.track,
                 "distance": run.distance,
@@ -340,26 +342,15 @@ def build_admin_data(race_data, contenders) -> dict:
                 "position": f"{run.position}/{run.starters}",
                 "margin": run.margin,
                 "rating": round(run.rating, 3) if run.rating else None,
+                "is_relevant": is_relevant,  # Highlight flag
             })
-
-        # Also include all ratings regardless of conditions for context
-        all_ratings = []
-        for run in runner.form:
-            if not run.is_barrier_trial and run.rating:
-                all_ratings.append({
-                    "date": run.date,
-                    "distance": run.distance,
-                    "condition": run.condition,
-                    "rating": round(run.rating, 3),
-                })
 
         all_runners_form[runner.name] = {
             "tab_no": runner.tab_no,
             "odds": runner.odds,
             "total_form_runs": runner.race_runs_count,
             "is_contender": runner.tab_no in contender_tabs,
-            "relevant_runs": relevant_runs,  # Runs at similar dist/cond
-            "all_ratings": all_ratings[:5],  # Last 5 rated runs for context
+            "all_runs": all_runs,  # ALL runs with is_relevant flag
         }
 
     return {
