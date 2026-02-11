@@ -350,6 +350,8 @@ def build_admin_data(race_data, contenders) -> dict:
         all_runners_form[runner.name] = {
             "tab_no": runner.tab_no,
             "odds": runner.odds,
+            "weight": runner.weight,  # Today's weight
+            "barrier": runner.barrier,  # Today's barrier
             "total_form_runs": runner.race_runs_count,
             "is_contender": runner.tab_no in contender_tabs,
             "all_runs": all_runs,  # ALL runs with is_relevant flag
