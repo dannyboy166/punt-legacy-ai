@@ -171,6 +171,7 @@ class MeetingPredictionRequest(BaseModel):
     date: str  # Format: dd-MMM-yyyy
     race_start: int = 1
     race_end: int = 12
+    include_admin_data: bool = True  # Default True since it's admin-only anyway
 
     @field_validator('track')
     @classmethod
@@ -197,6 +198,7 @@ class MeetingRaceResult(BaseModel):
     contenders: list[Contender]
     summary: str
     error: Optional[str] = None
+    admin_data: Optional[dict] = None  # Raw form data for admin
 
 
 class TipsheetPick(BaseModel):
@@ -871,6 +873,11 @@ def predict_meeting(req: MeetingPredictionRequest):
                 except Exception as e:
                     print(f"Warning: Failed to store prediction for R{race_num}: {e}")
 
+                # Build admin data if requested
+                admin_data = None
+                if req.include_admin_data:
+                    admin_data = build_admin_data(race_data, result.contenders)
+
                 race_results.append(MeetingRaceResult(
                     race_number=race_num,
                     race_name=race_data.race_name,
@@ -879,7 +886,8 @@ def predict_meeting(req: MeetingPredictionRequest):
                     class_=race_data.class_,
                     contenders=contenders,
                     summary=result.summary,
-                    error=None
+                    error=None,
+                    admin_data=admin_data
                 ))
 
             except Exception as e:
