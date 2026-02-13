@@ -158,7 +158,7 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 ## Key Analysis
 
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than career win/place stats.**
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than last start wins or career win/place stats.**
 
 **First-up/Second-up horses:** Check their past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh - their career first-up record and past first-up ratings tell you this.
 
@@ -207,7 +207,7 @@ Identify a bonus bet pick and/or promo pick (if genuine value exists):
 
 ## Key Analysis
 
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than career win/place stats.**
+Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than last start wins or career win/place stats.**
 
 **First-up/Second-up horses:** Check their past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh - their career first-up record and past first-up ratings tell you this.
 
