@@ -19,12 +19,70 @@ Usage:
 from dataclasses import dataclass, field
 from typing import Optional, Any
 from datetime import datetime
+import csv
+import os
 
 from api.puntingform import PuntingFormAPI
 from api.ladbrokes import LadbrokeAPI
 from core.normalize import normalize_horse_name, horses_match
 from core.speed import calculate_run_rating, parse_condition_number
 from core.results import PredictionResult, RaceStatus
+
+
+# Track ratings lookup for venue-adjusted speed ratings
+_TRACK_RATINGS: dict[str, float] = {}
+
+def _load_track_ratings() -> dict[str, float]:
+    """Load track ratings from CSV file."""
+    global _TRACK_RATINGS
+    if _TRACK_RATINGS:
+        return _TRACK_RATINGS
+
+    csv_path = os.path.join(os.path.dirname(__file__), "normalization", "track_ratings.csv")
+    if not os.path.exists(csv_path):
+        return {}
+
+    with open(csv_path, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            venue = row.get("venue", "").strip()
+            rating_str = row.get("overall_track_rating", "").strip()
+            if venue and rating_str:
+                try:
+                    _TRACK_RATINGS[venue.lower()] = float(rating_str)
+                except ValueError:
+                    pass
+
+    return _TRACK_RATINGS
+
+
+def get_track_rating(track_name: str) -> Optional[float]:
+    """
+    Get overall track rating for venue-adjusted calculations.
+
+    Returns None if track not found.
+    Higher rating = weaker track (horses beat baseline easier).
+    """
+    ratings = _load_track_ratings()
+
+    # Normalize track name for lookup
+    track_lower = track_name.lower().strip()
+
+    # Direct match
+    if track_lower in ratings:
+        return ratings[track_lower]
+
+    # Try replacing hyphens with spaces (e.g., "Sandown-Lakeside" -> "Sandown Lakeside")
+    track_spaces = track_lower.replace("-", " ")
+    if track_spaces in ratings:
+        return ratings[track_spaces]
+
+    # Try partial match (e.g., "Sandown-Lakeside" contains "Sandown")
+    for venue, rating in ratings.items():
+        if venue in track_lower or track_lower in venue:
+            return rating
+
+    return None
 
 
 @dataclass
@@ -45,6 +103,7 @@ class FormRun:
     rating: Optional[float]  # Normalized speed rating
     prep_run: Optional[int] = None  # 1 = first up, 2 = second up, etc.
     is_barrier_trial: bool = False  # True if this was a barrier trial
+    rating_venue_adjusted: Optional[float] = None  # Rating adjusted by track quality
 
     def to_dict(self) -> dict:
         return {
@@ -63,6 +122,7 @@ class FormRun:
             "rating": round(self.rating * 100, 1) if self.rating else None,
             "prep_run": self.prep_run,  # 1=1st up, 2=2nd up, etc.
             "is_barrier_trial": self.is_barrier_trial,
+            "rating_venue_adjusted": round(self.rating_venue_adjusted * 100, 1) if self.rating_venue_adjusted else None,
         }
 
 
@@ -288,6 +348,7 @@ class RaceData:
                 lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
                     rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
+                    # adj_str available via f.rating_venue_adjusted if needed later
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
                     margin_str = f"{f.margin}L"
@@ -542,6 +603,13 @@ class RaceDataPipeline:
                 if isinstance(run_track, dict):
                     run_track = run_track.get("name", "")
 
+                # Calculate venue-adjusted rating
+                rating_venue_adjusted = None
+                if rating is not None:
+                    track_rating = get_track_rating(run_track)
+                    if track_rating:
+                        rating_venue_adjusted = rating / track_rating
+
                 run_condition = run.get("trackCondition") or "G4"
 
                 # Get prep run number (1 = first up, 2 = second up, etc.)
@@ -565,6 +633,7 @@ class RaceDataPipeline:
                     rating=rating,
                     prep_run=run_prep,
                     is_barrier_trial=run.get("isBarrierTrial", False),
+                    rating_venue_adjusted=rating_venue_adjusted,
                 )
                 form_runs.append(form_run)
 
@@ -644,17 +713,8 @@ class RaceDataPipeline:
         if runners_without_form > 0:
             race_data.warnings.append(f"{runners_without_form} runners missing form")
 
-        # Count first-up runners
-        first_up_count = sum(1 for r in race_data.runners if r.first_up)
-        field_size = len(race_data.runners)
-        if first_up_count > 0:
-            pct = (first_up_count / field_size) * 100 if field_size > 0 else 0
-            if pct >= 50:
-                race_data.warnings.append(f"LOW CONFIDENCE: {first_up_count}/{field_size} runners ({pct:.0f}%) are first-up with limited form")
-            elif first_up_count >= 3:
-                race_data.warnings.append(f"{first_up_count}/{field_size} runners are first-up")
-
         # Count runners with limited form (< 3 actual race runs, excluding trials)
+        # Note: First-up horses are NOT limited form - they have race history, just returning from spell
         limited_form_count = sum(
             1 for r in race_data.runners
             if len([f for f in r.form if not f.is_barrier_trial]) < 3

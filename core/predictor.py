@@ -160,9 +160,11 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than career win/place stats.**
 
+**First-up/Second-up horses:** Check their past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh - their career first-up record and past first-up ratings tell you this.
+
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
-- If a horse has 0 race runs, they are UNKNOWN
+- If a horse has 0 race runs, they are UNKNOWN (first starter)
 - If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
 
 You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
@@ -207,9 +209,11 @@ Identify a bonus bet pick and/or promo pick (if genuine value exists):
 
 Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than career win/place stats.**
 
+**First-up/Second-up horses:** Check their past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh - their career first-up record and past first-up ratings tell you this.
+
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form — horses don't always try
-- If a horse has 0 race runs, they are UNKNOWN — could be brilliant or useless
+- If a horse has 0 race runs, they are UNKNOWN (first starter) — could be brilliant or useless
 
 You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
 
