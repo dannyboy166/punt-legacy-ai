@@ -519,6 +519,30 @@ class RaceDataPipeline:
             except Exception:
                 pass
 
+        # Try Ladbrokes meetings endpoint (has track_condition on races)
+        if not condition:
+            try:
+                # Convert date format (dd-MMM-yyyy -> YYYY-MM-DD)
+                dt = datetime.strptime(date, "%d-%b-%Y")
+                lb_date = dt.strftime("%Y-%m-%d")
+
+                lb_meetings = self.lb_api.get_meetings(date_from=lb_date)
+                for m in lb_meetings:
+                    # Match by track name
+                    lb_track = m.get("name", "")
+                    if lb_track.lower() == meeting_track.lower() or meeting_track.lower() in lb_track.lower():
+                        races = m.get("races", [])
+                        for r in races:
+                            if r.get("race_number") == race_number:
+                                lb_condition = r.get("track_condition")  # e.g., "Heavy8", "Good4"
+                                if lb_condition:
+                                    condition = lb_condition
+                                    condition_num = parse_condition_number(lb_condition)
+                                break
+                        break
+            except Exception:
+                pass
+
         # Fallback to fields_data - but FAIL if still missing (no silent defaults)
         if not condition:
             condition = fields_data.get("expectedCondition")
