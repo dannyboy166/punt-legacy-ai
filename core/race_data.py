@@ -506,9 +506,11 @@ class RaceDataPipeline:
                     race_results = results[0].get("raceResults", [])
                     for rr in race_results:
                         if rr.get("raceNumber") == race_number:
-                            condition = rr.get("trackConditionLabel")  # e.g., "Good"
+                            cond_label = rr.get("trackConditionLabel")  # e.g., "Good", "Unknown"
                             cond_num = rr.get("trackConditionNumber")
-                            if cond_num:
+                            # Skip if condition is "Unknown" or number is 0 (not yet assessed)
+                            if cond_label and cond_label.lower() != "unknown" and cond_num and cond_num != 0:
+                                condition = cond_label
                                 try:
                                     condition_num = int(cond_num)
                                 except ValueError:
