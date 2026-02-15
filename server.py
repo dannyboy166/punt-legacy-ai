@@ -1023,6 +1023,25 @@ def get_stats_by_day():
     return tracker.get_stats_by_day()
 
 
+@app.get("/stats/by-class")
+def get_stats_by_class():
+    """
+    Get performance statistics grouped by race class.
+
+    Returns dict of race_class -> stats with:
+    - total, wins, places
+    - win_rate, place_rate (percentages)
+    - avg_odds, flat_profit, roi
+
+    Classes are normalized to groups like:
+    - Maiden
+    - Class 1-3, Class 4-6
+    - BM45-58, BM58-72, BM72-85, BM85+
+    - Group 1, Group 2, Group 3, Listed
+    """
+    return tracker.get_stats_by_class()
+
+
 @app.get("/picks/by-day")
 def get_picks_for_day(race_date: str):
     """

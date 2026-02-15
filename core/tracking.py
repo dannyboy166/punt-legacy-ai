@@ -96,6 +96,7 @@ class PredictionTracker:
                     pick_type TEXT NOT NULL,
                     analysis TEXT,
                     tipsheet_pick INTEGER DEFAULT 0,  -- 1 if Claude would genuinely bet
+                    race_class TEXT,  -- e.g. "Maiden", "BM78", "Group 1"
 
                     -- Outcome (filled in after race)
                     won INTEGER,  -- 0 or 1
@@ -128,6 +129,11 @@ class PredictionTracker:
             if 'tipsheet_pick' not in columns:
                 conn.execute("ALTER TABLE predictions ADD COLUMN tipsheet_pick INTEGER DEFAULT 0")
                 logger.info("Added tipsheet_pick column to predictions table")
+
+            # Migration: Add race_class column if it doesn't exist
+            if 'race_class' not in columns:
+                conn.execute("ALTER TABLE predictions ADD COLUMN race_class TEXT")
+                logger.info("Added race_class column to predictions table")
 
             conn.commit()
 
@@ -167,8 +173,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -186,6 +192,7 @@ class PredictionTracker:
                             "contender",
                             contender.analysis,
                             1 if getattr(contender, 'tipsheet_pick', False) else 0,
+                            race_data.class_ if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -208,8 +215,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -227,6 +234,7 @@ class PredictionTracker:
                             "bonus_bet",
                             pick.analysis,
                             0,  # tipsheet_pick not applicable for promo/bonus
+                            race_data.class_ if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -248,8 +256,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -267,6 +275,7 @@ class PredictionTracker:
                             "promo_play",
                             pick.analysis,
                             0,  # tipsheet_pick not applicable for promo/bonus
+                            race_data.class_ if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -1196,3 +1205,144 @@ class PredictionTracker:
                 }
 
             return result
+
+    def get_stats_by_class(self, min_samples: int = 1) -> dict:
+        """
+        Get performance statistics grouped by race class.
+
+        Returns dict of race_class -> stats with win/place rates and ROI.
+        Race classes are normalized to groups like "Maiden", "Class 1-3", "BM50-65", etc.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    race_class,
+                    odds,
+                    won,
+                    placed
+                FROM predictions
+                WHERE outcome_recorded = 1 AND race_class IS NOT NULL
+            """).fetchall()
+
+            # Group by normalized class
+            by_class: dict[str, list] = {}
+            for row in rows:
+                raw_class = row['race_class'] or "Unknown"
+                # Normalize class name
+                normalized = self._normalize_race_class(raw_class)
+                if normalized not in by_class:
+                    by_class[normalized] = []
+                by_class[normalized].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            # Calculate stats for each class
+            stats = {}
+            for class_name, picks in by_class.items():
+                if len(picks) < min_samples:
+                    continue
+
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                avg_odds = sum(p['odds'] for p in picks) / total
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[class_name] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': round(wins / total * 100, 1) if total > 0 else 0,
+                    'place_rate': round(places / total * 100, 1) if total > 0 else 0,
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
+    def _normalize_race_class(self, raw_class: str) -> str:
+        """
+        Normalize race class string to a grouping.
+
+        Examples:
+        - "Maiden;" -> "Maiden"
+        - "Class 1;" -> "Class 1-3"
+        - "Benchmark 65;" -> "BM58-72"
+        - "Group 1;" -> "Group 1"
+        """
+        raw = raw_class.strip().rstrip(';').lower()
+
+        # Group races
+        if 'group 1' in raw:
+            return "Group 1"
+        if 'group 2' in raw:
+            return "Group 2"
+        if 'group 3' in raw:
+            return "Group 3"
+        if 'listed' in raw:
+            return "Listed"
+
+        # Maiden
+        if 'maiden' in raw:
+            return "Maiden"
+
+        # Class races
+        if 'class 1' in raw:
+            return "Class 1-3"
+        if 'class 2' in raw:
+            return "Class 1-3"
+        if 'class 3' in raw:
+            return "Class 1-3"
+        if 'class 4' in raw:
+            return "Class 4-6"
+        if 'class 5' in raw:
+            return "Class 4-6"
+        if 'class 6' in raw:
+            return "Class 4-6"
+
+        # Benchmark races - extract the number
+        import re
+        bm_match = re.search(r'benchmark\s*(\d+)', raw)
+        if bm_match:
+            bm_num = int(bm_match.group(1))
+            if bm_num <= 58:
+                return "BM45-58"
+            elif bm_num <= 72:
+                return "BM58-72"
+            elif bm_num <= 85:
+                return "BM72-85"
+            else:
+                return "BM85+"
+
+        # BM shorthand
+        bm_match = re.search(r'bm\s*(\d+)', raw)
+        if bm_match:
+            bm_num = int(bm_match.group(1))
+            if bm_num <= 58:
+                return "BM45-58"
+            elif bm_num <= 72:
+                return "BM58-72"
+            elif bm_num <= 85:
+                return "BM72-85"
+            else:
+                return "BM85+"
+
+        # Handicap
+        if 'handicap' in raw:
+            return "Handicap"
+
+        # Restricted/age races
+        if '2yo' in raw or '2 yo' in raw or '2-yo' in raw:
+            return "2YO"
+        if '3yo' in raw or '3 yo' in raw or '3-yo' in raw:
+            return "3YO"
+
+        # Default
+        return raw_class.strip().rstrip(';')
