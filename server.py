@@ -1660,6 +1660,97 @@ def update_tipsheet_picks(req: BackfillRequest):
     }
 
 
+@app.post("/backfill/race-class")
+def backfill_race_class():
+    """
+    Backfill race_class for existing predictions that don't have it.
+
+    Queries PuntingForm API for each unique race and updates the predictions.
+    """
+    import sqlite3
+    from pathlib import Path
+
+    db_path = Path(__file__).parent / "data" / "predictions.db"
+
+    if not db_path.exists():
+        raise HTTPException(status_code=404, detail="Database not found")
+
+    # Get unique races without race_class
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        races = conn.execute("""
+            SELECT DISTINCT track, race_number, race_date
+            FROM predictions
+            WHERE race_class IS NULL
+            ORDER BY race_date DESC, track, race_number
+        """).fetchall()
+
+    if not races:
+        return {"message": "No predictions need backfill", "updated": 0, "failed": 0}
+
+    # Cache for fields data
+    fields_cache: dict[str, dict] = {}
+    updated_total = 0
+    failed_races = []
+
+    for race in races:
+        track = race['track']
+        race_number = race['race_number']
+        race_date = race['race_date']
+        cache_key = f"{track}|{race_date}"
+
+        # Fetch meeting data if not cached
+        if cache_key not in fields_cache:
+            try:
+                meetings = pf_api.get_meetings(race_date)
+                meeting_id = None
+                for m in meetings:
+                    if m.get('track', {}).get('name', '').lower() == track.lower():
+                        meeting_id = m.get('meetingId')
+                        break
+
+                if not meeting_id:
+                    failed_races.append(f"{track} R{race_number} ({race_date}): Meeting not found")
+                    continue
+
+                fields = pf_api.get_fields(meeting_id)
+                fields_cache[cache_key] = fields
+            except Exception as e:
+                failed_races.append(f"{track} R{race_number} ({race_date}): {str(e)}")
+                continue
+
+        fields = fields_cache[cache_key]
+
+        # Find the race class
+        race_class = None
+        for r in fields.get('races', []):
+            if r.get('number') == race_number:
+                race_class = r.get('raceClass', '').strip().rstrip(';')
+                break
+
+        if not race_class:
+            failed_races.append(f"{track} R{race_number} ({race_date}): Race class not found")
+            continue
+
+        # Update predictions
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.execute("""
+                UPDATE predictions
+                SET race_class = ?
+                WHERE track = ? AND race_number = ? AND race_date = ?
+            """, (race_class, track, race_number, race_date))
+            conn.commit()
+            updated_total += cursor.rowcount
+
+    return {
+        "message": f"Backfilled race_class for {len(races)} races",
+        "races_processed": len(races),
+        "predictions_updated": updated_total,
+        "failed": len(failed_races),
+        "failed_details": failed_races[:20]  # Limit to first 20 failures
+    }
+
+
 @app.post("/backfill")
 def backfill_predictions(req: BackfillRequest):
     """
