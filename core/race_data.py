@@ -471,9 +471,51 @@ class RaceDataPipeline:
                     if tab_no is not None:
                         speedmap_by_tab[tab_no] = item
 
-        # 7. Get race-level info
-        condition = fields_data.get("expectedCondition") or "G4"
-        condition_num = parse_condition_number(condition) or 4
+        # 7. Get race-level condition
+        # Try conditions endpoint first (for upcoming races), then results (for past races)
+        condition = None
+        condition_num = None
+
+        # Try conditions endpoint (upcoming races)
+        try:
+            conditions = self.pf_api.get_conditions()
+            for c in conditions:
+                if c.get("meetingId") == int(meeting_id):
+                    condition = c.get("trackCondition")  # e.g., "Good", "Soft (5)"
+                    cond_num_str = c.get("trackConditionNumber")  # e.g., "4", "5"
+                    if cond_num_str:
+                        try:
+                            condition_num = int(cond_num_str)
+                        except ValueError:
+                            pass
+                    break
+        except Exception:
+            pass
+
+        # Try results endpoint (past races)
+        if not condition:
+            try:
+                results = self.pf_api.get_results(meeting_id, race_number)
+                if results and len(results) > 0:
+                    race_results = results[0].get("raceResults", [])
+                    for rr in race_results:
+                        if rr.get("raceNumber") == race_number:
+                            condition = rr.get("trackConditionLabel")  # e.g., "Good"
+                            cond_num = rr.get("trackConditionNumber")
+                            if cond_num:
+                                try:
+                                    condition_num = int(cond_num)
+                                except ValueError:
+                                    pass
+                            break
+            except Exception:
+                pass
+
+        # Fallback to fields_data or default
+        if not condition:
+            condition = fields_data.get("expectedCondition") or "G4"
+        if not condition_num:
+            condition_num = parse_condition_number(condition) or 4
 
         race_data = RaceData(
             track=meeting_track,
