@@ -91,16 +91,16 @@ class FormRun:
     date: str
     track: str
     distance: int
-    condition: str
-    condition_num: int
+    condition: str  # "G4", "S5", etc. or "UNK" if missing
+    condition_num: Optional[int]  # None if condition unknown
     position: int
-    margin: float
-    weight: float
-    barrier: int
+    margin: Optional[float]  # None if missing (non-winner with no margin data)
+    weight: Optional[float]  # None if missing
+    barrier: Optional[int]  # None if missing
     starters: int
     class_: str
     prize_money: int
-    rating: Optional[float]  # Normalized speed rating
+    rating: Optional[float]  # Normalized speed rating - None if can't calculate
     prep_run: Optional[int] = None  # 1 = first up, 2 = second up, etc.
     is_barrier_trial: bool = False  # True if this was a barrier trial
     rating_venue_adjusted: Optional[float] = None  # Rating adjusted by track quality
@@ -351,10 +351,16 @@ class RaceData:
                     # adj_str available via f.rating_venue_adjusted if needed later
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
-                    margin_str = f"{f.margin}L"
-                    if not f.is_barrier_trial and f.margin and f.margin >= 8:
-                        margin_str += " ⚠️eased"
-                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {f.condition} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
+                    # Handle None margin
+                    if f.margin is not None:
+                        margin_str = f"{f.margin}L"
+                        if not f.is_barrier_trial and f.margin >= 8:
+                            margin_str += " ⚠️eased"
+                    else:
+                        margin_str = "?" if f.position > 1 else "0L"  # Unknown for non-winners
+                    # Handle UNK condition
+                    cond_str = f.condition if f.condition != "UNK" else "?"
+                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
 
             else:
                 lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")
@@ -511,17 +517,27 @@ class RaceDataPipeline:
             except Exception:
                 pass
 
-        # Fallback to fields_data or default
+        # Fallback to fields_data - but FAIL if still missing (no silent defaults)
         if not condition:
-            condition = fields_data.get("expectedCondition") or "G4"
+            condition = fields_data.get("expectedCondition")
+        if not condition:
+            return None, f"Track condition not available for {meeting_track} R{race_number}. Cannot make accurate prediction."
+
         if not condition_num:
-            condition_num = parse_condition_number(condition) or 4
+            condition_num = parse_condition_number(condition)
+        if not condition_num:
+            return None, f"Could not parse track condition '{condition}' for {meeting_track} R{race_number}. Cannot make accurate prediction."
+
+        # Validate distance - must be present and non-zero
+        distance = race_info.get("distance", 0)
+        if not distance or distance == 0:
+            return None, f"Race distance not available for {meeting_track} R{race_number}. Cannot make accurate prediction."
 
         race_data = RaceData(
             track=meeting_track,
             race_number=race_number,
             race_name=race_info.get("name", ""),
-            distance=race_info.get("distance", 0),
+            distance=distance,
             condition=condition,
             condition_num=condition_num,
             class_=race_info.get("raceClass", ""),
@@ -652,24 +668,52 @@ class RaceDataPipeline:
                     if track_rating:
                         rating_venue_adjusted = rating / track_rating
 
-                run_condition = run.get("trackCondition") or "G4"
+                # Get form run data - skip run if critical data is missing
+                run_distance = run.get("distance")
+                run_starters = run.get("starters")
+                run_position = run.get("position")
+
+                # Skip form runs with missing critical data (useless for analysis)
+                if not run_distance or run_distance == 0:
+                    continue  # Can't compare without distance
+                if not run_starters or run_starters == 0:
+                    continue  # Can't interpret position without field size
+
+                # Condition - if missing, we can't calculate accurate rating
+                run_condition = run.get("trackCondition")
+                run_condition_num = None
+                if run_condition:
+                    run_condition_num = parse_condition_number(run_condition)
+                else:
+                    # Mark condition as unknown - rating will be None
+                    run_condition = "UNK"
+                    rating = None  # Can't calculate rating without condition
+                    rating_venue_adjusted = None
 
                 # Get prep run number (1 = first up, 2 = second up, etc.)
                 run_prep = run.get("prepRuns")
                 if run_prep is not None:
                     run_prep = run_prep + 1  # API returns 0-indexed, we want 1-indexed
 
+                # Weight and margin - use None if missing, not 0
+                run_weight = run.get("weight")
+                run_margin = run.get("margin")
+
+                # Validate margin for non-winners (should not be 0 or None unless winner)
+                if run_position and run_position > 1 and (run_margin is None or run_margin == 0):
+                    run_margin = None  # Mark as unknown rather than pretending 0
+
                 form_run = FormRun(
                     date=run_date,
                     track=run_track,
-                    distance=run.get("distance", 0),
+                    distance=run_distance,
                     condition=run_condition,
-                    condition_num=parse_condition_number(run_condition) or 4,
-                    position=run.get("position", 0),
-                    margin=run.get("margin", 0) or 0,
-                    weight=run.get("weight", 0) or 0,
-                    barrier=run.get("barrier", 0) or 0,
-                    starters=run.get("starters", 0) or 0,
+                    condition_num=run_condition_num,
+                    position=run_position or 0,
+                    margin=run_margin,
+                    weight=run_weight,
+                    barrier=run.get("barrier"),
+                    starters=run_starters,
                     class_=run.get("raceClass", ""),
                     prize_money=run.get("prizeMoney", 0) or 0,
                     rating=rating,

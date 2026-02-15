@@ -134,7 +134,7 @@ def get_baseline_speed(distance: int) -> float:
     return lower_speed + ratio * (upper_speed - lower_speed)
 
 
-def get_condition_multiplier(condition: str) -> float:
+def get_condition_multiplier(condition: str) -> Optional[float]:
     """
     Get speed multiplier for a track condition.
 
@@ -143,6 +143,7 @@ def get_condition_multiplier(condition: str) -> float:
 
     Returns:
         Speed multiplier (1.0 = G4 baseline, <1.0 = slower conditions)
+        Returns None if condition cannot be recognized (don't guess!)
 
     Example:
         >>> get_condition_multiplier("G4")
@@ -199,8 +200,8 @@ def get_condition_multiplier(condition: str) -> float:
         elif cond_num >= 10:
             return multipliers.get("H10", 1.0)
 
-    # Default to G4 if can't parse
-    return 1.0
+    # Don't guess - return None if we can't recognize the condition
+    return None
 
 
 def parse_condition_number(condition: str) -> Optional[int]:
@@ -410,6 +411,11 @@ def calculate_speed_rating(
     # Get expected speed for this distance and condition
     baseline = get_baseline_speed(distance)
     multiplier = get_condition_multiplier(condition)
+
+    # Can't calculate rating without condition multiplier
+    if multiplier is None:
+        return None
+
     expected_speed = baseline * multiplier
 
     # Return normalized rating
@@ -453,11 +459,18 @@ def calculate_run_rating(run: dict) -> Optional[float]:
     if winner_time is None:
         return None
 
-    # Get margin
-    margin = run.get("margin", 0) or 0
+    # Get margin - default to 0 only for winners (position 1)
+    margin = run.get("margin")
+    if margin is None:
+        if position == 1:
+            margin = 0  # Winner has 0 margin by definition
+        else:
+            return None  # Can't calculate rating for non-winner without margin
 
-    # Get condition
-    condition = run.get("trackCondition") or "G4"
+    # Get condition - don't guess, return None if missing
+    condition = run.get("trackCondition")
+    if not condition:
+        return None  # Can't calculate rating without condition
 
     return calculate_speed_rating(distance, winner_time, margin, position, condition)
 
@@ -519,10 +532,12 @@ def calculate_horse_rating(
 
         # Filter by condition similarity
         if race_cond_num is not None:
-            run_condition = run.get("trackCondition") or "G4"
-            run_cond_num = parse_condition_number(run_condition)
-            if run_cond_num and abs(run_cond_num - race_cond_num) > condition_tolerance:
-                continue
+            run_condition = run.get("trackCondition")
+            if run_condition:
+                run_cond_num = parse_condition_number(run_condition)
+                if run_cond_num and abs(run_cond_num - race_cond_num) > condition_tolerance:
+                    continue
+            # If run has no condition, skip it (can't compare unknowns)
 
         # Calculate rating for this run
         rating = calculate_run_rating(run)

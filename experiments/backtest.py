@@ -112,7 +112,9 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
 
     race = races[0]
     distance = race.get('distance', 0)
-    condition = race.get('trackCondition') or 'G4'
+    condition = race.get('trackCondition')
+    if not condition:
+        return None, "Track condition not available - cannot make accurate prediction", None
     race_name = race.get('raceName', '')
 
     form_by_id = {r.get('runnerId'): r.get('forms', []) for r in form_data}

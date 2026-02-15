@@ -180,9 +180,9 @@ class TestGetConditionMultiplier:
         # "Good 4" should map to G4
         assert get_condition_multiplier("Good 4") == pytest.approx(1.0, rel=1e-4)
 
-    def test_unknown_defaults_to_g4(self):
-        # Unknown condition defaults to 1.0
-        assert get_condition_multiplier("Unknown") == pytest.approx(1.0, rel=1e-4)
+    def test_unknown_returns_none(self):
+        # Unknown condition returns None (don't guess!)
+        assert get_condition_multiplier("Unknown") is None
 
 
 # =============================================================================

@@ -411,6 +411,7 @@ class TestRaceDataPipeline:
             {"track": {"name": "Randwick"}, "meetingId": 123}
         ]
         mock_pf.get_fields.return_value = {
+            "expectedCondition": "G4",  # Required - no silent defaults
             "races": [
                 {
                     "number": 1,
@@ -422,6 +423,8 @@ class TestRaceDataPipeline:
         }
         mock_pf.get_form.return_value = []
         mock_pf.get_speedmaps.return_value = []
+        mock_pf.get_conditions.return_value = []  # No conditions from API
+        mock_pf.get_results.return_value = []  # No results from API
 
         mock_lb = Mock()
         mock_lb.get_odds_for_pf_track.return_value = ({}, None)
