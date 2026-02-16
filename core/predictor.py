@@ -176,7 +176,7 @@ You also have: win/place odds, jockey/trainer A/E ratios, career record, first-u
 Also include brief notes for non-selected runners explaining why they weren't picked. Focus on:
 - Speed ratings at similar distance/condition vs contenders
 - Poor jockey/trainer A/E ratios if relevant
-- Weight up from last win, bad barrier
+- Significant weight changes from recent runs, bad barrier draw
 - Lack of form at this distance/condition
 Avoid generic career stats like "poor strike rate" - be specific to today's race.
 
@@ -195,8 +195,8 @@ Avoid generic career stats like "poor strike rate" - be specific to today's race
     }
   ],
   "runner_notes": {
-    "Horse Name": "1 sentence: specific reason (ratings, distance, condition, weight, barrier, jockey/trainer A/E)",
-    "Another Horse": "1 sentence: specific reason"
+    "Horse Name": "1 sentence: ratings at this distance/condition, weight change, barrier, jockey/trainer A/E",
+    "Another Horse": "1 sentence: specific reason vs contenders"
   },
   "summary": "Brief overview or reason for 0 picks"
 }
