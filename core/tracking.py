@@ -1206,24 +1206,39 @@ class PredictionTracker:
 
             return result
 
-    def get_stats_by_class(self, min_samples: int = 1) -> dict:
+    def get_stats_by_class(self, min_samples: int = 1, tag: Optional[str] = None) -> dict:
         """
         Get performance statistics grouped by race class.
+
+        Args:
+            min_samples: Minimum picks required to include a class
+            tag: Optional tag filter (e.g., "The one to beat")
 
         Returns dict of race_class -> stats with win/place rates and ROI.
         Race classes are normalized to groups like "Maiden", "Class 1-3", "BM50-65", etc.
         """
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            rows = conn.execute("""
-                SELECT
-                    race_class,
-                    odds,
-                    won,
-                    placed
-                FROM predictions
-                WHERE outcome_recorded = 1 AND race_class IS NOT NULL
-            """).fetchall()
+            if tag:
+                rows = conn.execute("""
+                    SELECT
+                        race_class,
+                        odds,
+                        won,
+                        placed
+                    FROM predictions
+                    WHERE outcome_recorded = 1 AND race_class IS NOT NULL AND tag = ?
+                """, (tag,)).fetchall()
+            else:
+                rows = conn.execute("""
+                    SELECT
+                        race_class,
+                        odds,
+                        won,
+                        placed
+                    FROM predictions
+                    WHERE outcome_recorded = 1 AND race_class IS NOT NULL
+                """).fetchall()
 
             # Group by normalized class
             by_class: dict[str, list] = {}

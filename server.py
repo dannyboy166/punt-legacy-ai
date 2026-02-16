@@ -1024,9 +1024,12 @@ def get_stats_by_day():
 
 
 @app.get("/stats/by-class")
-def get_stats_by_class():
+def get_stats_by_class(tag: Optional[str] = None):
     """
     Get performance statistics grouped by race class.
+
+    Args:
+        tag: Optional filter by tag (e.g., "The one to beat")
 
     Returns dict of race_class -> stats with:
     - total, wins, places
@@ -1039,7 +1042,7 @@ def get_stats_by_class():
     - BM45-58, BM58-72, BM72-85, BM85+
     - Group 1, Group 2, Group 3, Listed
     """
-    return tracker.get_stats_by_class()
+    return tracker.get_stats_by_class(tag=tag)
 
 
 @app.get("/picks/by-day")
