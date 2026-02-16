@@ -266,8 +266,12 @@ class RaceData:
             "warnings": self.warnings,
         }
 
-    def to_prompt_text(self) -> str:
-        """Format as text for Claude prompt."""
+    def to_prompt_text(self, include_venue_adjusted: bool = False) -> str:
+        """Format as text for Claude prompt.
+
+        Args:
+            include_venue_adjusted: If True, add Adj column with venue-adjusted ratings.
+        """
         lines = [
             f"# {self.track} Race {self.race_number}: {self.race_name}",
             f"Distance: {self.distance}m | Condition: {self.condition} | Class: {self.class_}",
@@ -344,11 +348,15 @@ class RaceData:
                     form_summary += " ⚠️ LIMITED FORM DATA"
                 lines.append(form_summary)
                 lines.append("")
-                lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |")
-                lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
+                if include_venue_adjusted:
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial |")
+                    lines.append("|------|-------|------|------|-----|--------|--------|-----|------|-------|")
+                else:
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |")
+                    lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
                     rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
-                    # adj_str available via f.rating_venue_adjusted if needed later
+                    adj_str = f"{f.rating_venue_adjusted * 100:.1f}" if f.rating_venue_adjusted else "-"
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
                     # Handle None margin
@@ -360,7 +368,10 @@ class RaceData:
                         margin_str = "?" if f.position > 1 else "0L"  # Unknown for non-winners
                     # Handle UNK condition
                     cond_str = f.condition if f.condition != "UNK" else "?"
-                    lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
+                    if include_venue_adjusted:
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} |")
+                    else:
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
 
             else:
                 lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")
@@ -827,6 +838,7 @@ class RaceDataPipeline:
 
         # Count runners with limited form (< 3 actual race runs, excluding trials)
         # Note: First-up horses are NOT limited form - they have race history, just returning from spell
+        field_size = len(race_data.runners)
         limited_form_count = sum(
             1 for r in race_data.runners
             if len([f for f in r.form if not f.is_barrier_trial]) < 3
