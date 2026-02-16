@@ -137,6 +137,7 @@ class PredictionResponse(BaseModel):
     bonus_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     promo_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     summary: str
+    runner_notes: dict = {}  # Notes for non-selected runners (1 sentence each)
     race_confidence: Optional[int] = None  # Deprecated - not used in new model
     confidence_reason: Optional[str] = None  # Deprecated - not used in new model
     skipped: bool = False  # True if race was skipped due to insufficient form data
@@ -718,7 +719,8 @@ def predict(req: PredictionRequest):
                 warnings=race_data.warnings,
                 tracking_stored=tracking_stored,
                 tracking_error=tracking_error,
-                admin_data=admin_data
+                admin_data=admin_data,
+                runner_notes=result.runner_notes
             )
 
     except HTTPException:

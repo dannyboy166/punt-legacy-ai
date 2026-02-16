@@ -107,6 +107,9 @@ class PredictionOutput:
     # Overall summary
     summary: str = ""
 
+    # Notes for non-selected runners (1 sentence each)
+    runner_notes: dict = field(default_factory=dict)
+
     # Race-level confidence (1-10) - deprecated, not used in new model
     race_confidence: Optional[int] = None
     confidence_reason: Optional[str] = None
@@ -125,6 +128,7 @@ class PredictionOutput:
             "mode": self.mode,
             "contenders": [c.to_dict() for c in self.contenders],
             "summary": self.summary,
+            "runner_notes": self.runner_notes,
             "race_confidence": self.race_confidence,
             "confidence_reason": self.confidence_reason,
             "track": self.track,
@@ -169,6 +173,8 @@ Focus on **normalized speed ratings** from RACE runs (not trials) at similar dis
 
 You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
 
+Also include brief notes for non-selected runners explaining why they weren't picked (1 sentence each).
+
 ## Output
 
 ```json
@@ -179,10 +185,14 @@ You also have: win/place odds, jockey/trainer A/E ratios, career record, first-u
       "tab_no": number,
       "odds": number,
       "tag": "The one to beat" | "Each-way chance" | "Value bet",
-      "analysis": "1-3 sentences referencing RACE form",
+      "analysis": "2-3 sentences referencing RACE form",
       "tipsheet_pick": true | false
     }
   ],
+  "runner_notes": {
+    "Horse Name": "1 sentence why not selected",
+    "Another Horse": "1 sentence why not selected"
+  },
   "summary": "Brief overview or reason for 0 picks"
 }
 ```
@@ -496,11 +506,15 @@ class Predictor:
             elif horse:
                 logger.warning(f"Skipping contender {horse}: missing tab_no={tab_no}")
 
+        # Extract runner notes for non-selected runners
+        runner_notes = data.get("runner_notes", {})
+
         # Return output (contenders can be empty)
         return PredictionOutput(
             mode="normal",
             contenders=contenders,
             summary=data.get("summary", ""),
+            runner_notes=runner_notes,
             track=race_data.track,
             race_number=race_data.race_number,
             model=self.model,
