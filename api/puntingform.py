@@ -236,6 +236,42 @@ class PuntingFormAPI:
         )
 
     # -------------------------------------------------------------------------
+    # PFAI Ratings
+    # -------------------------------------------------------------------------
+
+    def get_ratings(self, meeting_id: int) -> dict[int, dict]:
+        """
+        Get PFAI ratings for a meeting, indexed by tabNo.
+
+        Args:
+            meeting_id: Meeting ID
+
+        Returns:
+            Dict mapping tabNo to rating data:
+            {
+                1: {"pfai_rank": 1, "is_reliable": True},
+                2: {"pfai_rank": 3, "is_reliable": True},
+                ...
+            }
+        """
+        data = self._request(
+            "/Ratings/MeetingRatings",
+            {"meetingId": meeting_id},
+        )
+
+        ratings_by_tab = {}
+        if isinstance(data, list):
+            for item in data:
+                for runner in item.get("items", []):
+                    tab_no = runner.get("tabNo")
+                    if tab_no is not None:
+                        ratings_by_tab[tab_no] = {
+                            "pfai_rank": runner.get("pfaiRank"),
+                            "is_reliable": runner.get("isReliable", False),
+                        }
+        return ratings_by_tab
+
+    # -------------------------------------------------------------------------
     # Strikerate (Jockey/Trainer Stats)
     # -------------------------------------------------------------------------
 

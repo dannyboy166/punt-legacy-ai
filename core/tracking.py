@@ -135,6 +135,11 @@ class PredictionTracker:
                 conn.execute("ALTER TABLE predictions ADD COLUMN race_class TEXT")
                 logger.info("Added race_class column to predictions table")
 
+            # Migration: Add pfai_rank column if it doesn't exist
+            if 'pfai_rank' not in columns:
+                conn.execute("ALTER TABLE predictions ADD COLUMN pfai_rank INTEGER")
+                logger.info("Added pfai_rank column to predictions table")
+
             conn.commit()
 
     def store_prediction(
@@ -173,8 +178,8 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class, pfai_rank)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -193,6 +198,7 @@ class PredictionTracker:
                             contender.analysis,
                             1 if getattr(contender, 'tipsheet_pick', False) else 0,
                             race_data.class_ if race_data else None,
+                            getattr(contender, 'pfai_rank', None),
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -1361,3 +1367,214 @@ class PredictionTracker:
 
         # Default
         return raw_class.strip().rstrip(';')
+
+    def get_stats_by_pfai_rank(self, tag: Optional[str] = None) -> dict:
+        """
+        Get performance statistics grouped by PFAI rank.
+
+        Args:
+            tag: Optional tag filter (e.g., "The one to beat")
+
+        Returns:
+            Dict of pfai_rank -> stats with win/place rates and ROI.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            if tag:
+                rows = conn.execute("""
+                    SELECT
+                        pfai_rank,
+                        odds,
+                        won,
+                        placed
+                    FROM predictions
+                    WHERE outcome_recorded = 1 AND pfai_rank IS NOT NULL AND tag = ?
+                """, (tag,)).fetchall()
+            else:
+                rows = conn.execute("""
+                    SELECT
+                        pfai_rank,
+                        odds,
+                        won,
+                        placed
+                    FROM predictions
+                    WHERE outcome_recorded = 1 AND pfai_rank IS NOT NULL
+                """).fetchall()
+
+            # Group by PFAI rank
+            by_rank: dict[int, list] = {}
+            for row in rows:
+                rank = row['pfai_rank']
+                if rank not in by_rank:
+                    by_rank[rank] = []
+                by_rank[rank].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            # Calculate stats for each rank
+            stats = {}
+            for rank, picks in sorted(by_rank.items()):
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                avg_odds = sum(p['odds'] for p in picks) / total if total > 0 else 0
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[rank] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': round(wins / total * 100, 1) if total > 0 else 0,
+                    'place_rate': round(places / total * 100, 1) if total > 0 else 0,
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
+    def get_stats_by_tag_and_pfai(self, pfai_rank: int = 1) -> dict:
+        """
+        Get performance of each tag filtered to a specific PFAI rank.
+
+        This is useful to see how our "The one to beat" picks perform when
+        they're also PFAI Rank 1 (consensus picks).
+
+        Args:
+            pfai_rank: PFAI rank to filter (default 1 = PFAI's top pick)
+
+        Returns:
+            Dict of tag -> stats for picks where pfai_rank matches.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    tag,
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1 AND pfai_rank = ?
+            """, (pfai_rank,)).fetchall()
+
+            # Group by tag
+            by_tag: dict[str, list] = {}
+            for row in rows:
+                tag = row['tag']
+                if tag not in by_tag:
+                    by_tag[tag] = []
+                by_tag[tag].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                })
+
+            # Calculate stats for each tag
+            stats = {}
+            for tag, picks in by_tag.items():
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                avg_odds = sum(p['odds'] for p in picks) / total if total > 0 else 0
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[tag] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1) if total > 0 else 0,
+                    'place_rate': round(places / total * 100, 1) if total > 0 else 0,
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
+    def get_consensus_picks_stats(self) -> dict:
+        """
+        Get performance of "The one to beat" picks that are also PFAI Rank 1.
+
+        These are "consensus" picks where both AIs agree - potential tipsheet picks.
+
+        Returns:
+            Dict with stats for:
+            - consensus: "The one to beat" + PFAI Rank 1
+            - our_ai_only: "The one to beat" but NOT PFAI Rank 1
+            - pfai_only: PFAI Rank 1 but NOT "The one to beat"
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT
+                    tag,
+                    pfai_rank,
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1
+            """).fetchall()
+
+            # Group into categories
+            categories = {
+                'consensus': [],      # Both agree
+                'our_ai_only': [],    # Our pick, not PFAI #1
+                'pfai_only': [],      # PFAI #1, not our top pick
+            }
+
+            for row in rows:
+                is_our_top = row['tag'] == "The one to beat"
+                is_pfai_top = row['pfai_rank'] == 1
+
+                if is_our_top and is_pfai_top:
+                    categories['consensus'].append(row)
+                elif is_our_top and not is_pfai_top:
+                    categories['our_ai_only'].append(row)
+                elif is_pfai_top and not is_our_top:
+                    categories['pfai_only'].append(row)
+
+            # Calculate stats for each category
+            stats = {}
+            for cat_name, picks in categories.items():
+                if not picks:
+                    stats[cat_name] = {'total': 0}
+                    continue
+
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                avg_odds = sum(p['odds'] for p in picks) / total
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[cat_name] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1),
+                    'place_rate': round(places / total * 100, 1),
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats

@@ -54,6 +54,7 @@ class Contender:
     place_odds: Optional[float] = None  # Place odds for each-way bets
     confidence: Optional[int] = None  # Deprecated - not used in new model
     tipsheet_pick: bool = False  # True if Claude would genuinely bet on this
+    pfai_rank: Optional[int] = None  # PuntingForm AI rank (1 = best)
 
     def to_dict(self) -> dict:
         result = {
@@ -64,6 +65,7 @@ class Contender:
             "tag": self.tag,
             "analysis": self.analysis,
             "tipsheet_pick": self.tipsheet_pick,
+            "pfai_rank": self.pfai_rank,
         }
         if self.confidence is not None:
             result["confidence"] = self.confidence
@@ -480,6 +482,7 @@ class Predictor:
                     place_odds = None
 
             # Look up from race data if not provided or invalid
+            pfai_rank = None
             if horse:
                 normalized_horse = normalize_horse_name(horse)
                 for runner in race_data.runners:
@@ -490,6 +493,7 @@ class Predictor:
                             place_odds = runner.place_odds
                         tab_no = runner.tab_no
                         horse = runner.name  # Canonical name
+                        pfai_rank = runner.pfai_rank  # Get PFAI rank from runner data
                         break
 
                 if not odds:
@@ -505,6 +509,7 @@ class Predictor:
                     place_odds=place_odds,
                     confidence=None,  # Not used in new model
                     tipsheet_pick=c.get("tipsheet_pick", False),
+                    pfai_rank=pfai_rank,
                 ))
             elif horse and tab_no and not odds:
                 logger.warning(f"Skipping contender {horse}: no odds available")

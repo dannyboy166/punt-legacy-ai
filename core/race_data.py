@@ -173,6 +173,9 @@ class RunnerData:
     early_speed_rank: Optional[int] = None
     settling_position: Optional[int] = None
 
+    # PFAI Ratings (from PuntingForm)
+    pfai_rank: Optional[int] = None  # 1 = best, None if not available
+
     # Extra fields (synced with backtest pipeline)
     days_since_last: Optional[int] = None
     gear_changes: Optional[str] = None
@@ -220,6 +223,7 @@ class RunnerData:
             "trial_runs_count": self.trial_runs_count,
             "early_speed_rank": self.early_speed_rank,
             "settling_position": self.settling_position,
+            "pfai_rank": self.pfai_rank,
         }
 
 
@@ -434,13 +438,19 @@ class RaceDataPipeline:
         if not meeting_id:
             return None, f"Track '{track}' not found in meetings for {date}"
 
-        # 2. Fetch all data in parallel (form, fields, speedmaps, odds)
+        # 2. Fetch all data in parallel (form, fields, speedmaps, ratings, odds)
         try:
             fields_data = self.pf_api.get_fields(meeting_id, race_number)
             form_data = self.pf_api.get_form(meeting_id, race_number, runs=10)
             speedmap_data = self.pf_api.get_speedmaps(meeting_id, race_number)
         except Exception as e:
             return None, f"Failed to fetch PuntingForm data: {str(e)}"
+
+        # Fetch PFAI ratings (non-critical, don't fail if unavailable)
+        try:
+            ratings_data = self.pf_api.get_ratings(meeting_id)
+        except Exception:
+            ratings_data = {}
 
         # 3. Get Ladbrokes odds
         # Convert PF date format (dd-MMM-yyyy) to Ladbrokes format (YYYY-MM-DD)
@@ -776,9 +786,13 @@ class RaceDataPipeline:
             gear_changes_raw = runner.get("gearChanges")
             gear_changes = gear_changes_raw.strip() if gear_changes_raw and gear_changes_raw.strip() else None
 
+            # Get PFAI rank for this runner
+            tab_no = runner.get("tabNo", 0)
+            pfai_rank = ratings_data.get(tab_no, {}).get("pfai_rank")
+
             runner_data = RunnerData(
                 name=horse_name,
-                tab_no=runner.get("tabNo", 0),
+                tab_no=tab_no,
                 barrier=runner.get("barrier", 0),
                 weight=runner.get("weight", 0),
                 age=runner.get("age", 0),
@@ -808,6 +822,7 @@ class RaceDataPipeline:
                 form=form_runs,
                 early_speed_rank=sm.get("speed"),
                 settling_position=sm.get("settle"),
+                pfai_rank=pfai_rank,
                 days_since_last=days_since_last,
                 gear_changes=gear_changes,
             )

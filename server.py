@@ -114,6 +114,7 @@ class Contender(BaseModel):
     analysis: str
     confidence: Optional[int] = None  # Deprecated - not used in new model
     tipsheet_pick: bool = False  # True if Claude would genuinely bet on this (admin only)
+    pfai_rank: Optional[int] = None  # PuntingForm AI rank (1 = best)
 
 
 class PromoBonusPick(BaseModel):
@@ -683,6 +684,7 @@ def predict(req: PredictionRequest):
                     analysis=c.analysis,
                     confidence=c.confidence,  # Will be None in new model
                     tipsheet_pick=c.tipsheet_pick,
+                    pfai_rank=c.pfai_rank,
                 ))
 
             # Store prediction for tracking (even if 0 contenders)
@@ -1045,6 +1047,53 @@ def get_stats_by_class(tag: Optional[str] = None):
     - Group 1, Group 2, Group 3, Listed
     """
     return tracker.get_stats_by_class(tag=tag)
+
+
+@app.get("/stats/by-pfai-rank")
+def get_stats_by_pfai_rank(tag: Optional[str] = None):
+    """
+    Get performance statistics grouped by PFAI rank.
+
+    Args:
+        tag: Optional filter by tag (e.g., "The one to beat")
+
+    Returns dict of pfai_rank -> stats with:
+    - total, wins, places
+    - win_rate, place_rate (percentages)
+    - avg_odds, flat_profit, roi
+    """
+    return tracker.get_stats_by_pfai_rank(tag=tag)
+
+
+@app.get("/stats/by-tag-pfai")
+def get_stats_by_tag_and_pfai(pfai_rank: int = 1):
+    """
+    Get performance of each tag filtered to a specific PFAI rank.
+
+    This shows how "The one to beat" picks perform when they're also
+    PFAI Rank 1 (consensus picks where both AIs agree).
+
+    Args:
+        pfai_rank: PFAI rank to filter (default 1 = PFAI's top pick)
+
+    Returns dict of tag -> stats for picks where pfai_rank matches.
+    """
+    return tracker.get_stats_by_tag_and_pfai(pfai_rank=pfai_rank)
+
+
+@app.get("/stats/consensus")
+def get_consensus_picks_stats():
+    """
+    Get performance of "The one to beat" picks that are also PFAI Rank 1.
+
+    These are "consensus" picks where both AIs agree - potential tipsheet picks.
+
+    Returns stats for:
+    - consensus: "The one to beat" + PFAI Rank 1
+    - our_ai_only: "The one to beat" but NOT PFAI Rank 1
+    - pfai_only: PFAI Rank 1 but NOT "The one to beat"
+    """
+    return tracker.get_consensus_picks_stats()
 
 
 @app.get("/picks/by-day")
@@ -1627,6 +1676,7 @@ class BackfillPrediction(BaseModel):
     confidence: int = 5
     race_confidence: int = 5
     tipsheet_pick: bool = False  # True if Claude would genuinely bet on this
+    pfai_rank: Optional[int] = None  # PuntingForm AI rank (1 = best)
 
 
 class BackfillRequest(BaseModel):
@@ -1756,6 +1806,139 @@ def backfill_race_class():
     }
 
 
+@app.post("/backfill/pfai-rank")
+def backfill_pfai_rank(limit: int = 0):
+    """
+    Backfill PFAI rank for existing predictions that don't have it.
+
+    Queries PuntingForm API for each unique meeting and updates predictions.
+
+    Args:
+        limit: Max meetings to process (0 = all). Use for testing.
+
+    Returns:
+        Summary of updated predictions.
+    """
+    import sqlite3
+    from pathlib import Path
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    db_path = Path(__file__).parent / "data" / "predictions.db"
+
+    if not db_path.exists():
+        raise HTTPException(status_code=404, detail="Database not found")
+
+    # Get unique meetings without pfai_rank
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        meetings = conn.execute("""
+            SELECT DISTINCT track, race_date
+            FROM predictions
+            WHERE pfai_rank IS NULL
+            ORDER BY race_date DESC
+        """).fetchall()
+
+    if not meetings:
+        return {"message": "No predictions need PFAI rank backfill", "updated": 0}
+
+    meetings_list = [(m['track'], m['race_date']) for m in meetings]
+    if limit > 0:
+        meetings_list = meetings_list[:limit]
+
+    # Process meetings (can parallelize)
+    updated_total = 0
+    failed_meetings = []
+    meeting_cache: dict[str, int] = {}  # track|date -> meeting_id
+
+    def get_meeting_id(track: str, date: str) -> Optional[int]:
+        """Get meeting ID from PuntingForm."""
+        cache_key = f"{track}|{date}"
+        if cache_key in meeting_cache:
+            return meeting_cache[cache_key]
+
+        try:
+            meetings_data = pf_api.get_meetings(date)
+            for m in meetings_data:
+                m_track = m.get('track', {}).get('name', '')
+                if m_track.lower() == track.lower() or track.lower() in m_track.lower():
+                    meeting_id = m.get('meetingId')
+                    meeting_cache[cache_key] = meeting_id
+                    return meeting_id
+        except Exception:
+            pass
+        return None
+
+    def process_meeting(track: str, race_date: str) -> dict:
+        """Process a single meeting - fetch ratings and update predictions."""
+        result = {"track": track, "date": race_date, "updated": 0, "error": None}
+
+        try:
+            meeting_id = get_meeting_id(track, race_date)
+            if not meeting_id:
+                result["error"] = "Meeting not found"
+                return result
+
+            # Fetch PFAI ratings
+            ratings_data = pf_api.get_ratings(meeting_id)
+            if not ratings_data:
+                result["error"] = "No ratings data"
+                return result
+
+            # Update predictions
+            with sqlite3.connect(db_path) as conn:
+                conn.row_factory = sqlite3.Row
+
+                # Get predictions for this meeting
+                predictions = conn.execute("""
+                    SELECT id, tab_no
+                    FROM predictions
+                    WHERE track = ? AND race_date = ? AND pfai_rank IS NULL
+                """, (track, race_date)).fetchall()
+
+                for pred in predictions:
+                    tab_no = pred['tab_no']
+                    pfai_rank = ratings_data.get(tab_no, {}).get('pfai_rank')
+
+                    if pfai_rank is not None:
+                        conn.execute("""
+                            UPDATE predictions
+                            SET pfai_rank = ?
+                            WHERE id = ?
+                        """, (pfai_rank, pred['id']))
+                        result["updated"] += 1
+
+                conn.commit()
+
+        except Exception as e:
+            result["error"] = str(e)
+
+        return result
+
+    # Process meetings (parallel for speed)
+    results = []
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_meeting = {
+            executor.submit(process_meeting, track, date): (track, date)
+            for track, date in meetings_list
+        }
+        for future in as_completed(future_to_meeting):
+            result = future.result()
+            results.append(result)
+            if result["updated"] > 0:
+                updated_total += result["updated"]
+            if result["error"]:
+                failed_meetings.append(f"{result['track']} ({result['date']}): {result['error']}")
+
+    return {
+        "message": f"Backfilled PFAI rank for {len(meetings_list)} meetings",
+        "meetings_processed": len(meetings_list),
+        "predictions_updated": updated_total,
+        "failed": len(failed_meetings),
+        "failed_details": failed_meetings[:20],
+        "results": results[:20]  # Show first 20 results
+    }
+
+
 @app.post("/backfill")
 def backfill_predictions(req: BackfillRequest):
     """
@@ -1815,8 +1998,8 @@ def backfill_predictions(req: BackfillRequest):
                     INSERT OR IGNORE INTO predictions
                     (timestamp, track, race_number, race_date, horse, tab_no,
                      odds, place_odds, tag, confidence, race_confidence,
-                     confidence_reason, mode, pick_type, analysis, tipsheet_pick)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     confidence_reason, mode, pick_type, analysis, tipsheet_pick, pfai_rank)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     datetime.now().isoformat(),
                     pred.track,
@@ -1834,6 +2017,7 @@ def backfill_predictions(req: BackfillRequest):
                     pred.pick_type,
                     pred.analysis,
                     1 if pred.tipsheet_pick else 0,
+                    pred.pfai_rank,
                 ))
                 if conn.total_changes > 0:
                     imported += 1
