@@ -37,6 +37,30 @@ logger = get_logger(__name__)
 # Default model
 DEFAULT_MODEL = "claude-sonnet-4-20250514"
 
+# Metro tracks in Australia (Saturday feature tracks)
+# Tipsheet picks on non-metro tracks require PFAI rank 1-3 consensus
+METRO_TRACKS = {
+    # NSW
+    "randwick", "rosehill", "canterbury", "warwick farm", "royal randwick",
+    # VIC
+    "flemington", "caulfield", "moonee valley", "sandown", "sandown-hillside",
+    "sandown-lakeside", "pakenham",
+    # QLD
+    "eagle farm", "doomben", "gold coast",
+    # SA
+    "morphettville", "morphettville parks",
+    # WA
+    "ascot", "belmont", "belmont park",
+    # TAS
+    "hobart", "launceston",
+}
+
+
+def is_metro_track(track: str) -> bool:
+    """Check if a track is a metro track."""
+    track_lower = track.lower().strip()
+    return any(metro in track_lower for metro in METRO_TRACKS)
+
 
 # =============================================================================
 # PREDICTION RESULT
@@ -500,15 +524,31 @@ class Predictor:
                     logger.warning(f"Could not find odds for {horse} (tab {tab_no}) in race data")
 
             if horse and tab_no and odds:
+                # Get Claude's tipsheet recommendation
+                tipsheet_pick = c.get("tipsheet_pick", False)
+                tag = c.get("tag", "Contender")
+
+                # PFAI filter for non-metro tracks:
+                # "The one to beat" only gets ⭐ if PFAI rank 1-3 (consensus)
+                # This removes -43% ROI noise on country/midweek tracks
+                if tipsheet_pick and tag == "The one to beat":
+                    if not is_metro_track(race_data.track):
+                        if pfai_rank is None or pfai_rank > 3:
+                            tipsheet_pick = False
+                            logger.info(
+                                f"Removed tipsheet star from {horse} on non-metro "
+                                f"{race_data.track} (PFAI rank {pfai_rank})"
+                            )
+
                 contenders.append(Contender(
                     horse=horse,
                     tab_no=tab_no,
                     odds=odds,
-                    tag=c.get("tag", "Contender"),
+                    tag=tag,
                     analysis=c.get("analysis", ""),
                     place_odds=place_odds,
                     confidence=None,  # Not used in new model
-                    tipsheet_pick=c.get("tipsheet_pick", False),
+                    tipsheet_pick=tipsheet_pick,
                     pfai_rank=pfai_rank,
                 ))
             elif horse and tab_no and not odds:
