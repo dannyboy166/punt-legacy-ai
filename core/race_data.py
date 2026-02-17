@@ -788,7 +788,8 @@ class RaceDataPipeline:
 
             # Get PFAI rank for this runner
             tab_no = runner.get("tabNo", 0)
-            pfai_rank = ratings_data.get(tab_no, {}).get("pfai_rank")
+            # Ratings keyed by (race_no, tab_no) when fetching all races
+            pfai_rank = ratings_data.get((race_number, tab_no), {}).get("pfai_rank")
 
             runner_data = RunnerData(
                 name=horse_name,

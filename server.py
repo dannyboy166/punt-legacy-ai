@@ -1888,16 +1888,18 @@ def backfill_pfai_rank(limit: int = 0):
             with sqlite3.connect(db_path) as conn:
                 conn.row_factory = sqlite3.Row
 
-                # Get predictions for this meeting
+                # Get predictions for this meeting (include race_number for lookup)
                 predictions = conn.execute("""
-                    SELECT id, tab_no
+                    SELECT id, tab_no, race_number
                     FROM predictions
                     WHERE track = ? AND race_date = ? AND pfai_rank IS NULL
                 """, (track, race_date)).fetchall()
 
                 for pred in predictions:
                     tab_no = pred['tab_no']
-                    pfai_rank = ratings_data.get(tab_no, {}).get('pfai_rank')
+                    race_num = pred['race_number']
+                    # Ratings keyed by (race_no, tab_no)
+                    pfai_rank = ratings_data.get((race_num, tab_no), {}).get('pfai_rank')
 
                     if pfai_rank is not None:
                         conn.execute("""

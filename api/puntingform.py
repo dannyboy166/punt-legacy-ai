@@ -239,19 +239,25 @@ class PuntingFormAPI:
     # PFAI Ratings
     # -------------------------------------------------------------------------
 
-    def get_ratings(self, meeting_id: int) -> dict[int, dict]:
+    def get_ratings(self, meeting_id: int, race_number: int = 0) -> dict[int, dict]:
         """
         Get PFAI ratings for a meeting, indexed by tabNo.
 
         Args:
             meeting_id: Meeting ID
+            race_number: Race number (0 = all races)
 
         Returns:
-            Dict mapping tabNo to rating data:
+            Dict mapping (race_number, tabNo) or just tabNo to rating data:
+            {
+                (1, 1): {"pfai_rank": 1, "is_reliable": True, "race_no": 1},
+                (1, 2): {"pfai_rank": 3, "is_reliable": True, "race_no": 1},
+                ...
+            }
+            Or if race_number specified:
             {
                 1: {"pfai_rank": 1, "is_reliable": True},
                 2: {"pfai_rank": 3, "is_reliable": True},
-                ...
             }
         """
         data = self._request(
@@ -261,14 +267,23 @@ class PuntingFormAPI:
 
         ratings_by_tab = {}
         if isinstance(data, list):
-            for item in data:
-                for runner in item.get("items", []):
-                    tab_no = runner.get("tabNo")
-                    if tab_no is not None:
-                        ratings_by_tab[tab_no] = {
-                            "pfai_rank": runner.get("pfaiRank"),
-                            "is_reliable": runner.get("isReliable", False),
-                        }
+            for runner in data:
+                # Data is flat - each item is a runner directly
+                tab_no = runner.get("tabNo")
+                race_no = runner.get("raceNo")
+                if tab_no is not None:
+                    rating_data = {
+                        "pfai_rank": runner.get("pfaiRank"),
+                        "is_reliable": runner.get("isReliable", False),
+                        "pfai_score": runner.get("pfaiScore"),
+                        "race_no": race_no,
+                    }
+                    if race_number == 0:
+                        # Return keyed by (race_no, tab_no)
+                        ratings_by_tab[(race_no, tab_no)] = rating_data
+                    elif race_no == race_number:
+                        # Return keyed by tab_no only for specific race
+                        ratings_by_tab[tab_no] = rating_data
         return ratings_by_tab
 
     # -------------------------------------------------------------------------
