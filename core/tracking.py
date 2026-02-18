@@ -926,6 +926,84 @@ class PredictionTracker:
 
             return stats
 
+    def get_stats_by_metro(self, tag: Optional[str] = None) -> dict:
+        """
+        Get performance statistics split by metro vs non-metro tracks.
+
+        Metro tracks: Randwick, Rosehill, Canterbury, Warwick Farm, Flemington,
+        Caulfield, Moonee Valley, Sandown, Pakenham, Eagle Farm, Doomben,
+        Gold Coast, Morphettville, Ascot, Belmont.
+        """
+        metro_tracks = {
+            "randwick", "rosehill", "canterbury", "warwick farm", "royal randwick",
+            "flemington", "caulfield", "moonee valley", "sandown", "sandown-hillside",
+            "sandown-lakeside", "pakenham",
+            "eagle farm", "doomben", "gold coast",
+            "morphettville", "morphettville parks",
+            "ascot", "belmont", "belmont park",
+        }
+
+        def is_metro(track_name: str) -> bool:
+            track_lower = track_name.lower().strip()
+            return any(metro in track_lower for metro in metro_tracks)
+
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            query = """
+                SELECT track, tag, odds, won, placed, tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1
+            """
+            if tag:
+                query += f" AND tag = '{tag}'"
+
+            rows = conn.execute(query).fetchall()
+
+            # Group by metro/non-metro
+            metro_preds = []
+            non_metro_preds = []
+
+            for row in rows:
+                pred = {
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                }
+                if is_metro(row['track']):
+                    metro_preds.append(pred)
+                else:
+                    non_metro_preds.append(pred)
+
+            def calc_stats(predictions: list) -> dict:
+                if not predictions:
+                    return None
+                total = len(predictions)
+                wins = sum(1 for p in predictions if p['won'])
+                places = sum(1 for p in predictions if p['placed'])
+                starred = sum(1 for p in predictions if p['tipsheet_pick'])
+                avg_odds = sum(p['odds'] for p in predictions) / total
+                profit = sum(p['odds'] - 1 if p['won'] else -1 for p in predictions)
+                roi = (profit / total * 100) if total > 0 else 0
+
+                return {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1),
+                    'place_rate': round(places / total * 100, 1),
+                    'avg_odds': round(avg_odds, 2),
+                    'profit': round(profit, 2),
+                    'roi': round(roi, 1)
+                }
+
+            return {
+                'metro': calc_stats(metro_preds),
+                'non_metro': calc_stats(non_metro_preds)
+            }
+
     def get_stats_by_meeting(self) -> list[dict]:
         """
         Get performance statistics grouped by meeting (track + date).

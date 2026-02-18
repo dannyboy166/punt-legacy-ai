@@ -1099,6 +1099,21 @@ def get_consensus_picks_stats():
     return tracker.get_consensus_picks_stats()
 
 
+@app.get("/stats/by-metro")
+def get_stats_by_metro(tag: Optional[str] = None):
+    """
+    Get performance split by metro vs non-metro tracks.
+
+    Args:
+        tag: Optional tag filter (e.g., "The one to beat")
+
+    Returns dict with:
+    - metro: stats for metro tracks (Sydney, Melbourne, Brisbane, Perth, Adelaide)
+    - non_metro: stats for country/provincial tracks
+    """
+    return tracker.get_stats_by_metro(tag=tag)
+
+
 @app.get("/picks/by-day")
 def get_picks_for_day(race_date: str):
     """

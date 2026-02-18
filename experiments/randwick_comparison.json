@@ -1,0 +1,150 @@
+[
+  {
+    "race": 1,
+    "name": "TAB Highway Hcp (C3)",
+    "class": "Class 3;",
+    "live_picks": [
+      "Warrior For Peace",
+      "Regal Problem",
+      "Mr Chips"
+    ],
+    "adj_picks": [
+      "Warrior For Peace",
+      "Regal Problem",
+      "Ulysses Blue"
+    ],
+    "same": false
+  },
+  {
+    "race": 2,
+    "name": "Midway (Bm72)",
+    "class": "Benchmark 72;",
+    "live_picks": [
+      "Everyone's A Star",
+      "Mal Coupe",
+      "Be Quiet"
+    ],
+    "adj_picks": [
+      "Mal Coupe",
+      "Everyone's A Star",
+      "Be Quiet"
+    ],
+    "same": false
+  },
+  {
+    "race": 3,
+    "name": "Coolmore Pierro Plate",
+    "class": "Open;",
+    "live_picks": [],
+    "adj_picks": [],
+    "same": true
+  },
+  {
+    "race": 4,
+    "name": "Myplates (Bm78)",
+    "class": "Benchmark 78;",
+    "live_picks": [
+      "Sovereign Hill",
+      "Off The Press",
+      "Amreekiyah"
+    ],
+    "adj_picks": [
+      "Sovereign Hill",
+      "Off The Press",
+      "Arabian Rose"
+    ],
+    "same": false
+  },
+  {
+    "race": 5,
+    "name": "Wellington Racing Club Trophy (Bm88)",
+    "class": "Benchmark 88;",
+    "live_picks": [
+      "Cross Tasman",
+      "Hellsing",
+      "It's A Knockout"
+    ],
+    "adj_picks": [
+      "Cross Tasman",
+      "Hellsing",
+      "It's A Knockout"
+    ],
+    "same": true
+  },
+  {
+    "race": 6,
+    "name": "TAB Light Fingers Stakes",
+    "class": "Open;",
+    "live_picks": [
+      "Apocalyptic",
+      "Savvy Hallie",
+      "Nepo Baby"
+    ],
+    "adj_picks": [
+      "Apocalyptic",
+      "Savvy Hallie",
+      "Nepo Baby"
+    ],
+    "same": true
+  },
+  {
+    "race": 7,
+    "name": "Asahi Super Dry Expressway Stakes",
+    "class": "Open;",
+    "live_picks": [
+      "Joliestar",
+      "Caballus"
+    ],
+    "adj_picks": [
+      "Joliestar",
+      "Angel Capital",
+      "Caballus"
+    ],
+    "same": false
+  },
+  {
+    "race": 8,
+    "name": "Petaluma Apollo Stakes",
+    "class": "Open;",
+    "live_picks": [
+      "Autumn Glow",
+      "The Instructor"
+    ],
+    "adj_picks": [
+      "Autumn Glow",
+      "The Instructor",
+      "Lindermann"
+    ],
+    "same": false
+  },
+  {
+    "race": 9,
+    "name": "Robrick Lodge Triscay Stakes",
+    "class": "Open;",
+    "live_picks": [
+      "Weeping Woman",
+      "Super Norwest"
+    ],
+    "adj_picks": [
+      "Weeping Woman",
+      "Super Norwest"
+    ],
+    "same": true
+  },
+  {
+    "race": 10,
+    "name": "Macquarie St Social (Bm88)",
+    "class": "Benchmark 88;",
+    "live_picks": [
+      "Althoff",
+      "Sunshineinmypocket",
+      "Gatsby's"
+    ],
+    "adj_picks": [
+      "Althoff",
+      "Sunshineinmypocket",
+      "Gatsby's"
+    ],
+    "same": true
+  }
+]
