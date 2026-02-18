@@ -212,6 +212,7 @@ class TipsheetPick(BaseModel):
     place_odds: Optional[float]
     tag: str
     analysis: str
+    pfai_rank: Optional[int] = None
 
 
 class MeetingPredictionResponse(BaseModel):
@@ -865,7 +866,8 @@ def predict_meeting(req: MeetingPredictionRequest):
                             odds=c.odds,
                             place_odds=place_odds,
                             tag=c.tag,
-                            analysis=c.analysis
+                            analysis=c.analysis,
+                            pfai_rank=c.pfai_rank
                         ))
 
                 if contenders:
