@@ -854,6 +854,7 @@ def predict_meeting(req: MeetingPredictionRequest):
                         tag=c.tag,
                         analysis=c.analysis,
                         tipsheet_pick=c.tipsheet_pick,
+                        pfai_rank=c.pfai_rank,
                     )
                     contenders.append(contender)
 
