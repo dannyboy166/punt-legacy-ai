@@ -30,6 +30,7 @@ _TRACK_MAPPINGS = [
     ("Geelong", "Ladbrokes Geelong"),
     ("Fannie Bay", "Darwin"),
     ("Beaumont", "Newcastle"),
+    ("Kingscote", "Kangaroo Island"),
 ]
 
 # Build normalized lookup dictionaries
