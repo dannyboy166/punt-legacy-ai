@@ -1657,21 +1657,36 @@ class PredictionTracker:
 
             return stats
 
-    def get_stats_by_odds_range(self, tag: Optional[str] = None, starred_only: bool = False) -> dict:
+    def get_stats_by_odds_range(self, tag: Optional[str] = None, starred_only: bool = False, metro: Optional[bool] = None) -> dict:
         """
         Get performance statistics grouped by odds range.
 
         Args:
             tag: Optional filter by tag (e.g., "The one to beat")
             starred_only: If True, only include tipsheet_pick=1
+            metro: If True, only metro tracks. If False, only non-metro. If None, all tracks.
 
         Returns dict of odds_range -> stats
         """
+        metro_tracks = {
+            "randwick", "rosehill", "canterbury", "warwick farm", "royal randwick",
+            "flemington", "caulfield", "moonee valley", "sandown", "sandown-hillside",
+            "sandown-lakeside", "pakenham",
+            "eagle farm", "doomben", "gold coast",
+            "morphettville", "morphettville parks",
+            "ascot", "belmont", "belmont park",
+        }
+
+        def is_metro(track_name: str) -> bool:
+            track_lower = track_name.lower().strip()
+            return any(m in track_lower for m in metro_tracks)
+
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
 
             query = """
                 SELECT
+                    track,
                     odds,
                     won,
                     placed,
@@ -1689,6 +1704,10 @@ class PredictionTracker:
                 query += " AND tipsheet_pick = 1"
 
             rows = conn.execute(query, params).fetchall()
+
+            # Filter by metro if specified
+            if metro is not None:
+                rows = [r for r in rows if is_metro(r['track']) == metro]
 
             # Define odds ranges
             def get_odds_range(odds: float) -> str:

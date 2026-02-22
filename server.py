@@ -1325,17 +1325,18 @@ def get_stats_by_metro(tag: Optional[str] = None):
 
 
 @app.get("/stats/by-odds")
-def get_stats_by_odds(tag: Optional[str] = None, starred_only: bool = False):
+def get_stats_by_odds(tag: Optional[str] = None, starred_only: bool = False, metro: Optional[bool] = None):
     """
     Get performance split by odds range.
 
     Args:
         tag: Optional tag filter (e.g., "The one to beat")
         starred_only: If True, only include tipsheet_pick=1
+        metro: If True, only metro tracks. If False, only non-metro.
 
     Returns dict of odds_range -> stats
     """
-    return tracker.get_stats_by_odds_range(tag=tag, starred_only=starred_only)
+    return tracker.get_stats_by_odds_range(tag=tag, starred_only=starred_only, metro=metro)
 
 
 @app.get("/picks/by-day")
