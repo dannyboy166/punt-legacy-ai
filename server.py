@@ -10,6 +10,8 @@ Endpoints:
     GET  /meetings?date=09-Jan-2026     - List tracks racing on date
     GET  /races?track=Gosford&date=X    - List races at track
     POST /predict                        - Generate prediction for race
+    POST /predict-test                   - TEST: Collateral form analysis (not tracked)
+    POST /predict-test-adj               - TEST: Track-adjusted ratings (not tracked)
     POST /backtest                       - Run backtest on historical races
     GET  /health                         - Health check
 
@@ -31,6 +33,8 @@ load_dotenv()
 
 from core.race_data import RaceDataPipeline
 from core.predictor import Predictor
+from core.predictor_collateral import CollateralPredictor
+from core.predictor_track_adjusted import TrackAdjustedPredictor
 from core.tracking import PredictionTracker
 from core.backtest import run_backtest, run_backtest_meeting, get_race_results
 from api.puntingform import PuntingFormAPI
@@ -57,6 +61,8 @@ app.add_middleware(
 # Initialize once
 pipeline = RaceDataPipeline()
 predictor = Predictor()
+collateral_predictor = CollateralPredictor()  # TEST: collateral form analysis
+track_adjusted_predictor = TrackAdjustedPredictor()  # TEST: track-adjusted ratings
 pf_api = PuntingFormAPI()
 tracker = PredictionTracker()
 
@@ -732,6 +738,210 @@ def predict(req: PredictionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/predict-test", response_model=PredictionResponse)
+def predict_test(req: PredictionRequest):
+    """
+    TEST ENDPOINT: Generate prediction using collateral form analysis.
+
+    Same as /predict but uses a different prompt focused on comparing horses
+    through common tracks and opponents, rather than absolute speed ratings.
+
+    Ideal for midweek/country racing where track speeds vary significantly.
+
+    NOT tracked, NOT stored - for testing purposes only.
+    """
+    try:
+        # Get race data
+        race_data, error = pipeline.get_race_data(req.track, req.race_number, req.date, allow_finished=req.allow_finished)
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        # Check if odds are available
+        runners_with_odds = sum(1 for r in race_data.runners if r.odds)
+        if runners_with_odds == 0:
+            raise HTTPException(
+                status_code=503,
+                detail="Odds not available yet. Please wait for the market to open and try again."
+            )
+
+        # Check if >50% of field has no race form
+        total_runners = len(race_data.runners)
+        runners_with_no_form = sum(1 for r in race_data.runners if r.race_runs_count == 0)
+        no_form_percentage = (runners_with_no_form / total_runners * 100) if total_runners > 0 else 0
+
+        if no_form_percentage > 50:
+            return PredictionResponse(
+                mode=req.mode,
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=race_data.condition,
+                class_=race_data.class_,
+                contenders=[],
+                summary=f"[TEST] This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
+                skipped=True,
+                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history"
+            )
+
+        # Generate prediction with COLLATERAL PREDICTOR (different prompt)
+        result = collateral_predictor.predict(race_data)
+
+        # Build contenders response
+        contenders = []
+        for c in result.contenders:
+            place_odds = c.place_odds
+            if not place_odds:
+                for r in race_data.runners:
+                    if r.tab_no == c.tab_no:
+                        place_odds = r.place_odds
+                        break
+
+            contenders.append(Contender(
+                horse=c.horse,
+                tab_no=c.tab_no,
+                odds=c.odds,
+                place_odds=place_odds,
+                tag=c.tag,
+                analysis=c.analysis,
+                confidence=c.confidence,
+                tipsheet_pick=c.tipsheet_pick,
+                pfai_rank=c.pfai_rank,
+            ))
+
+        # Build admin data if requested
+        admin_data = None
+        if req.include_admin_data and contenders:
+            admin_data = build_admin_data(race_data, result.contenders)
+
+        # NOT tracked - this is test only
+        return PredictionResponse(
+            mode="normal",
+            track=race_data.track,
+            race_number=race_data.race_number,
+            race_name=race_data.race_name,
+            distance=race_data.distance,
+            condition=race_data.condition,
+            class_=race_data.class_,
+            contenders=contenders,
+            summary=f"[TEST - Collateral Form] {result.summary}",
+            race_confidence=result.race_confidence,
+            confidence_reason=result.confidence_reason,
+            warnings=race_data.warnings,
+            tracking_stored=False,  # Test endpoint - not tracked
+            admin_data=admin_data,
+            runner_notes=result.runner_notes
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict-test-adj", response_model=PredictionResponse)
+def predict_test_adj(req: PredictionRequest):
+    """
+    TEST ENDPOINT: Generate prediction showing track-adjusted ratings.
+
+    Same as /predict but shows an "Adj" column in form tables with
+    ratings normalized by track speed (removes track bias).
+
+    Uses the exact same prompt as live predictor.
+
+    NOT tracked, NOT stored - for testing purposes only.
+    """
+    try:
+        # Get race data
+        race_data, error = pipeline.get_race_data(req.track, req.race_number, req.date, allow_finished=req.allow_finished)
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        # Check if odds are available
+        runners_with_odds = sum(1 for r in race_data.runners if r.odds)
+        if runners_with_odds == 0:
+            raise HTTPException(
+                status_code=503,
+                detail="Odds not available yet. Please wait for the market to open and try again."
+            )
+
+        # Check if >50% of field has no race form
+        total_runners = len(race_data.runners)
+        runners_with_no_form = sum(1 for r in race_data.runners if r.race_runs_count == 0)
+        no_form_percentage = (runners_with_no_form / total_runners * 100) if total_runners > 0 else 0
+
+        if no_form_percentage > 50:
+            return PredictionResponse(
+                mode=req.mode,
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=race_data.condition,
+                class_=race_data.class_,
+                contenders=[],
+                summary=f"[TEST] This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
+                skipped=True,
+                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history"
+            )
+
+        # Generate prediction with TRACK-ADJUSTED PREDICTOR (shows Adj column)
+        result = track_adjusted_predictor.predict(race_data)
+
+        # Build contenders response
+        contenders = []
+        for c in result.contenders:
+            place_odds = c.place_odds
+            if not place_odds:
+                for r in race_data.runners:
+                    if r.tab_no == c.tab_no:
+                        place_odds = r.place_odds
+                        break
+
+            contenders.append(Contender(
+                horse=c.horse,
+                tab_no=c.tab_no,
+                odds=c.odds,
+                place_odds=place_odds,
+                tag=c.tag,
+                analysis=c.analysis,
+                confidence=c.confidence,
+                tipsheet_pick=c.tipsheet_pick,
+                pfai_rank=c.pfai_rank,
+            ))
+
+        # Build admin data if requested
+        admin_data = None
+        if req.include_admin_data and contenders:
+            admin_data = build_admin_data(race_data, result.contenders)
+
+        # NOT tracked - this is test only
+        return PredictionResponse(
+            mode="normal",
+            track=race_data.track,
+            race_number=race_data.race_number,
+            race_name=race_data.race_name,
+            distance=race_data.distance,
+            condition=race_data.condition,
+            class_=race_data.class_,
+            contenders=contenders,
+            summary=f"[TEST - Track-Adjusted] {result.summary}",
+            race_confidence=result.race_confidence,
+            confidence_reason=result.confidence_reason,
+            warnings=race_data.warnings,
+            tracking_stored=False,  # Test endpoint - not tracked
+            admin_data=admin_data,
+            runner_notes=result.runner_notes
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/predict-meeting", response_model=MeetingPredictionResponse)
 def predict_meeting(req: MeetingPredictionRequest):
     """
@@ -1112,6 +1322,20 @@ def get_stats_by_metro(tag: Optional[str] = None):
     - non_metro: stats for country/provincial tracks
     """
     return tracker.get_stats_by_metro(tag=tag)
+
+
+@app.get("/stats/by-odds")
+def get_stats_by_odds(tag: Optional[str] = None, starred_only: bool = False):
+    """
+    Get performance split by odds range.
+
+    Args:
+        tag: Optional tag filter (e.g., "The one to beat")
+        starred_only: If True, only include tipsheet_pick=1
+
+    Returns dict of odds_range -> stats
+    """
+    return tracker.get_stats_by_odds_range(tag=tag, starred_only=starred_only)
 
 
 @app.get("/picks/by-day")

@@ -1656,3 +1656,105 @@ class PredictionTracker:
                 }
 
             return stats
+
+    def get_stats_by_odds_range(self, tag: Optional[str] = None, starred_only: bool = False) -> dict:
+        """
+        Get performance statistics grouped by odds range.
+
+        Args:
+            tag: Optional filter by tag (e.g., "The one to beat")
+            starred_only: If True, only include tipsheet_pick=1
+
+        Returns dict of odds_range -> stats
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            query = """
+                SELECT
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1
+            """
+            params = []
+
+            if tag:
+                query += " AND tag = ?"
+                params.append(tag)
+
+            if starred_only:
+                query += " AND tipsheet_pick = 1"
+
+            rows = conn.execute(query, params).fetchall()
+
+            # Define odds ranges
+            def get_odds_range(odds: float) -> str:
+                if odds < 2.0:
+                    return "$1.01-$1.99"
+                elif odds < 3.0:
+                    return "$2.00-$2.99"
+                elif odds < 4.0:
+                    return "$3.00-$3.99"
+                elif odds < 5.0:
+                    return "$4.00-$4.99"
+                elif odds < 7.0:
+                    return "$5.00-$6.99"
+                elif odds < 10.0:
+                    return "$7.00-$9.99"
+                elif odds < 15.0:
+                    return "$10.00-$14.99"
+                else:
+                    return "$15.00+"
+
+            # Group by odds range
+            by_range: dict[str, list] = {}
+            for row in rows:
+                odds_range = get_odds_range(row['odds'])
+                if odds_range not in by_range:
+                    by_range[odds_range] = []
+                by_range[odds_range].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                })
+
+            # Calculate stats for each range
+            stats = {}
+            # Sort by odds range
+            range_order = [
+                "$1.01-$1.99", "$2.00-$2.99", "$3.00-$3.99", "$4.00-$4.99",
+                "$5.00-$6.99", "$7.00-$9.99", "$10.00-$14.99", "$15.00+"
+            ]
+
+            for odds_range in range_order:
+                if odds_range not in by_range:
+                    continue
+
+                picks = by_range[odds_range]
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                avg_odds = sum(p['odds'] for p in picks) / total
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[odds_range] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1),
+                    'place_rate': round(places / total * 100, 1),
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats

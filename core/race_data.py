@@ -77,11 +77,8 @@ def get_track_rating(track_name: str) -> Optional[float]:
     if track_spaces in ratings:
         return ratings[track_spaces]
 
-    # Try partial match (e.g., "Sandown-Lakeside" contains "Sandown")
-    for venue, rating in ratings.items():
-        if venue in track_lower or track_lower in venue:
-            return rating
-
+    # NO partial matching - too risky (Sandown Hillside != Sandown Lakeside)
+    # If track not found exactly, return None and Adj column will show "-"
     return None
 
 
