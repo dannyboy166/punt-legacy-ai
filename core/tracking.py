@@ -1709,24 +1709,28 @@ class PredictionTracker:
             if metro is not None:
                 rows = [r for r in rows if is_metro(r['track']) == metro]
 
-            # Define odds ranges
+            # Define odds ranges (finer granularity in key zones)
             def get_odds_range(odds: float) -> str:
-                if odds < 2.0:
-                    return "$1.01-$1.99"
+                if odds < 1.50:
+                    return "$1.01-$1.49"
+                elif odds < 2.0:
+                    return "$1.50-$1.99"
+                elif odds < 2.5:
+                    return "$2.00-$2.49"
                 elif odds < 3.0:
-                    return "$2.00-$2.99"
+                    return "$2.50-$2.99"
+                elif odds < 3.5:
+                    return "$3.00-$3.49"
                 elif odds < 4.0:
-                    return "$3.00-$3.99"
+                    return "$3.50-$3.99"
                 elif odds < 5.0:
                     return "$4.00-$4.99"
                 elif odds < 7.0:
                     return "$5.00-$6.99"
                 elif odds < 10.0:
                     return "$7.00-$9.99"
-                elif odds < 15.0:
-                    return "$10.00-$14.99"
                 else:
-                    return "$15.00+"
+                    return "$10.00+"
 
             # Group by odds range
             by_range: dict[str, list] = {}
@@ -1745,8 +1749,9 @@ class PredictionTracker:
             stats = {}
             # Sort by odds range
             range_order = [
-                "$1.01-$1.99", "$2.00-$2.99", "$3.00-$3.99", "$4.00-$4.99",
-                "$5.00-$6.99", "$7.00-$9.99", "$10.00-$14.99", "$15.00+"
+                "$1.01-$1.49", "$1.50-$1.99", "$2.00-$2.49", "$2.50-$2.99",
+                "$3.00-$3.49", "$3.50-$3.99", "$4.00-$4.99",
+                "$5.00-$6.99", "$7.00-$9.99", "$10.00+"
             ]
 
             for odds_range in range_order:
