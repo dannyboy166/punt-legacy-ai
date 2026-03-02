@@ -46,7 +46,7 @@ def _load_track_ratings() -> dict[str, float]:
         reader = csv.DictReader(f)
         for row in reader:
             venue = row.get("venue", "").strip()
-            rating_str = row.get("overall_track_rating", "").strip()
+            rating_str = row.get("track_rating", "").strip()
             if venue and rating_str:
                 try:
                     _TRACK_RATINGS[venue.lower()] = float(rating_str)
@@ -273,9 +273,11 @@ class RaceData:
         Args:
             include_venue_adjusted: If True, add Adj column with venue-adjusted ratings.
         """
+        # Format condition as abbreviation (e.g., "S6", "G4", "H8")
+        cond_abbrev = f"{self.condition[0].upper()}{self.condition_num}" if self.condition_num else self.condition
         lines = [
             f"# {self.track} Race {self.race_number}: {self.race_name}",
-            f"Distance: {self.distance}m | Condition: {self.condition} | Class: {self.class_}",
+            f"Distance: {self.distance}m | Condition: {cond_abbrev} | Class: {self.class_}",
             f"Field Size: {len(self.runners)} | Pace: {self.pace_scenario} ({self.leaders_count} leaders)",
         ]
 

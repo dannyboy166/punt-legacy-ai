@@ -44,7 +44,7 @@ A subscription product where users can:
 - [x] Build predictor prompt (simplified, lets Claude decide)
 - [x] Claude API integration
 - [x] Natural language tags (not forced categories)
-- [x] Place odds consideration for each-way ($1.80+ threshold)
+- [x] Place odds consideration for each-way (win $4+, place $1.80+)
 
 ### Phase 5: Product ✅ COMPLETE
 - [x] Build frontend to display predictions
@@ -418,7 +418,7 @@ Claude uses natural language tags - not forced categories. Examples:
 - "Main danger"
 - "First-up specialist"
 - "Course specialist"
-- "Each-way chance" (only if place odds $1.80+)
+- "Each-way chance" (win odds $4+, place odds $1.80+)
 
 ---
 
@@ -430,7 +430,7 @@ The prompt is intentionally simple - it explains what the data means, but doesn'
 - How many contenders (1-3)
 - What tags to use
 - How to weight different factors (speed ratings, A/E, prep patterns, etc.)
-- Whether to mention each-way (only if place odds $1.80+)
+- Whether to mention each-way (win odds $4+, place odds $1.80+)
 
 **Why contenders instead of "BET/NO BET"?**
 

@@ -39,6 +39,14 @@ from core.tracking import PredictionTracker
 from core.backtest import run_backtest, run_backtest_meeting, get_race_results
 from api.puntingform import PuntingFormAPI
 
+
+def format_condition_abbrev(condition: str, condition_num: int | None) -> str:
+    """Format condition as abbreviation (e.g., 'S6', 'G4', 'H8')."""
+    if condition_num:
+        return f"{condition[0].upper()}{condition_num}"
+    return condition
+
+
 app = FastAPI(
     title="Punt Legacy AI Predictor",
     description="AI-powered horse racing predictions using Claude",
@@ -370,7 +378,7 @@ def build_admin_data(race_data, contenders) -> dict:
 
     return {
         "race_distance": today_distance,
-        "race_condition": race_data.condition,
+        "race_condition": format_condition_abbrev(race_data.condition, race_data.condition_num),
         "distance_tolerance": "±20%",
         "condition_tolerance": "±2 levels",
         "runners": all_runners_form,
@@ -583,7 +591,7 @@ def predict(req: PredictionRequest):
                 race_number=race_data.race_number,
                 race_name=race_data.race_name,
                 distance=race_data.distance,
-                condition=race_data.condition,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=[],
                 summary=f"This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
@@ -657,7 +665,7 @@ def predict(req: PredictionRequest):
                 race_number=race_data.race_number,
                 race_name=race_data.race_name,
                 distance=race_data.distance,
-                condition=race_data.condition,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=[],
                 bonus_pick=bonus_pick_response,
@@ -719,7 +727,7 @@ def predict(req: PredictionRequest):
                 race_number=race_data.race_number,
                 race_name=race_data.race_name,
                 distance=race_data.distance,
-                condition=race_data.condition,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=contenders,
                 summary=result.summary,
@@ -777,7 +785,7 @@ def predict_test(req: PredictionRequest):
                 race_number=race_data.race_number,
                 race_name=race_data.race_name,
                 distance=race_data.distance,
-                condition=race_data.condition,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=[],
                 summary=f"[TEST] This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
@@ -822,7 +830,7 @@ def predict_test(req: PredictionRequest):
             race_number=race_data.race_number,
             race_name=race_data.race_name,
             distance=race_data.distance,
-            condition=race_data.condition,
+            condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
             class_=race_data.class_,
             contenders=contenders,
             summary=f"[TEST - Collateral Form] {result.summary}",
@@ -879,7 +887,7 @@ def predict_test_adj(req: PredictionRequest):
                 race_number=race_data.race_number,
                 race_name=race_data.race_name,
                 distance=race_data.distance,
-                condition=race_data.condition,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=[],
                 summary=f"[TEST] This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
@@ -924,7 +932,7 @@ def predict_test_adj(req: PredictionRequest):
             race_number=race_data.race_number,
             race_name=race_data.race_name,
             distance=race_data.distance,
-            condition=race_data.condition,
+            condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
             class_=race_data.class_,
             contenders=contenders,
             summary=f"[TEST - Track-Adjusted] {result.summary}",
@@ -1018,7 +1026,7 @@ def predict_meeting(req: MeetingPredictionRequest):
                         race_number=race_num,
                         race_name=race_data.race_name,
                         distance=race_data.distance,
-                        condition=race_data.condition,
+                        condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                         class_=race_data.class_,
                         contenders=[],
                         summary="",
@@ -1035,7 +1043,7 @@ def predict_meeting(req: MeetingPredictionRequest):
                         race_number=race_num,
                         race_name=race_data.race_name,
                         distance=race_data.distance,
-                        condition=race_data.condition,
+                        condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                         class_=race_data.class_,
                         contenders=[],
                         summary=f"Skipped: {runners_with_no_form}/{total_runners} runners ({no_form_pct:.0f}%) have no race form.",
@@ -1099,7 +1107,7 @@ def predict_meeting(req: MeetingPredictionRequest):
                     race_number=race_num,
                     race_name=race_data.race_name,
                     distance=race_data.distance,
-                    condition=race_data.condition,
+                    condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                     class_=race_data.class_,
                     contenders=contenders,
                     summary=result.summary,

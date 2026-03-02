@@ -1,95 +1,284 @@
-venue,good_rating,good_samples,soft_rating,soft_samples,heavy_rating,heavy_samples,overall_track_rating,total_sample_size,num_conditions
-Rockhampton,1.0209,94,1.0281,311,,0,1.026429,405,2
-Townsville,1.0211,209,1.0289,202,,0,1.024934,411,2
-Ararat,1.0228,31,,0,,0,1.0228,31,1
-Darwin,1.0212,108,,0,,0,1.0212,108,1
-Northam,,0,1.0201,25,,0,1.0201,25,1
-Broome,1.0194,125,,0,,0,1.0194,125,1
-Grafton,1.0091,92,1.023,81,1.0293,32,1.017745,205,3
-Alice Springs,1.0173,115,,0,,0,1.0173,115,1
-Dubbo,1.015,54,1.0215,27,,0,1.017167,81,2
-Orange,1.0171,42,,0,,0,1.0171,42,1
-Canberra,1.0103,57,1.0199,85,,0,1.016046,142,2
-Tamworth,1.0126,121,1.0206,79,,0,1.01576,200,2
-Cairns,1.009,40,1.0162,115,1.024,22,1.015542,177,3
-Wyong,1.0148,362,1.0154,357,1.0171,158,1.015459,877,3
-Benalla,1.0136,154,,0,,0,1.0136,154,1
-Doomben,1.0114,480,1.0117,339,,0,1.011524,819,2
-Mackay,1.0085,187,1.0175,57,,0,1.010602,244,2
-Gold Coast,1.0079,128,1.0118,194,,0,1.01025,322,2
-Corowa,1.0066,24,1.0126,32,,0,1.010029,56,2
-Randwick,1.0118,312,1.0085,225,1.0064,103,1.009771,640,3
-Aquis Park Gold Coast Poly,1.0093,519,,0,,0,1.0093,519,1
-Kembla Grange,1.009,582,1.0055,286,1.014,254,1.00924,1122,3
-Warwick Farm,1.0091,23,,0,,0,1.0091,23,1
-Yarra Valley,1.0085,65,,0,,0,1.0085,65,1
-Muswellbrook,1.0195,55,1.0026,113,1.0083,62,1.008178,230,3
-Taree,1.008,32,1.0077,62,1.0082,35,1.00791,129,3
-Flemington,1.0074,222,1.01,43,,0,1.007822,265,2
-Canterbury,1.0078,400,1.0075,529,1.007,183,1.007526,1112,3
-Moruya,0.9998,44,1.0068,50,1.0177,33,1.007207,127,3
-Wagga,1.0086,112,1.0014,27,,0,1.007201,139,2
-Rosehill Gardens,1.0079,307,1.0072,297,1.0042,190,1.006753,794,3
-Sapphire Coast,1.0182,27,0.9922,37,1.0154,24,1.006505,88,3
-Eagle Farm,1.0085,390,1.0038,283,1.0045,20,1.006465,693,3
-Ipswich,1.0041,279,1.0063,325,1.0172,59,1.006344,663,3
-Caulfield Heath,1.0052,346,,0,,0,1.0052,346,1
-Sandown Hillside,1.0038,779,1.0065,370,1.0126,48,1.004987,1197,3
-Scone,0.9993,70,1.0092,106,1.0029,30,1.004918,206,3
-Horsham,,0,1.0063,31,0.9965,20,1.002457,51,2
-Wangaratta,1.003,194,1.0001,63,,0,1.002289,257,2
-Bendigo,1.006,542,0.993,230,1.0026,201,1.002225,973,3
-Ballina,1.0126,34,0.9948,51,,0,1.00192,85,2
-Ascot,1.0011,928,1.0111,42,,0,1.001533,970,2
-Wellington,,0,1.0014,21,,0,1.0014,21,1
-Nowra,1.0086,45,0.996,21,0.9927,36,1.000394,102,3
-Albury,1.0003,88,,0,,0,1.0003,88,1
-Donald,0.9999,36,,0,,0,0.9999,36,1
-Bathurst,1.0115,29,,0,0.9835,21,0.99974,50,2
-Caulfield,1.0002,132,0.9979,43,,0,0.999635,175,2
-Geelong,0.9994,336,0.9991,182,1.0012,46,0.99945,564,3
-Pinjarra,0.9999,101,0.9983,43,,0,0.999422,144,2
-Launceston,0.993,191,1.0082,127,,0,0.99907,318,2
-Gosford,0.9976,72,0.9973,275,1.0041,47,0.998166,394,3
-Swan Hill,0.999,138,0.9918,21,,0,0.998049,159,2
-Sandown Lakeside,0.9994,595,0.9974,252,0.9927,125,0.99802,972,3
-Mornington,0.9957,277,1.0022,104,1.0027,44,0.998015,425,3
-Pakenham Synthetic,0.9979,449,,0,,0,0.9979,449,1
-Goulburn,0.9952,78,0.9934,71,1.0063,57,0.997651,206,3
-Port Augusta,0.9975,70,,0,,0,0.9975,70,1
-Seymour,1.0013,212,0.9922,220,1.0114,24,0.997441,456,3
-Moonee Valley,0.9972,570,,0,,0,0.9972,570,1
-Kalgoorlie,0.9966,230,0.9985,73,,0,0.997058,303,2
-Sunshine Coast,0.9948,374,0.9958,500,1.0018,164,0.996388,1038,3
-Newcastle,0.9968,453,0.9975,530,0.992,192,0.996331,1175,3
-Sale,1.001,365,0.9912,137,0.9868,109,0.996269,611,3
-Bunbury,0.9934,32,0.9953,31,0.9981,41,0.995819,104,3
-Pinjarra Scarpside,0.9881,24,0.9999,25,0.9986,21,0.995464,70,3
-Hamilton,0.9979,51,,0,0.9897,27,0.995062,78,2
-Armidale,0.9949,26,,0,,0,0.9949,26,1
-Cranbourne,0.9949,465,0.9928,207,,0,0.994253,672,2
-Port Macquarie,0.9942,110,,0,,0,0.9942,110,1
-Morphettville,1.0007,563,0.9751,192,,0,0.99419,755,2
-Morphettville Parks,0.9947,558,0.991,214,0.9783,82,0.992198,854,3
-Murtoa,0.9954,40,,0,0.9848,22,0.991639,62,2
-Stawell,0.9915,49,,0,,0,0.9915,49,1
-Warrnambool,1.0056,87,0.9871,194,0.9825,60,0.991011,341,3
-Devonport Synthetic,0.9909,179,,0,,0,0.9909,179,1
-Sunshine Coast Poly,0.9905,207,,0,,0,0.9905,207,1
-Port Hedland,0.99,63,,0,,0,0.99,63,1
-Mudgee,0.9879,27,,0,,0,0.9879,27,1
-Kilmore,0.986,59,,0,0.9853,21,0.985816,80,2
-Belmont,0.9927,103,0.9859,558,0.9706,56,0.985682,717,3
-Pakenham,0.9886,542,0.9861,140,0.9401,40,0.985428,722,3
-Ballarat Synthetic,0.9842,459,,0,,0,0.9842,459,1
-Gawler,0.9911,52,0.9785,75,,0,0.983659,127,2
-Mildura,0.9882,35,0.9785,31,,0,0.983644,66,2
-Geraldton,0.9821,285,,0,,0,0.9821,285,1
-Echuca,0.9854,133,0.9725,50,,0,0.981875,183,2
-Ballarat,0.9814,343,0.9801,215,,0,0.980899,558,2
-Hobart,0.9805,126,0.9811,211,,0,0.980876,337,2
-Albany,0.9806,162,0.9734,50,,0,0.978902,212,2
-Mount Gambier,1.0001,64,0.9708,109,0.9707,93,0.977815,266,3
-Port Lincoln,0.976,198,0.977,22,,0,0.9761,220,2
-Strathalbyn,0.9727,28,,0,,0,0.9727,28,1
-Toowoomba,0.9688,444,0.9697,221,0.9543,30,0.96846,695,3
+venue,track_rating,samples
+Yass,1.031366,6
+Trentham,1.030455,9
+Texas,1.028748,20
+Tomingley,1.026587,2
+Mareeba,1.02631,48
+Berrigan,1.025917,43
+Atherton,1.022711,97
+Braidwood,1.022247,30
+Townsville,1.018211,755
+Deniliquin,1.016904,30
+Adaminaby,1.016535,16
+Warialda,1.016222,2
+Hastings,1.015927,1
+Cunnamulla,1.015508,1
+Tottenham,1.013989,2
+Rockhampton,1.013353,710
+Thangool,1.012855,68
+Riccarton Park Synthetic,1.012697,3
+Mendooran,1.010809,10
+Randwick,1.010016,1011
+Hawkesbury,1.009933,542
+Gulgong,1.008981,11
+Young,1.008981,7
+Cambridge,1.008766,1
+Tauherenikau,1.008701,3
+Cooktown,1.008465,9
+Ellerslie,1.0083,18
+Doomben,1.007659,1184
+G B - Great Leighs,1.007409,3
+Wagga Riverside,1.007405,107
+Eagle Farm,1.007278,1158
+Gold Coast,1.00699,919
+Rosehill,1.006915,862
+Bowen,1.006907,42
+Bundarra,1.006825,13
+Coonabarabran,1.006219,51
+Canterbury,1.006023,516
+Warwick Farm,1.005458,448
+Queanbeyan,1.005236,255
+Wyong,1.005199,492
+Canberra,1.005145,442
+Gordonvale,1.00502,14
+Dubbo,1.004835,462
+Blackall,1.004592,1
+Narrandera,1.004068,62
+Lismore,1.004021,148
+Kumbia,1.003956,11
+G B - Lingfield,1.003933,3
+Chinchilla,1.003594,55
+Grafton,1.00359,557
+Flemington,1.003491,762
+Barcaldine,1.003438,36
+Nowra,1.002983,284
+Cairns,1.002894,325
+Beaudesert,1.002701,210
+Tumbarumba,1.002555,36
+Cooma,1.00241,23
+Innisfail,1.002385,65
+Muswellbrook,1.002377,415
+Canberra Acton,1.002203,153
+Warwick,1.001803,210
+Randwick-Kensington,1.001498,346
+Stanthorpe,1.001477,11
+Towong,1.001266,11
+Moruya,1.001052,421
+Forbes,1.000803,40
+Caulfield,1.000546,723
+Inverell,1.000543,144
+Tamworth,1.000528,553
+Bathurst,1.000425,211
+Mackay,1.000375,332
+Burrumbeet,1.000225,53
+Waverley,1.000163,7
+Crookwell,0.99998,2
+Balaklava,0.999782,374
+Te Aroha,0.999745,1
+Jandowae,0.999278,6
+Ipswich,0.999154,979
+Quirindi,0.998954,112
+Gold Coast Poly,0.998915,290
+New Plymouth Raceway,0.998748,1
+Te Rapa,0.998712,10
+Colac,0.998697,141
+Otaki,0.998266,3
+Benalla,0.998141,118
+Kununurra,0.997855,25
+Morphettville,0.997767,816
+Ararat,0.997668,175
+Clifton,0.997576,20
+G B - Kempton Park,0.997483,3
+Bell,0.997401,36
+Gayndah,0.997342,21
+Warracknabeal,0.997308,111
+Kembla Grange,0.997241,831
+Sandown-Hillside,0.99704,530
+Orange,0.997007,259
+Corowa,0.996828,144
+Sapphire Coast,0.996808,336
+Gosford,0.996268,438
+Geelong,0.996142,776
+Caulfield Heath,0.996094,205
+Gunnedah,0.995982,192
+Deepwater,0.995976,31
+Pakenham Synthetic,0.995852,309
+Lockhart,0.995743,10
+Scone,0.995561,537
+Coonamble,0.995434,46
+Bendigo,0.995204,506
+Holbrook,0.995074,9
+Mt Garnet,0.995047,6
+Gundagai,0.995007,201
+Binnaway,0.994995,11
+Parkes,0.99486,115
+Murwillumbah,0.994251,213
+Matamata,0.994247,5
+King Island,0.994224,22
+Northam,0.994164,495
+Tumut,0.994142,88
+Terang,0.99414,190
+Camperdown,0.99408,64
+Moonee Valley,0.99408,358
+Yeppoon,0.994052,13
+Moree,0.994002,143
+Gatton,0.993714,413
+Ascot,0.993574,1290
+Goulburn,0.993447,445
+Dongara,0.993049,7
+Penshurst,0.99296,27
+Boorowa,0.992668,1
+Dalby,0.992667,276
+Wangaratta,0.99221,441
+Bombala,0.992081,13
+Wodonga,0.992068,276
+Taree,0.991968,518
+Gulargambone,0.991762,11
+York,0.991525,81
+Launceston,0.991104,588
+Bingara,0.991035,1
+Casterton,0.990903,66
+Sandown-Lakeside,0.99066,449
+Sunshine Coast,0.99063,1457
+Sale,0.990584,492
+Singapore,0.990535,3
+Geurie,0.990428,6
+Tauranga,0.990346,4
+Kerang,0.990307,68
+Harden,0.990154,6
+Donald,0.990032,159
+Seymour,0.989582,529
+Wellington,0.989514,131
+Coleraine,0.989353,31
+Mortlake,0.989306,29
+Balranald,0.989111,11
+Sha Tin,0.989096,3
+Pinjarra,0.989068,602
+Pakenham,0.989063,697
+Leeton,0.989021,36
+Ruakaka,0.988913,1
+St Arnaud,0.988913,28
+Wagga,0.988788,682
+Swan Hill,0.988575,233
+Mornington,0.988549,519
+Esperance,0.988357,546
+Pinjarra Scarpside,0.988199,350
+Emerald,0.988101,118
+Nanango,0.988071,62
+Wycheproof,0.987806,22
+Newcastle,0.987797,764
+Home Hill,0.987747,53
+Sunshine Coast Poly,0.987535,70
+Warrnambool,0.987385,429
+Bedgerebong,0.987253,15
+Bordertown,0.986647,137
+Tuncurry,0.986636,132
+Hamilton,0.986604,126
+Walcha,0.986603,75
+Eidsvold,0.986383,9
+Cranbourne,0.986361,761
+Kempsey,0.986208,111
+Tocumwal,0.986162,7
+Wauchope,0.986064,26
+Laura,0.985983,4
+Great Western,0.985928,35
+Morphettville Parks,0.985825,683
+Warren,0.985724,99
+Kilcoy,0.98563,274
+Albury,0.985506,444
+Mt Perry,0.985505,9
+Gilgandra,0.985375,114
+Monto,0.985307,3
+Murtoa,0.985233,46
+Beaumont,0.985029,231
+Wean,0.984902,9
+Grenfell,0.984777,21
+Tatura,0.984767,137
+Goondiwindi,0.984695,75
+Jamestown,0.984463,19
+Port Macquarie,0.984298,511
+Murray Bridge GH,0.984211,781
+G B - York,0.984173,1
+Glen Innes,0.983959,53
+Traralgon,0.983831,53
+Jerilderie,0.983624,16
+Edenhope,0.98353,15
+Bunbury,0.983451,808
+Bowraville,0.983379,48
+G B - Newcastle,0.983161,2
+Werribee,0.983068,249
+Yarra Glen,0.983055,269
+Wanganui,0.983035,5
+Ballina,0.982784,255
+Horsham,0.982487,140
+Dunkeld,0.981973,24
+Dederang,0.9819,7
+Kyneton,0.981713,295
+Casino,0.981649,70
+Bairnsdale,0.981564,175
+Pukekohe Park,0.981431,1
+Cowra,0.980991,116
+Armidale,0.980969,204
+Ballarat Synthetic,0.98074,419
+Devonport Synthetic,0.980461,289
+Griffith,0.980339,19
+Longford,0.980207,21
+Kalgoorlie,0.979998,261
+Esk,0.979932,20
+Belmont Park,0.979781,656
+Manangatang,0.979562,21
+Coffs Harbour,0.979422,248
+Mildura,0.979017,136
+Gunbower,0.978729,16
+Mt Gambier,0.978378,253
+Yea,0.977804,89
+Ballarat,0.977594,382
+Mudgee,0.977557,147
+Avoca,0.977415,47
+Buchan,0.976523,7
+Arawa Park,0.976145,4
+Naracoorte,0.975706,155
+Ceduna,0.975577,1
+Kilmore,0.975467,282
+Hobart,0.975274,757
+Stawell,0.9747,99
+G B - Southwell,0.973718,4
+Mt Barker,0.973541,134
+Hinnomunjie,0.973355,10
+Drouin,0.973338,36
+Echuca,0.973146,302
+Gawler,0.972918,466
+Ingham,0.972772,22
+Toodyay,0.97255,16
+Albany,0.972464,615
+Nhill,0.972214,31
+Geraldton,0.971838,608
+Moe,0.971509,380
+Merton,0.970727,29
+Halidon,0.970636,24
+Narromine,0.970217,108
+Cootamundra,0.970044,36
+Balnarring,0.970043,107
+Hanging Rock,0.969562,84
+Taupo,0.968833,3
+Healesville,0.968625,173
+Port Lincoln,0.967553,311
+Alexandra,0.967522,40
+Oakbank,0.967207,225
+Merriwa,0.964737,7
+Swifts Creek,0.964604,11
+Bong Bong,0.963713,18
+Kingscote,0.96238,88
+Stony Creek,0.961456,164
+Tabulam,0.961298,9
+Strathalbyn,0.961006,435
+Toowoomba,0.960954,860
+Warra,0.960343,6
+Gladstone,0.958791,1
+Penola,0.955687,126
+Narrogin,0.951774,90
+Clare,0.949654,119
+Hawera,0.941099,2
+Bundaberg,0.935506,1
+Woolamai,0.92885,118
+Mansfield,0.922643,17
