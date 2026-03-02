@@ -528,6 +528,18 @@ class Predictor:
                 tipsheet_pick = c.get("tipsheet_pick", False)
                 tag = c.get("tag", "Contender")
 
+                # Each-way chance requires place odds $1.80+ and win odds $4+
+                # Otherwise change to "Main danger"
+                if tag == "Each-way chance":
+                    place_ok = place_odds and place_odds >= 1.80
+                    win_ok = odds >= 4.0
+                    if not (place_ok and win_ok):
+                        logger.info(
+                            f"Changed {horse} from 'Each-way chance' to 'Main danger' "
+                            f"(odds=${odds}, place=${place_odds})"
+                        )
+                        tag = "Main danger"
+
                 # PFAI filter for non-metro tracks:
                 # "The one to beat" only gets ⭐ if PFAI rank 1-3 (consensus)
                 # This removes -43% ROI noise on country/midweek tracks
