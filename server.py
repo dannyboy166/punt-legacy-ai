@@ -140,6 +140,15 @@ class PromoBonusPick(BaseModel):
     analysis: str
 
 
+class OtherChance(BaseModel):
+    """Horse with competitive ratings but issues - good for bonus bets."""
+    horse: str
+    tab_no: int
+    odds: float
+    rating: str  # e.g. "101.2 at 1200m S5"
+    issue: str  # Brief reason why not a top contender
+
+
 class PredictionResponse(BaseModel):
     mode: str = "normal"  # "normal" or "promo_bonus"
     track: str
@@ -149,6 +158,8 @@ class PredictionResponse(BaseModel):
     condition: str
     class_: str
     contenders: list[Contender] = []  # Used in normal mode (can be empty = no picks)
+    other_chances: list[OtherChance] = []  # Horses with good ratings but issues (admin only)
+    less_likely: list[str] = []  # Horses with weaker ratings - just names (admin only)
     bonus_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     promo_pick: Optional[PromoBonusPick] = None  # Used in promo_bonus mode
     summary: str
@@ -720,6 +731,18 @@ def predict(req: PredictionRequest):
             if req.include_admin_data and contenders:
                 admin_data = build_admin_data(race_data, result.contenders)
 
+            # Build other_chances for response
+            other_chances = [
+                OtherChance(
+                    horse=oc.horse,
+                    tab_no=oc.tab_no,
+                    odds=oc.odds,
+                    rating=oc.rating,
+                    issue=oc.issue,
+                )
+                for oc in result.other_chances
+            ]
+
             # Return response (contenders can be empty = no picks for this race)
             return PredictionResponse(
                 mode="normal",
@@ -730,6 +753,8 @@ def predict(req: PredictionRequest):
                 condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
                 class_=race_data.class_,
                 contenders=contenders,
+                other_chances=other_chances,
+                less_likely=result.less_likely,
                 summary=result.summary,
                 race_confidence=result.race_confidence,
                 confidence_reason=result.confidence_reason,

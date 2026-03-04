@@ -117,6 +117,26 @@ class PromoBonusPick:
 
 
 @dataclass
+class OtherChance:
+    """A horse with competitive ratings but issues preventing top contender status."""
+
+    horse: str
+    tab_no: int
+    odds: float
+    rating: str  # e.g. "101.2 at 1200m S5"
+    issue: str  # Brief reason why not a top contender
+
+    def to_dict(self) -> dict:
+        return {
+            "horse": self.horse,
+            "tab_no": self.tab_no,
+            "odds": self.odds,
+            "rating": self.rating,
+            "issue": self.issue,
+        }
+
+
+@dataclass
 class PredictionOutput:
     """Output from Claude predictor."""
 
@@ -136,6 +156,12 @@ class PredictionOutput:
     # Notes for non-selected runners (1 sentence each)
     runner_notes: dict = field(default_factory=dict)
 
+    # Other chances - competitive horses with issues (for bonus bets)
+    other_chances: list[OtherChance] = field(default_factory=list)
+
+    # Less likely horses - just names
+    less_likely: list[str] = field(default_factory=list)
+
     # Race-level confidence (1-10) - deprecated, not used in new model
     race_confidence: Optional[int] = None
     confidence_reason: Optional[str] = None
@@ -153,6 +179,8 @@ class PredictionOutput:
         result = {
             "mode": self.mode,
             "contenders": [c.to_dict() for c in self.contenders],
+            "other_chances": [oc.to_dict() for oc in self.other_chances],
+            "less_likely": self.less_likely,
             "summary": self.summary,
             "runner_notes": self.runner_notes,
             "race_confidence": self.race_confidence,
@@ -178,7 +206,7 @@ SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
 Pick 0-3 contenders for this race. For each, assign a tag:
 - **"The one to beat"** - Clear standout
-- **"Each-way chance"** - Win odds $4+, place odds $1.80+, consistent form suggests top 3 finish
+- **"Each-way chance"** - Good ratings at similar DISTANCE and CONDITIONS vs the field, place odds $1.80+
 - **"Value bet"** - Odds better than their form suggests
 
 **Pick 0 contenders (no bet) when:**
@@ -190,20 +218,19 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than last start wins or career win/place stats.**
 
-**First-up/Second-up horses:** Check their past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh - their career first-up record and past first-up ratings tell you this.
+**First-up/Second-up horses:** Check their ratings in past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh. Their career first/second-up record and past second/first-up ratings also help.
 
 **Critical:**
 - Barrier trials (marked TRIAL) don't count as form - horses don't always try
 - If a horse has 0 race runs, they are UNKNOWN (first starter)
 - If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
 
-You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
+You also have: prep run number, barrier, weight, speedmap/pace data, win/place odds, jockey/trainer A/E ratios, first-up/second-up records, gear changes.
 
 Also include brief notes for non-selected runners explaining why they weren't picked. Focus on:
-- Speed ratings at similar distance/condition vs contenders
-- Poor jockey/trainer A/E ratios if relevant
+- Speed ratings at similar distance and condition vs contenders
 - Significant weight changes from recent runs, bad barrier draw
-- Lack of form at this distance/condition
+- Lack of form at this distance and/or condition
 Avoid generic career stats like "poor strike rate" - be specific to today's race.
 
 ## Output
@@ -220,16 +247,29 @@ Avoid generic career stats like "poor strike rate" - be specific to today's race
       "tipsheet_pick": true | false
     }
   ],
+  "other_chances": [
+    {
+      "horse": "Horse Name",
+      "tab_no": number,
+      "odds": number,
+      "rating": "101.2 at 1200m S5",
+      "issue": "Brief reason this horse has issues vs contenders"
+    }
+  ],
+  "less_likely": ["Horse A", "Horse B"],
   "runner_notes": {
-    "Horse Name": "1 sentence: ratings at this distance/condition, weight change, barrier, jockey/trainer A/E",
+    "Horse Name": "1 sentence: ratings at this distance/condition, weight change, barrier",
     "Another Horse": "1 sentence: specific reason vs contenders"
   },
   "summary": "Brief overview or reason for 0 picks"
 }
 ```
 
+**other_chances**: Horses with competitive ratings that COULD win but have issues preventing them being top contenders. Good value for bonus bets.
+**less_likely**: Horses with weaker ratings or clear issues - just list names.
+
 **tipsheet_pick = true** when you would genuinely bet on this horse yourself:
-- Speed ratings clearly support this horse vs the field at this distance/condition
+- Speed ratings clearly support this horse vs the field at this distance and condition
 - The odds represent real value
 - You're confident in the pick (requires most of the field to have sufficient form data)"""
 
@@ -571,10 +611,48 @@ class Predictor:
         # Extract runner notes for non-selected runners
         runner_notes = data.get("runner_notes", {})
 
+        # Parse other_chances (horses with competitive ratings but issues)
+        other_chances = []
+        for oc in data.get("other_chances", []):
+            horse = oc.get("horse")
+            tab_no = oc.get("tab_no")
+            odds = oc.get("odds")
+
+            # Check if odds is a valid number
+            if odds is not None:
+                try:
+                    odds = float(odds)
+                except (ValueError, TypeError):
+                    odds = None
+
+            # Look up from race data if not provided
+            if horse and not odds:
+                normalized_horse = normalize_horse_name(horse)
+                for runner in race_data.runners:
+                    if normalize_horse_name(runner.name) == normalized_horse or runner.tab_no == tab_no:
+                        odds = runner.odds
+                        tab_no = runner.tab_no
+                        horse = runner.name
+                        break
+
+            if horse and tab_no and odds:
+                other_chances.append(OtherChance(
+                    horse=horse,
+                    tab_no=tab_no,
+                    odds=odds,
+                    rating=oc.get("rating", ""),
+                    issue=oc.get("issue", ""),
+                ))
+
+        # Parse less_likely (just horse names)
+        less_likely = data.get("less_likely", [])
+
         # Return output (contenders can be empty)
         return PredictionOutput(
             mode="normal",
             contenders=contenders,
+            other_chances=other_chances,
+            less_likely=less_likely,
             summary=data.get("summary", ""),
             runner_notes=runner_notes,
             track=race_data.track,
