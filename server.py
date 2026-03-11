@@ -329,12 +329,10 @@ def build_admin_data(race_data, contenders) -> dict:
 
     Marks runs as "relevant" if they match:
     - Within ±20% of today's race distance
-    - Similar track condition (within ±2 condition levels)
+    - Similar track condition (within ±1 condition level)
     """
-    from core.speed import parse_condition_number
-
     today_distance = race_data.distance
-    today_condition_num = parse_condition_number(race_data.condition)
+    today_condition_num = race_data.condition_num  # Use actual value, not re-parsed
     distance_tolerance = today_distance * 0.20  # ±20%
 
     # Get contender tab numbers for highlighting
@@ -358,10 +356,10 @@ def build_admin_data(race_data, contenders) -> dict:
             if distance_diff > distance_tolerance:
                 is_relevant = False
 
-            # Check condition (within ±2 levels)
+            # Check condition (within ±1 level)
             if today_condition_num is not None and run.condition_num is not None:
                 condition_diff = abs(run.condition_num - today_condition_num)
-                if condition_diff > 2:
+                if condition_diff > 1:
                     is_relevant = False
 
             all_runs.append({
@@ -391,7 +389,7 @@ def build_admin_data(race_data, contenders) -> dict:
         "race_distance": today_distance,
         "race_condition": format_condition_abbrev(race_data.condition, race_data.condition_num),
         "distance_tolerance": "±20%",
-        "condition_tolerance": "±2 levels",
+        "condition_tolerance": "±1 level",
         "runners": all_runners_form,
     }
 
