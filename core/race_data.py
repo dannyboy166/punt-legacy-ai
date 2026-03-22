@@ -101,6 +101,7 @@ class FormRun:
     prep_run: Optional[int] = None  # 1 = first up, 2 = second up, etc.
     is_barrier_trial: bool = False  # True if this was a barrier trial
     rating_venue_adjusted: Optional[float] = None  # Rating adjusted by track quality
+    stewards_report: Optional[str] = None  # Official stewards report (eased, checked, etc.)
 
     def to_dict(self) -> dict:
         return {
@@ -120,6 +121,7 @@ class FormRun:
             "prep_run": self.prep_run,  # 1=1st up, 2=2nd up, etc.
             "is_barrier_trial": self.is_barrier_trial,
             "rating_venue_adjusted": round(self.rating_venue_adjusted * 100, 1) if self.rating_venue_adjusted else None,
+            "stewards_report": self.stewards_report,
         }
 
 
@@ -352,29 +354,33 @@ class RaceData:
                 lines.append(form_summary)
                 lines.append("")
                 if include_venue_adjusted:
-                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial |")
-                    lines.append("|------|-------|------|------|-----|--------|--------|-----|------|-------|")
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-----|--------|--------|-----|------|-------|-------|")
                 else:
-                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |")
-                    lines.append("|------|-------|------|------|-----|--------|--------|------|-------|")
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-----|--------|--------|------|-------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
                     rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
                     adj_str = f"{f.rating_venue_adjusted * 100:.1f}" if f.rating_venue_adjusted else "-"
                     prep_str = f"{f.prep_run}" if f.prep_run else "-"
                     trial_str = "TRIAL" if f.is_barrier_trial else "-"
+                    notes_str = f.stewards_report if f.stewards_report else "-"
                     # Handle None margin
                     if f.margin is not None:
                         margin_str = f"{f.margin}L"
-                        if not f.is_barrier_trial and f.margin >= 8:
-                            margin_str += " ⚠️eased"
+                        # Check stewards report for official "eased" (not our guess)
+                        if f.stewards_report:
+                            report_lower = f.stewards_report.lower()
+                            if "eased" in report_lower or "not persevere" in report_lower:
+                                margin_str += " ⚠️eased"
                     else:
                         margin_str = "?" if f.position > 1 else "0L"  # Unknown for non-winners
                     # Handle UNK condition
                     cond_str = f.condition if f.condition != "UNK" else "?"
                     if include_venue_adjusted:
-                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} |")
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
                     else:
-                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} | {notes_str} |")
 
             else:
                 lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")
@@ -749,6 +755,10 @@ class RaceDataPipeline:
                 if run_position and run_position > 1 and (run_margin is None or run_margin == 0):
                     run_margin = None  # Mark as unknown rather than pretending 0
 
+                # Get stewards report (official eased/checked info)
+                stewards_report_raw = run.get("stewardsReport", "")
+                stewards_report = stewards_report_raw.strip() if stewards_report_raw else None
+
                 form_run = FormRun(
                     date=run_date,
                     track=run_track,
@@ -766,6 +776,7 @@ class RaceDataPipeline:
                     prep_run=run_prep,
                     is_barrier_trial=run.get("isBarrierTrial", False),
                     rating_venue_adjusted=rating_venue_adjusted,
+                    stewards_report=stewards_report,
                 )
                 form_runs.append(form_run)
 
