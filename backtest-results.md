@@ -1,6 +1,6 @@
 # Backtest Results - Simple Daily Picks
 
-**Rule:** Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND odds aren't too short (~$1.30 or under). Skip races with limited form, multiple similar contenders, or no clear best.
+**Rule:** Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND you would bet on it at that price. Skip races with limited form, multiple similar contenders, or no clear standout.
 
 ---
 

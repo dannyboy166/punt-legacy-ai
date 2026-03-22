@@ -961,12 +961,12 @@ A streamlined approach for manual daily predictions using Claude Code.
 
 ### The Rule
 
-**Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND odds aren't too short (~$1.30 or under).**
+**Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND you would bet on it at that price.**
 
 Skip races with:
 - Limited form (too many first starters/unknowns)
 - Multiple similar contenders (no clear edge)
-- Clear standout but odds too short
+- Clear standout but odds don't justify the bet
 
 ### Condition Proximity Scale
 
