@@ -373,6 +373,7 @@ def build_admin_data(race_data, contenders) -> dict:
                 "barrier": run.barrier,
                 "rating": round(run.rating, 3) if run.rating else None,
                 "is_relevant": is_relevant,  # Highlight flag
+                "notes": run.stewards_report,  # Stewards notes (e.g., "Began awkwardly")
             })
 
         all_runners_form[runner.name] = {
