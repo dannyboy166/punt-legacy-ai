@@ -721,11 +721,296 @@ curl -X POST http://localhost:8000/predict-meeting \
 
 ---
 
+---
+
+## Claude Code Analysis (Free Alternative)
+
+Export race data and paste to Claude Code for **free analysis** without Claude API costs.
+
+### Quick Start
+
+```bash
+cd /Users/danielsamus/punt-legacy-ai
+
+# Single race
+python3 tools/export_for_claude_code.py "Randwick" 5 22-Mar-2026
+
+# Range of races
+python3 tools/export_for_claude_code.py "Randwick" 3-7 22-Mar-2026
+
+# All races at meeting
+python3 tools/export_for_claude_code.py "Randwick" all 22-Mar-2026
+
+# Skip instructions header (if pasting multiple batches)
+python3 tools/export_for_claude_code.py "Randwick" all 22-Mar-2026 --no-instructions
+```
+
+### What It Outputs
+
+The script outputs:
+1. **Analysis instructions** - Same methodology as the API predictor
+2. **Race data** - Exactly what Claude API would see
+
+```
+## ANALYSIS INSTRUCTIONS
+You are an expert horse racing analyst...
+
+---
+
+# Randwick Race 5: [Race Name]
+Distance: 1200m | Condition: G4 | Class: BM72
+Field Size: 12 | Pace: moderate (2 leaders)
+
+## Runners
+
+### 1. Horse Name
+Odds: $4.50 win / $1.80 place → 22.2% implied
+Jockey: J Smith (A/E: 1.12)
+...
+
+| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial |
+|------|-------|------|------|-----|--------|--------|-----|------|-------|
+| 15-Mar | Canterbury | 1200m | G4 | 2/9 | 1.5L | 101.2 | 100.5 | 3 | - |
+```
+
+### Workflow
+
+```bash
+# 1. Export data
+python3 tools/export_for_claude_code.py "Randwick" all 22-Mar-2026 > /tmp/races.txt
+
+# 2. Copy to clipboard (macOS)
+cat /tmp/races.txt | pbcopy
+
+# 3. Paste to Claude Code and ask:
+"Analyze these races and pick your best bets"
+```
+
+### Rating Columns Explained
+
+| Column | What It Means |
+|--------|---------------|
+| **Rating** | Normalized by distance + condition. 100 = expected speed. 102 = 2% faster than expected. |
+| **Adj** | Further normalized by track quality. Makes ratings comparable across venues (e.g., Randwick vs Yass). |
+
+### Analysis Methodology
+
+#### 1. Look at Adj ratings at similar distance and conditions
+- Find runs at similar distance and conditions to the race being predicted
+- Use your judgment on what's most relevant from their form
+- More recent runs are **a lot** more relevant than older runs
+
+#### 2. Understanding the ratings
+- **Rating column** = normalized by distance + condition (100 = expected speed)
+- **Adj column** = further normalized by track quality (some tracks are faster/slower than others)
+- **Ignore finishing position** - a higher rating is better regardless of where they finished
+- **Ignore margin for non-winners** - already baked into the rating
+- **Winners by big margins** - they may have eased off, could be better than rating shows
+- **Eased runs (⚠️eased)** - from official stewards report, horse wasn't fully pushed, actual ability is likely higher than the rating shown
+
+#### 3. Compare across the field
+For each horse, look at their recent Adj ratings at similar conditions and distance:
+- Who has the highest recent Adj?
+- Is the trend improving or declining?
+
+#### 4. Assign picks
+
+**"The one to beat" ⭐** = The horse you think will WIN based on best recent Adj ratings at similar distances and conditions to the race being predicted. **Only star it if it's a clear standout AND you would bet on it yourself at those odds.**
+
+**"Value bet" / "Each-way chance"** = Similar Adj ratings to the top picks but at much bigger odds
+
+### Common Mistakes to Avoid
+
+1. ❌ Looking at best historical rating instead of recent
+2. ❌ Caring about finishing position
+3. ❌ Including runs at irrelevant distances
+4. ❌ Weighting old runs (6+ months) too heavily
+
+### Pick Tags
+
+- **"The one to beat"** ⭐ - Clear standout based on ratings (tipsheet pick)
+- **"Each-way chance"** - Good ratings, place odds $1.80+
+- **"Value bet"** - Odds better than form suggests
+
+### How to Use Claude Code for Predictions
+
+**Step 1: Export the data**
+```bash
+cd /Users/danielsamus/punt-legacy-ai
+python3 tools/export_for_claude_code.py "Rosehill" all 22-Mar-2026 > /tmp/races.txt
+cat /tmp/races.txt | pbcopy
+```
+
+**Step 2: Start a new Claude Code chat and paste the data**
+
+**Step 3: Ask Claude to analyze** - Example prompt:
+```
+Analyze these races and pick 0-3 contenders per race.
+
+For each race:
+1. Look at Adj ratings at SIMILAR distance and conditions to the race
+2. More recent runs = more relevant
+3. Ignore TRIAL runs (horses don't try)
+4. Mark your strongest pick as "tipsheet_pick" = ⭐
+
+Output format per race:
+- The one to beat: [horse] @ $X.XX - [2-3 sentence analysis referencing ratings]
+- Each-way chance: [horse] @ $X.XX - [reason]
+- Value bet: [horse] @ $X.XX - [reason]
+```
+
+### Backtest Results (Mar 21, 2026 Rosehill - 9 races)
+
+| Metric | Result |
+|--------|--------|
+| Winners | 4/9 (44%) |
+| ROI (flat stake) | **+42.8%** |
+| Top picks placed (1-4) | 7/9 |
+
+**What worked:**
+- Quality races with clear ratings leaders (R5, R6, R7) - all won
+- Favourites with dominant Adj ratings delivered
+
+**What didn't work:**
+- 2YO races (Golden Slipper) - wet track form didn't predict
+- $81 upset (R4 Beskar) - anomaly, ratings couldn't predict
+- Leaders in wet can outperform inferior ratings (R3)
+
+### Files
+
+- `tools/export_for_claude_code.py` - Export script
+- `core/race_data.py` - Data pipeline (uses `to_prompt_text(include_venue_adjusted=True)`)
+- `core/predictor.py` - Original prompts (SYSTEM_PROMPT)
+
+---
+
+## Daily Picks Workflow (Manual with Claude Code)
+
+A simple morning routine for generating daily subscriber picks using Claude Code.
+
+### The Approach
+
+**One rule:** Pick ONLY when there's a clear standout based on recent Adj ratings at similar distance/condition, AND the odds are worth it (not too short).
+
+**What to skip:**
+- Races with limited form data (too many first starters/unknowns)
+- Races where multiple horses have similar ratings (no clear standout)
+- Clear standout but odds too short (e.g., $1.20 for marginal edge)
+
+### Step-by-Step
+
+```bash
+# 1. Export data for a meeting
+cd /Users/danielsamus/punt-legacy-ai
+source .env && python3 tools/export_for_claude_code.py "Pakenham" all 19-Mar-2026 --no-instructions
+
+# 2. Paste output to Claude Code and ask:
+```
+
+**Prompt to use:**
+```
+Look at every race. For each one, tell me:
+1. Is there a CLEAR standout based on recent Adj ratings at similar distance/condition?
+2. If yes - are the odds worth betting?
+
+Only pick if BOTH are true. One pick max per race.
+
+Skip races where:
+- Not enough form data to judge
+- Multiple horses have similar ratings (no clear edge)
+- Standout exists but odds too short for the edge
+
+Output format:
+R1: SKIP - [reason]
+R2: BET - Horse Name @ $X.XX - [1 sentence: why they're the standout on ratings]
+R3: SKIP - [reason]
+...
+```
+
+### What "Clear Standout" Means
+
+Look at the Adj column for runs at similar distance and condition:
+
+| Scenario | Decision |
+|----------|----------|
+| Horse A: 101, 102, 101. Horse B: 99, 98, 100 | BET Horse A - clearly better |
+| Horse A: 101, 99. Horse B: 100, 101 | SKIP - too close |
+| Horse A: 102 but $1.30. Horse B: 99 at $5 | Consider skipping - edge doesn't justify $1.30 |
+| 4/8 horses have no form data | SKIP - too many unknowns |
+
+### What NOT to Focus On
+
+- ❌ Whether they've been winning/placing lately (ratings already tell you performance)
+- ❌ Jockey/trainer stats (minor factor)
+- ❌ Gear changes (noise)
+- ❌ Barrier draws (minor except extreme cases)
+- ❌ Best-ever rating (use RECENT form)
+
+### Backtest Results
+
+**Cranbourne 20-Mar-2026 (7 races):**
+- 2 picks made: Luigi The Brave $1.75, Finance Shogun $5.00
+- 5 races skipped (no clear standout or limited form)
+- Result: **2/2 winners (100%)**
+
+---
+
+## Simple Daily Picks System
+
+A streamlined approach for manual daily predictions using Claude Code.
+
+### The Rule
+
+**Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND odds aren't too short (~$1.30 or under).**
+
+Skip races with:
+- Limited form (too many first starters/unknowns)
+- Multiple similar contenders (no clear edge)
+- Clear standout but odds too short
+
+### Condition Proximity Scale
+
+Track conditions in order (adjacent conditions are highly relevant):
+
+```
+G3 → G4 → S5 → S6 → S7 → H8 → H9 → H10
+Good ────────────────> Soft ──────────> Heavy
+```
+
+**Key insight:** When analyzing a H8 race, S7 form is highly relevant (1 step away). Don't only look at exact condition matches.
+
+| Today's Condition | Most Relevant Form | Also Relevant (1 step) |
+|-------------------|-------------------|------------------------|
+| H8 | H8 | S7, H9 |
+| S7 | S7 | S6, H8 |
+| S5 | S5 | G4, S6 |
+| G4 | G4 | G3, S5 |
+
+### Quick Export Command
+
+```bash
+cd /Users/danielsamus/punt-legacy-ai
+source .env && python3 tools/export_for_claude_code.py "Track" all DD-MMM-YYYY --no-instructions
+```
+
+### Results Tracking
+
+Results logged in `backtest-results.md` with running totals.
+
+**Current stats (Mar 18-22, 2026):**
+- 9 picks, 6 winners = 66.7% strike rate
+- +8.90u profit (from 6 picks with known P/L)
+
+---
+
 ## Next Steps
 
 1. ~~Historical backtesting~~ ✅ Done (experiments/backtest.py)
 2. ~~Prediction accuracy tracking~~ ✅ Done (tracking endpoints)
 3. ~~Switch live predictor to v2 approach~~ ✅ Done (auto-skip, tipsheet_pick)
 4. ~~Tipsheet generator~~ ✅ Done (/admin/tipsheet)
-5. Performance dashboard improvements
-6. User customization options
+5. ~~Claude Code export~~ ✅ Done (tools/export_for_claude_code.py)
+6. ~~Daily Picks Workflow~~ ✅ Done (manual Claude Code routine)
+7. ~~Simple Daily Picks System~~ ✅ Done (condition proximity documented)
+8. Performance dashboard improvements
+9. User customization options
