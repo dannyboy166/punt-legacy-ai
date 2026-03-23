@@ -8,6 +8,7 @@
 
 | Date | Track | Race | Pick | Odds | Result | P/L |
 |------|-------|------|------|------|--------|-----|
+| Mar 23 | Beaumont | R3 | Warbreccan | $2.00 | WON | +1.00u |
 | Mar 22 | Pinjarra | R3 | Mamma Says So | $3.00 | WON | +2.00u |
 | Mar 22 | Pinjarra | R6 | Show The Way | $3.70 | 4th+ | -1.00u |
 | Mar 20 | Cranbourne | ? | Luigi The Brave | ? | WON | ? |
@@ -22,11 +23,11 @@
 
 ## Summary
 
-**Total Picks:** 9
-**Winners:** 6
-**Strike Rate:** 66.7%
+**Total Picks:** 10
+**Winners:** 7
+**Strike Rate:** 70%
 
-**Known P/L:** +8.90u from 6 picks (Mar 18 + Mar 22)
+**Known P/L:** +9.90u from 7 picks (Mar 18, 22, 23)
 
 ---
 
