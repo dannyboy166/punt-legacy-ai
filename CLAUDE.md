@@ -955,15 +955,38 @@ Look at the Adj column for runs at similar distance and condition:
 
 ---
 
-## Simple Daily Picks System
+## Simple Daily Picks System (Claude Code Manual Analysis)
 
-A streamlined approach for manual daily predictions using Claude Code.
+**NOTE:** This is for when the user asks Claude Code to manually analyze races. This is SEPARATE from the live AI Predictor on the website - do not touch that system.
 
-### The Rule
+### How to Analyze Races
 
-**Pick when there's ONE clear best horse on recent Adj ratings at similar distance/condition, AND you would bet on it at that price.**
+When the user asks "check [Track] tomorrow" - apply common sense using these principles:
 
-Skip races with:
+#### Primary Factors (Most Important)
+
+1. **Adj ratings are king** - The primary selection metric
+2. **Recency** - Recent ratings weighted more heavily than old runs
+3. **Distance match** - Form at similar distance to today's race
+4. **Condition match** - Form at similar/adjacent conditions (see scale below)
+5. **Consistency** - Horses CONSISTENTLY rating above the field = top pick (not just one peak rating)
+
+#### Selection Rules
+
+- **Top pick:** Horse whose recent Adj ratings at similar distance/condition are consistently higher than the rest of the field
+- **Roughie angle:** If a roughie ($10+) has ratings clearly above the field at relevant distance/condition = potential value pick
+- **First/second up:** Check their historical 1st-up or 2nd-up ratings specifically
+
+#### Secondary Factors (Consider but less critical)
+
+- **Weight changes** - Notable increases from last run
+- **Barrier draws** - Inside vs outside at certain tracks/distances
+- **Class rise/drop** - Stepping up significantly or down
+- **Gear changes** - Blinkers/winkers first time can help or hinder
+- **Days since last run** - Backing up quickly vs fresh
+
+#### Skip Races When
+
 - Limited form (too many first starters/unknowns)
 - Multiple similar contenders (no clear edge)
 - Clear standout but odds don't justify the bet
@@ -977,7 +1000,7 @@ G3 → G4 → S5 → S6 → S7 → H8 → H9 → H10
 Good ────────────────> Soft ──────────> Heavy
 ```
 
-**Key insight:** When analyzing a H8 race, S7 form is highly relevant (1 step away). Don't only look at exact condition matches.
+**Key insight:** When analyzing a S5 race, S6/G4 form is highly relevant (1 step away). When analyzing H8, S7 form is highly relevant.
 
 | Today's Condition | Most Relevant Form | Also Relevant (1 step) |
 |-------------------|-------------------|------------------------|
@@ -989,17 +1012,12 @@ Good ────────────────> Soft ──────�
 ### Quick Export Command
 
 ```bash
-cd /Users/danielsamus/punt-legacy-ai
-source .env && python3 tools/export_for_claude_code.py "Track" all DD-MMM-YYYY --no-instructions
+source /Users/danielsamus/punt-legacy-ai/.env && python3 /Users/danielsamus/punt-legacy-ai/tools/export_for_claude_code.py "Track" all DD-MMM-YYYY --no-instructions
 ```
 
 ### Results Tracking
 
 Results logged in `backtest-results.md` with running totals.
-
-**Current stats (Mar 18-22, 2026):**
-- 9 picks, 6 winners = 66.7% strike rate
-- +8.90u profit (from 6 picks with known P/L)
 
 ---
 
