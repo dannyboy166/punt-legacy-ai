@@ -963,6 +963,15 @@ Look at the Adj column for runs at similar distance and condition:
 
 When the user asks "check [Track] tomorrow" - apply common sense using these principles:
 
+#### Before You Start
+
+**Slow down. Think about each horse's form in context of THIS specific race, rather than hunting for the highest number in the spreadsheet.**
+
+For each horse, ask: "Is this form actually relevant to the race we're analyzing?" Consider:
+- Is the distance similar? (1100m form isn't relevant for a 1600m race)
+- Is it recent? (a year-old run is less relevant)
+- Is the condition relevant? (adjacent conditions count)
+
 #### Core Principle
 
 **Best ratings at relevant runs.** Think logically - don't overweight any single factor too aggressively.
