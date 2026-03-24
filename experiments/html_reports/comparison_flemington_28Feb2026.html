@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt Comparison: Flemington - 28-Feb-2026</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .race {
+            margin-bottom: 40px;
+            background: #16213e;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .race-header {
+            background: #0f3460;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .race-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .race-info {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .column {
+            padding: 20px;
+            border-right: 1px solid #0f3460;
+        }
+        .column:last-child { border-right: none; }
+        .column-header {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #0f3460;
+        }
+        .live { background: #1a1a2e; }
+        .test { background: #1e2a3a; }
+        .contender {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .contender-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .horse-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #fff;
+        }
+        .odds {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+        .tag-beat { background: #854d0e; color: #fef08a; }
+        .tag-eachway { background: #1e40af; color: #93c5fd; }
+        .tag-value { background: #166534; color: #86efac; }
+        .analysis {
+            color: #ccc;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .tipsheet {
+            color: #fbbf24;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        .summary {
+            color: #888;
+            font-style: italic;
+            padding: 10px 0;
+            font-size: 0.9em;
+        }
+        .top-ratings {
+            background: #0d2137;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #67e8f9;
+        }
+        .top-ratings-label {
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .runner-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .runner-notes-header {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .runner-note {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .runner-note strong {
+            color: #aaa;
+        }
+        .no-picks {
+            color: #888;
+            font-style: italic;
+            padding: 20px 0;
+        }
+        .other-chances {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .other-chances-header {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+        .other-chance {
+            background: #1e3a5f;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #f59e0b;
+        }
+        .other-chance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .other-chance-horse {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .other-chance-odds {
+            color: #4ade80;
+            font-size: 0.9em;
+        }
+        .other-chance-rating {
+            color: #67e8f9;
+            font-size: 0.85em;
+        }
+        .other-chance-issue {
+            color: #f87171;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+        .no-chance {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #1a1a2e;
+            border-radius: 6px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .no-chance-label {
+            color: #888;
+            margin-right: 8px;
+        }
+        .diff-marker {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        .diff-same { background: #4ade80; }
+        .diff-different { background: #f87171; }
+        .stats {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prompt Comparison</h1>
+    <p class="subtitle">Flemington - 28-Feb-2026</p>
+
+    <div class="stats">
+        <div>
+            <div class="stat-value">10</div>
+            <div class="stat-label">Races</div>
+        </div>
+        <div>
+            <div class="stat-value">6/10</div>
+            <div class="stat-label">Same Top Pick</div>
+        </div>
+        <div>
+            <div class="stat-value">21</div>
+            <div class="stat-label">Live Picks</div>
+        </div>
+        <div>
+            <div class="stat-value">21</div>
+            <div class="stat-label">Test Picks</div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 1 <span class="diff-marker diff-different"></span></span>
+            <span class="race-info">1000m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                <div class="no-picks">No contenders selected</div>
+                <div class="summary">Picking 0 contenders due to insufficient form data - 8/8 runners have less than 3 race runs and 3 runners have no race form at all. With such limited data across the entire field, it's impossible to make confident assessments of relative ability.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Gin Twist (101.3 at 1000m G4), Jacaranda (101.2 at 1100m G4), Gin Twist (99.2 at 1000m G4), La Gitana/Ladhar (both 99.1 at 1000m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#6. Gin Twist</span>
+                    <span class="odds">$3.50</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Best speed rating of 101.3 at exact distance and conditions when winning on debut, then ran 99.2 when third at same track/distance. Two solid race runs at 1000m G4 give clear form edge over this limited field.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#5. Jacaranda</span>
+                    <span class="odds">$3.20</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong 101.2 rating at 1100m G4 last start and won debut with 98.7 rating. The slight distance stretch from 1100m to 1000m suits, and has shown consistent form across two runs.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#7. La Gitana</span>
+                        <span class="other-chance-odds">$5.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 99.1 at 1000m G4</div>
+                    <div class="other-chance-issue">⚠️ Only one race run limits assessment, though rating competitive</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Harry Met Sally, Ladhar, Superwill, The Troubleshooter, Nikitria</div></div>
+                <div class="summary">Limited field with most having minimal form. Gin Twist stands out with two solid 1000m G4 runs including a 101.3 winner. Jacaranda has similar ratings but at 1100m. Half the field are first starters or have insufficient data.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 2 <span class="diff-marker diff-different"></span></span>
+            <span class="race-info">1200m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#1. Rue De Royale</span>
+                    <span class="odds">$2.60</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Consistent 1200m form at Flemington with ratings of 100.4, 98.7 and 101.1 in last three runs at this track/distance. Recent narrow second (0.1L) at this exact track/distance combination shows current fitness and suitability.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#11. Legacy Bay</span>
+                    <span class="odds">$4.60</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong recent form with ratings around 99-100 and significant 5kg weight drop to 54kg. Good jockey/trainer combination with positive A/E ratios and has shown ability to place consistently at this level.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Dirty Grin:</strong> Recent 1200m rating of 101.9 is competitive but poor trainer A/E (0.80) and weight rise of 2.5kg from wide barrier 10</div><div class="runner-note"><strong>Fission:</strong> Won at Flemington 1200m in January (98.8 rating) but significant 5.5kg weight rise and recent form decline with 99.7 rating last start</div><div class="runner-note"><strong>Call Him Iggy:</strong> First-up after 350 days with limited 1200m form, best rating 101.4 but at longer distance, unknown quantity at this trip fresh</div><div class="runner-note"><strong>Regal Tycoon:</strong> First-up specialist but recent 1200m rating of 100.4 below Rue De Royale, barrier 1 advantage but weight rise of 2kg</div><div class="runner-note"><strong>Flying Mikki:</strong> Strong first-up record but recent 1200m ratings of 98.7-98.8 below the main contenders, poor trainer A/E (0.55)</div></div>
+                <div class="summary">Clear standout in Rue De Royale with superior 1200m form at this track. Legacy Bay offers each-way value with weight drop and consistent placing record.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Dirty Grin (101.9 at 1200m G3, 102.1 at 1200m G4), Fission (101.9 at 1200m G3), Gold Medallist (101.4 at 1200m G4), Rue De Royale (100.4 at 1200m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#2. Dirty Grin</span>
+                    <span class="odds">$11.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong speed ratings of 101.9 at 1200m G3 and 102.1 at 1200m G4 are among the best in this field. Won at Geelong 1214m G3 first-up this prep and has solid form at this distance and condition.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Fission</span>
+                    <span class="odds">$21.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Excellent speed rating of 101.9 at 1200m G3 and won at this track and distance in January. Good jockey/trainer A/E ratios and the odds look generous for a horse with proven form at the conditions.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#8. Gold Medallist</span>
+                        <span class="other-chance-odds">$13.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.4 at 1200m G4</div>
+                    <div class="other-chance-issue">⚠️ Limited race experience (5 runs) and poor first-up run last start</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#11. Legacy Bay</span>
+                        <span class="other-chance-odds">$4.60</span>
+                    </div>
+                    <div class="other-chance-rating">📊 100.8 at 1100m G4</div>
+                    <div class="other-chance-issue">⚠️ No strong form at exact 1200m G4 conditions, ratings slightly below the standouts</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Rue De Royale, Regal Tycoon, Flying Mikki, Behaviour, Wolfy, Call Him Iggy</div></div>
+                <div class="summary">Two value bets stand out with superior speed ratings at similar conditions. Dirty Grin and Fission both have 101.9+ ratings at 1200m in good/firm conditions, well above most of the field.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 3 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1400m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#7. Watersports</span>
+                    <span class="odds">$2.70</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Strong recent form with a win at Sandown-Hillside over 1500m rating 99.0, plus consistent ratings around 99-102 at similar distances. Gets significant weight relief dropping 3.5kg and trainer Archie Alexander has excellent A/E ratio of 1.22.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#5. Bons To Riches</span>
+                    <span class="odds">$4.80</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">In excellent form with three wins from last five starts including recent 1400m victories at Pakenham and Cranbourne with ratings around 100. Gets weight relief dropping 1.5kg and has proven form at this exact distance.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Great Maximus:</strong> Recent ratings of 100-101 are competitive but poor jockey/trainer A/E ratios (0.64/0.65) and weight rise of 2.5kg are concerns</div><div class="runner-note"><strong>Little Jack:</strong> First-up after 448 days with limited first-up form data, plus trainer A/E of only 0.51 makes this too risky despite good jockey</div><div class="runner-note"><strong>Rhinoceros:</strong> Multiple eased runs in recent form and ratings around 99-101 don't stand out, plus poor trainer A/E of 0.72</div><div class="runner-note"><strong>Inexorable:</strong> Significant weight drop of 5kg is positive but recent ratings of 97-99 are below the top contenders, plus poor jockey/trainer A/E ratios</div><div class="runner-note"><strong>Maisy:</strong> First-up after 189 days with limited race experience (only 7 runs) and ratings around 100-101 don't clearly stand out from the field</div></div>
+                <div class="summary">Watersports stands out with consistent form at similar distances and significant weight relief, while Bons To Riches offers each-way value with proven 1400m form.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Watersports (102.1 at 1500m G4, 101.5 at 1400m G4), Great Maximus (102.5 at 1200m G4, 102.2 at 1200m S5), Bons To Riches (100.4 at 1400m G4), Maisy (101.2 at 2000m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#7. Watersports</span>
+                    <span class="odds">$2.70</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Superior speed ratings at this distance with 102.1 at 1500m G4 and 101.5 at 1400m G4, both recent wins. Gets significant 3.5kg weight drop and trainer A/E of 1.22 is strong positive.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#5. Bons To Riches</span>
+                    <span class="odds">$4.80</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Consistent form with 100.4 rating winning at 1400m G4 last start and 100.1 second at 1400m G3 two back. Gets 1.5kg weight relief but trainer A/E of 0.51 is concerning.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#1. Great Maximus</span>
+                        <span class="other-chance-odds">$3.90</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.5 at 1200m G4</div>
+                    <div class="other-chance-issue">⚠️ Best ratings at shorter 1200m trips, poor jockey (0.64) and trainer (0.65) A/E ratios</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#8. Maisy</span>
+                        <span class="other-chance-odds">$5.50</span>
+                    </div>
+                    <div class="other-chance-rating">📊 100.4 at 1400m S5</div>
+                    <div class="other-chance-issue">⚠️ First-up after 189 days, limited form at 1400m distance</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Little Jack, Rhinoceros, Inexorable</div></div>
+                <div class="summary">Watersports stands out with superior ratings at this exact distance and gets significant weight relief. Bons To Riches offers each-way value despite trainer concerns.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 4 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1600m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Sneaky Sunrise</span>
+                    <span class="odds">$3.60</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Strong recent form with a dominant 1600m win at Caulfield (101.1 rating) last start and consistent ratings around 100+ at this distance. Has proven form at 1600m with multiple wins and placings, and the slight weight rise shouldn't stop this progressive horse.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Ahha Ahha</span>
+                    <span class="odds">$3.10</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Consistent performer with strong recent form including a close second at Caulfield (100.8 rating) and multiple wins this prep. The 1600m distance suits with good ratings at similar trips, though needs to find a bit more to beat Sneaky Sunrise.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Jimi Hendrix:</strong> Poor trainer/jockey A/E ratios (0.52/0.73), first-up after 280 days with no career first-up wins, ratings around 100-102 but inconsistent</div><div class="runner-note"><strong>Alder:</strong> First-up after 462 days, only one career first-up win from four attempts, recent ratings around 99-102 but question marks over fitness</div><div class="runner-note"><strong>Blanchland:</strong> Poor first-up record (0 wins from 7 attempts), trainer Busuttin/Young solid but jockey Mertens has low A/E (0.82), ratings around 99-100</div><div class="runner-note"><strong>Mometz:</strong> Recent wins but at lower ratings (99.5-99.8), significant weight drop helps but settles last which is concerning in moderate pace</div><div class="runner-note"><strong>Hot Digity Boom:</strong> Good recent win but at 1400m, trainer has poor A/E (0.72), ratings around 100-101 but question over 1600m distance</div></div>
+                <div class="summary">Sneaky Sunrise stands out with superior recent form and proven 1600m ability. Ahha Ahha provides the main danger with consistent form this prep.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Sneaky Sunrise (101.1 at 1600m G4), Ahha Ahha (100.8 at 1600m G4), Hot Digity Boom (101.0 at 1340m G3), Astral Flame (100.2 at 1600m G3)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Sneaky Sunrise</span>
+                    <span class="odds">$3.60</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Won last start at this exact distance and condition with a strong 101.1 rating. Has excellent recent form with multiple placings at 1600m G3-G4 level, showing consistent ratings around 100-101. Third-up and proven at the trip.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Ahha Ahha</span>
+                    <span class="odds">$3.10</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Ran second in same race as Sneaky Sunrise with competitive 100.8 rating at 1600m G4. Has strong recent form with multiple wins and placings at similar distances. Good trainer A/E ratio and drawn well in barrier 2.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#7. Hot Digity Boom</span>
+                        <span class="other-chance-odds">$4.80</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.0 at 1340m G3</div>
+                    <div class="other-chance-issue">⚠️ Poor trainer A/E (0.72) and stepping up 200m in distance</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#8. Astral Flame</span>
+                        <span class="other-chance-odds">$5.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 100.2 at 1600m G3</div>
+                    <div class="other-chance-issue">⚠️ Inconsistent form with poor run at 1400m (92.2 rating) mixed in</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Jimi Hendrix, Alder, Blanchland, Mometz</div></div>
+                <div class="summary">Sneaky Sunrise stands out with the best rating at exact conditions, while Ahha Ahha offers each-way value from the same race</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 5 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1000m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. Mcgaw</span>
+                    <span class="odds">$2.50</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Top speed rating of 103.2 at Flemington 1100m last prep shows class at this distance. First-up record is solid (1 win, 1 place from 3 starts) and the 1.5kg weight drop helps. Speed rank 1 suggests he'll be prominent early which suits the moderate pace scenario.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Celui</span>
+                    <span class="odds">$4.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong recent form with a 102.3 rating win at Randwick 1000m first-up, showing he's ready to fire second-up. The Freedman stable has excellent A/E ratio (1.31) and bar plates first time could provide extra improvement. Competitive speed ratings at this distance range.</div>
+                
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#10. Perilous Fighter</span>
+                    <span class="odds">$8.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Last start winner at Flemington 1100m with a solid 101.5 rating shows current form. The 2.5kg weight drop to 53kg is significant and jockey Cartwright has good A/E ratio. Recent ratings around 101-102 make him competitive at these odds.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Bridal Waltz:</strong> Speed ratings around 100-102 at 1100-1200m are competitive but first-up after 126 days with 3.5kg weight rise is concerning</div><div class="runner-note"><strong>Midwest:</strong> Recent 100.5 rating first-up at Caulfield 1000m is below the top contenders, though second-up and gets barrier 3</div><div class="runner-note"><strong>My Zephyr:</strong> Speed ratings consistently below 101 at this distance, first-up record shows no wins from 4 attempts</div><div class="runner-note"><strong>Nostra Bella:</strong> Poor recent form with ratings around 97-100, multiple eased runs suggest ongoing issues despite trainer's high A/E</div><div class="runner-note"><strong>Salsa Fellow:</strong> Recent ratings of 101.2 are competitive but significant 4kg weight drop suggests connections lack confidence</div></div>
+                <div class="summary">Mcgaw stands out with superior speed ratings at this distance and solid first-up record. Celui offers each-way value as an in-form second-up runner, while Perilous Fighter's last start win and weight drop provide value at longer odds.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Mcgaw (103.2 at 1100m G4), Celui (102.3 at 1000m G4), Bridal Waltz (101.8 at 1100m G4), Perilous Fighter (101.5 at 1100m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. Mcgaw</span>
+                    <span class="odds">$2.50</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Standout rating of 103.2 at 1100m G4 when winning last prep, showing clear class edge at this distance and condition. First-up record is solid (1 win from 3 starts) and drops 1.5kg from last run.</div>
+                
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Celui</span>
+                    <span class="odds">$4.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong recent win at exact distance/condition (102.3 at 1000m G4) and excellent trainer A/E of 1.31. Second-up with good recent trial form and bar plates added for first time.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#1. Bridal Waltz</span>
+                        <span class="other-chance-odds">$5.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.8 at 1100m G4</div>
+                    <div class="other-chance-issue">⚠️ First-up after 126 days + significant weight rise (3.5kg)</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#10. Perilous Fighter</span>
+                        <span class="other-chance-odds">$8.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.5 at 1100m G4</div>
+                    <div class="other-chance-issue">⚠️ Recent win but lower peak rating than top two</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Midwest, Salsa Fellow, My Zephyr, Nostra Bella</div></div>
+                <div class="summary">Mcgaw has the standout rating at this exact distance/condition but poor trainer A/E (0.72) creates doubt. Celui offers better value with strong recent form and excellent trainer record.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 6 <span class="diff-marker diff-different"></span></span>
+            <span class="race-info">1100m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. Wintery</span>
+                    <span class="odds">$7.50</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Strong recent form with 102.5 rating when second at Caulfield over this distance last start, backed up by a 102.9 rating win at 1000m. Consistent performer at this level with good barrier draw and strong jockey/trainer combination.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#2. Thanks Gorgeous</span>
+                    <span class="odds">$9.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Won at Flemington 1100m with 103.0 rating two starts back, showing ability at this track and distance. Excellent jockey/trainer A/E ratios suggest good value despite the weight rise.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Bel Merci:</strong> Second-up with poor career record at this stage (0 from 2), last start rating of 101.6 below key rivals</div><div class="runner-note"><strong>Yum:</strong> First-up after 133 days with no wins from 3 first-up attempts, best recent rating of 101.1 at 1400m doesn't translate to sprint</div><div class="runner-note"><strong>La Roux:</strong> Recent ratings of 99.1 and 97.4 well below the top contenders, first-time blinkers may help but form gap too large</div><div class="runner-note"><strong>Educated:</strong> Only 2 race runs makes assessment difficult, ratings of 99.5 and 99.6 modest for this level despite perfect record</div><div class="runner-note"><strong>Befuddle:</strong> Poor trainer A/E of 0.51, recent rating of 99.6 below top contenders despite significant weight drop</div></div>
+                <div class="summary">Wintery stands out with superior recent ratings at the distance, while Thanks Gorgeous offers each-way value with strong connections. Most others have form or rating deficiencies.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Superliv (102.5 at 1125m G4), Wintery (102.9 at 1000m G4, 102.5 at 1100m G4), Thanks Gorgeous (103.0 at 1100m G4), Bel Merci (102.5 at 1100m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#2. Thanks Gorgeous</span>
+                    <span class="odds">$9.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong 103.0 rating winning at Flemington 1100m G4 last start, with consistent form around 100+ ratings at this distance and condition. Excellent jockey/trainer A/E ratios (1.24/1.33) suggest market underestimating this horse despite the weight rise.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. Wintery</span>
+                    <span class="odds">$7.50</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Excellent recent form with 102.5 rating running second at Caulfield 1100m G4 last start and 102.9 rating winning at 1000m G4 prior. Good barrier draw and strong jockey/trainer combination with positive A/E ratios.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#1. Bel Merci</span>
+                        <span class="other-chance-odds">$3.10</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.5 at 1100m G4</div>
+                    <div class="other-chance-issue">⚠️ Second-up with poor trainer A/E (0.82) and wide barrier</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#12. Superliv</span>
+                        <span class="other-chance-odds">$31.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.5 at 1125m G4</div>
+                    <div class="other-chance-issue">⚠️ Extreme wide barrier (11) and poor trainer A/E (0.94)</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Educated, Gwen's Girl, Headbanger, Yum, La Roux, Befuddle</div></div>
+                <div class="summary">Thanks Gorgeous offers excellent value with top ratings and strong connections, while Wintery provides solid each-way appeal from a good draw</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 7 <span class="diff-marker diff-different"></span></span>
+            <span class="race-info">1600m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#5. Birdman</span>
+                    <span class="odds">$3.50</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Strong second-up record (2 wins from 4 starts) and excellent recent form with ratings of 102.1, 103.5, and 102.7 at similar distances. The 3kg weight drop and Ben Melham's strong A/E ratio of 1.16 add further appeal.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#8. Enxuto</span>
+                    <span class="odds">$7.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Consistent form with ratings of 102.2, 103.2, and 101.7 at 1400-1600m distances. Recent third at Flemington over 1400m shows he's in good order, though jockey Moloney's poor A/E ratio is a concern.</div>
+                
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#7. Air Assault</span>
+                    <span class="odds">$3.80</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Speed leader with trainer A/E of 1.24, but recent 1600m rating of 101.4 is below the top contenders. The 2kg weight drop helps, but form at this distance doesn't match the standouts.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Willydoit:</strong> Poor first-up run (rating 101.0) and trainer/jockey both have below-average A/E ratios</div><div class="runner-note"><strong>Apulia:</strong> Strong first-up record but no recent 1600m form - last three wins were at 2100m+</div><div class="runner-note"><strong>Onesmoothoperator:</strong> Massive 5kg weight rise from last start, poor first-up record (1 win from 5), wide barrier</div><div class="runner-note"><strong>Casino Seventeen:</strong> Rating of 101.4 last start at this distance is below the top contenders, poor trainer A/E</div><div class="runner-note"><strong>Holymanz:</strong> Solid 101.6 rating last start at 1600m but lacks the class of top contenders</div></div>
+                <div class="summary">Birdman stands out with superior ratings at similar distances and strong second-up record. Enxuto and Air Assault offer each-way value but lack the standout form of the favourite.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Enxuto (103.2 at 1600m G4), Birdman (102.7 at 1600m G4), Apulia (100.6 at 1600m G4), Holymanz (101.6 at 1600m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#8. Enxuto</span>
+                    <span class="odds">$7.00</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Clear standout with 103.2 rating at 1600m G4 in December, backed up by 102.2 at 1400m G4 last start. Consistent form at this level with multiple placings in similar grade races.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#5. Birdman</span>
+                    <span class="odds">$3.50</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong 102.7 rating at 1600m G4 when winning in September, plus good second-up record (2 wins from 4). Recent 102.1 first-up run shows he's ready to fire.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#2. Apulia</span>
+                        <span class="other-chance-odds">$5.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 100.6 at 1600m G4</div>
+                    <div class="other-chance-issue">⚠️ First-up after 58 days, lower rating at this exact distance/condition</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#6. Holymanz</span>
+                        <span class="other-chance-odds">$9.50</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.6 at 1600m G4</div>
+                    <div class="other-chance-issue">⚠️ Trainer C Maher poor A/E (0.82), barrier 1 not ideal for settler</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Air Assault, Willydoit, Casino Seventeen, Plymouth, Onesmoothoperator, Mark Twain</div></div>
+                <div class="summary">Enxuto stands out with superior speed ratings at this exact distance and condition. Birdman offers each-way value with good second-up record and strong form.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 8 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1600m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#1. Observer</span>
+                    <span class="odds">$1.90</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Dominant speed ratings at 1600m with 101.9 first-up and 100.2 when second-up at this distance last prep. Strong second-up record (2 wins from 3 starts) and gets significant 2.5kg weight drop.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. Sixties</span>
+                    <span class="odds">$3.10</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Excellent recent form with 102.0 and 102.8 ratings in last two starts, both wins. Strong at this distance range and gets 1.5kg weight relief from last start.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#2. Planet Red</span>
+                    <span class="odds">$7.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong second-up record (1 win from 2 starts) with solid 101.6 rating first-up and excellent 100.5 rating when second-up at 1600m last prep. Odds underestimate second-up ability.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>West Of Swindon:</strong> Solid 101.6 rating at 1600m last prep but poor second-up record (0 wins from 3 starts) and trainer A/E of 0.82</div><div class="runner-note"><strong>Bingi:</strong> Poor ratings at this level (99.5 at 1600m) and weak second-up form with only 101.2 rating first-up this prep</div><div class="runner-note"><strong>Officiate:</strong> Moderate ratings around 99-101 range and poor trainer A/E of 0.67, plus weight increase</div><div class="runner-note"><strong>Romantic Encounter:</strong> Decent 101.4 rating last start but limited form at 1600m and weight increase from last run</div><div class="runner-note"><strong>Victorious Spirit:</strong> Limited form with only 98.2 rating at distance and poor second-up record (0 wins from 2 starts)</div></div>
+                <div class="summary">Clear form race with Observer the standout based on superior speed ratings and strong second-up record. Sixties offers solid each-way value with excellent recent form, while Planet Red represents value given second-up ability.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Observer (101.9 at 1400m G4), Planet Red (101.6 at 1400m G4, 100.5 at 1600m G3), Sixties (102.0 at 1400m G4), West Of Swindon (101.6 at 1600m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#1. Observer</span>
+                    <span class="odds">$1.90</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Dominant 101.9 rating when winning first-up at Caulfield 1400m G4, exactly matching today's conditions. Strong second-up record (2 wins from 3 starts) and gets 2.5kg weight relief. Speed leader with excellent jockey booking.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#2. Planet Red</span>
+                    <span class="odds">$7.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Solid 101.6 rating when second in the same race as Observer, then ran 100.5 at this exact 1600m distance at Caulfield. Good second-up record and settles back which suits the moderate pace scenario.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#4. Sixties</span>
+                        <span class="other-chance-odds">$3.10</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.0 at 1400m G4</div>
+                    <div class="other-chance-issue">⚠️ Poor trainer A/E (0.67) and wide barrier 10</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#3. West Of Swindon</span>
+                        <span class="other-chance-odds">$27.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.6 at 1600m G4</div>
+                    <div class="other-chance-issue">⚠️ Poor trainer A/E (0.82) and inconsistent form</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Bingi, Officiate, Romantic Encounter, Victorious Spirit, Onavuitton, Express Class</div></div>
+                <div class="summary">Observer stands out with superior ratings at the exact conditions, backed by strong second-up record. Planet Red offers each-way value from the same form line.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 9 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1200m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Alpha Sofie</span>
+                    <span class="odds">$1.90</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Dominant record with 4 wins from 6 starts and strong 1200m form including three wins at this distance. Recent first-up win at Caulfield with 102.8 rating shows she's in top form, and her 1200m ratings (100.4, 99.8, 101.3) are consistently strong at this trip.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. La Astro Chat</span>
+                    <span class="odds">$41.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong recent form with wins at Caulfield (101.5 rating) and Mornington, showing good speed at 1000-1100m. The 4.5kg weight rise is concerning but the odds are generous for a horse with four wins from nine starts and solid ratings around 99-101.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Nashville Jack:</strong> Limited race form with only 103.7 rating at 1100m, poor jockey/trainer A/E ratios (0.86/0.86), first-up after 49 days</div><div class="runner-note"><strong>Getta Good Feeling:</strong> Recent form over longer distances (1600m-2500m), only 101.0 rating at 1200m from August, first-up after 114 days</div><div class="runner-note"><strong>Trapper John:</strong> Only two race runs both at 1000m with modest ratings (99.4, 101.0), unproven at 1200m despite good recent form</div><div class="runner-note"><strong>Night Agent:</strong> Limited form with only 98.2 rating at similar distance, second-up after poor debut season, wide barrier 15</div><div class="runner-note"><strong>Agarwood:</strong> Inconsistent form with 100.9 rating at 1100m but poor 1200m record (100.6 rating when 12th), second-up</div></div>
+                <div class="summary">Alpha Sofie stands out with superior 1200m form and ratings, while La Astro Chat offers value despite weight concerns. Several runners have limited form data but Alpha Sofie's consistency at this distance makes her the clear standout.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Alpha Sofie (102.8 at 1100m G4), Signature Scent (102.2 at 1100m G4), La Astro Chat (101.5 at 1100m G4), Rohesia (101.1 at 1200m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#3. Alpha Sofie</span>
+                    <span class="odds">$1.90</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Clear standout with 102.8 rating at 1100m G4 first-up, showing she's improved since her excellent 4-win streak last prep. Strong record second-up (1 from 2) and settles back which suits the moderate pace.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#4. La Astro Chat</span>
+                    <span class="odds">$41.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Excellent 101.5 rating at 1100m G4 last start and has won 4 from 9 with strong form at this distance. The 4.5kg weight rise is concerning but the odds are far too generous for this quality.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#8. Signature Scent</span>
+                        <span class="other-chance-odds">$23.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.2 at 1100m G4</div>
+                    <div class="other-chance-issue">⚠️ Disappointing 5th when resuming, trainer C Maher poor A/E (0.82)</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#10. Rohesia</span>
+                        <span class="other-chance-odds">$23.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.1 at 1200m G4</div>
+                    <div class="other-chance-issue">⚠️ Wide barrier 13, only 1 win from 9 starts despite good ratings</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Nashville Jack, Getta Good Feeling, Trapper John, Night Agent, Agarwood, Jenni The Ninja</div></div>
+                <div class="summary">Alpha Sofie has the best rating at the exact distance/condition and strong second-up record. La Astro Chat offers huge value despite weight concerns given her quality ratings.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 10 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">2000m | Good4</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#7. Fiorenot</span>
+                    <span class="odds">$3.70</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Strong recent form with 102.8 rating when second at this track/distance last start, following two wins at Flemington. Consistent 102+ ratings at 1800-2000m distances show this horse handles the step up well.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#11. Ambassadorial</span>
+                    <span class="odds">$3.30</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Won last start at Caulfield 2000m with solid 99.1 rating and ran 102.8 when second at Flemington 1800m two starts back. Proven at this distance with consistent form around 100+ ratings.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Aberfeldie Boy:</strong> First-up with only 99.7-101.9 ratings at 2000m, well below the main contenders, plus significant 6kg weight rise</div><div class="runner-note"><strong>Foujita San:</strong> First-up with poor record fresh (0 wins from 7), recent 2000m ratings of 100.2-101.4 below the leaders, jockey A/E of 0.73</div><div class="runner-note"><strong>Regal Lion:</strong> Recent 2000m ratings of 99.7-101.4 are below the main contenders, plus 5.5kg weight rise and poor trainer A/E of 0.86</div><div class="runner-note"><strong>Dublin Journal:</strong> Last 2000m rating of 99.2 when eased, best recent form at shorter distances, 4kg weight drop helps but still below top ratings</div><div class="runner-note"><strong>My Brothers Keeper:</strong> Recent 2000m rating of 102.4 competitive but ran 8th, inconsistent form with poor barrier 1 for a backmarker</div></div>
+                <div class="summary">Clear two-horse race between Fiorenot and Ambassadorial based on superior recent ratings at this distance. Fiorenot gets the nod with stronger recent form including two Flemington wins.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Fiorenot (102.8 at 2000m G4), Ambassadorial (102.8 at 1800m G4), Sunsets (102.5 at 2000m G4), Georgie Get Mad (102.6 at 2000m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#7. Fiorenot</span>
+                    <span class="odds">$3.70</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Excellent recent form with 102.8 rating at this exact distance/condition last start when second. Won two starts back at Flemington 1800m G4 with 102.9 rating. Strong record with 4 wins from 11 starts.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#11. Ambassadorial</span>
+                    <span class="odds">$3.30</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Won last start at Caulfield 2000m G4 and ran second at Flemington 1800m G4 with matching 102.8 rating to Fiorenot. Consistent form at these distances and gets inside barrier draw.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#15. Georgie Get Mad</span>
+                    <span class="odds">$13.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong 102.6 rating last start at this exact distance/condition when third. Consistent ratings around 100+ at similar trips. Odds don't reflect competitive form line.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#8. Sunsets</span>
+                        <span class="other-chance-odds">$8.50</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.5 at 2000m G4</div>
+                    <div class="other-chance-issue">⚠️ Poor jockey A/E (0.86) and trainer A/E (0.92)</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#6. My Brothers Keeper</span>
+                        <span class="other-chance-odds">$15.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 102.4 at 2000m G4</div>
+                    <div class="other-chance-issue">⚠️ Excellent trainer/jockey A/E but only one competitive rating at distance</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Xtra Rush, Politely Dun, Dublin Journal, Regal Lion, Foujita San, Aberfeldie Boy</div></div>
+                <div class="summary">Clear two-horse race between Fiorenot and Ambassadorial based on superior ratings at exact distance/conditions. Georgie Get Mad offers value at long odds with competitive form.</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

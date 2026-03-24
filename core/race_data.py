@@ -354,11 +354,11 @@ class RaceData:
                 lines.append(form_summary)
                 lines.append("")
                 if include_venue_adjusted:
-                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial | Notes |")
-                    lines.append("|------|-------|------|------|-----|--------|--------|-----|------|-------|-------|")
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-----|--------|-------|-------|------|--------|-----|------|-------|-------|")
                 else:
-                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial | Notes |")
-                    lines.append("|------|-------|------|------|-----|--------|--------|------|-------|-------|")
+                    lines.append("| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-----|--------|-------|-------|------|--------|------|-------|-------|")
                 for f in r.form[:10]:  # Max 10 runs
                     rating_str = f"{f.rating * 100:.1f}" if f.rating else "N/A"
                     adj_str = f"{f.rating_venue_adjusted * 100:.1f}" if f.rating_venue_adjusted else "-"
@@ -377,10 +377,33 @@ class RaceData:
                         margin_str = "?" if f.position > 1 else "0L"  # Unknown for non-winners
                     # Handle UNK condition
                     cond_str = f.condition if f.condition != "UNK" else "?"
-                    if include_venue_adjusted:
-                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
+
+                    # Calculate relevance columns (distance %, condition steps, weight change)
+                    # Distance % difference from today
+                    if self.distance and f.distance:
+                        dist_diff = ((f.distance - self.distance) / self.distance) * 100
+                        dist_str = f"{dist_diff:+.0f}%" if abs(dist_diff) >= 1 else "="
                     else:
-                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} | {notes_str} |")
+                        dist_str = "?"
+
+                    # Condition steps away from today
+                    if self.condition_num and f.condition_num:
+                        cond_diff = f.condition_num - self.condition_num
+                        cond_str_diff = f"{cond_diff:+d}" if cond_diff != 0 else "="
+                    else:
+                        cond_str_diff = "?"
+
+                    # Weight change from that run to today
+                    if r.weight and f.weight:
+                        wt_diff = r.weight - f.weight
+                        wt_str = f"{wt_diff:+.1f}" if abs(wt_diff) >= 0.1 else "="
+                    else:
+                        wt_str = "?"
+
+                    if include_venue_adjusted:
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {dist_str} | {cond_str_diff} | {wt_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
+                    else:
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {dist_str} | {cond_str_diff} | {wt_str} | {rating_str} | {prep_str} | {trial_str} | {notes_str} |")
 
             else:
                 lines.append("⚠️ NO FORM AVAILABLE - first starter or no data")

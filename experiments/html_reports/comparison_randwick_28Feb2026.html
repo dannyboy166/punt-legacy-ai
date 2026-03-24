@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt Comparison: Randwick - 28-Feb-2026</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .race {
+            margin-bottom: 40px;
+            background: #16213e;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .race-header {
+            background: #0f3460;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .race-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .race-info {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .column {
+            padding: 20px;
+            border-right: 1px solid #0f3460;
+        }
+        .column:last-child { border-right: none; }
+        .column-header {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #0f3460;
+        }
+        .live { background: #1a1a2e; }
+        .test { background: #1e2a3a; }
+        .contender {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .contender-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .horse-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #fff;
+        }
+        .odds {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+        .tag-beat { background: #854d0e; color: #fef08a; }
+        .tag-eachway { background: #1e40af; color: #93c5fd; }
+        .tag-value { background: #166534; color: #86efac; }
+        .analysis {
+            color: #ccc;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .tipsheet {
+            color: #fbbf24;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        .summary {
+            color: #888;
+            font-style: italic;
+            padding: 10px 0;
+            font-size: 0.9em;
+        }
+        .top-ratings {
+            background: #0d2137;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #67e8f9;
+        }
+        .top-ratings-label {
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .runner-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .runner-notes-header {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .runner-note {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .runner-note strong {
+            color: #aaa;
+        }
+        .no-picks {
+            color: #888;
+            font-style: italic;
+            padding: 20px 0;
+        }
+        .other-chances {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .other-chances-header {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+        .other-chance {
+            background: #1e3a5f;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #f59e0b;
+        }
+        .other-chance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .other-chance-horse {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .other-chance-odds {
+            color: #4ade80;
+            font-size: 0.9em;
+        }
+        .other-chance-rating {
+            color: #67e8f9;
+            font-size: 0.85em;
+        }
+        .other-chance-issue {
+            color: #f87171;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+        .no-chance {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #1a1a2e;
+            border-radius: 6px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .no-chance-label {
+            color: #888;
+            margin-right: 8px;
+        }
+        .diff-marker {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        .diff-same { background: #4ade80; }
+        .diff-different { background: #f87171; }
+        .stats {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prompt Comparison</h1>
+    <p class="subtitle">Randwick - 28-Feb-2026</p>
+
+    <div class="stats">
+        <div>
+            <div class="stat-value">1</div>
+            <div class="stat-label">Races</div>
+        </div>
+        <div>
+            <div class="stat-value">1/1</div>
+            <div class="stat-label">Same Top Pick</div>
+        </div>
+        <div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Live Picks</div>
+        </div>
+        <div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Test Picks</div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 10 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1200m | Soft5</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#12. Mal Coupe</span>
+                    <span class="odds">$3.00</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Won first-up at Randwick 1000m with a 101.2 rating and has an excellent second-up record (2 wins from 3 starts). Recent form shows consistent ratings around 101-103 at similar distances, and the 4kg weight drop is significant.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#6. Roselyn's Star</span>
+                    <span class="odds">$3.80</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong recent form with ratings of 102.5 and 102.4 at 1200m, plus won at this distance in October with a 101.8 rating. The 2.5kg weight drop and good trainer A/E ratio support the chances despite the poor jockey record.</div>
+                
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Mogo Magic</span>
+                    <span class="odds">$9.50</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Recent 1200m ratings of 102.5 and 102.2 are competitive for this grade, and won at Randwick-Kensington 1250m in October. The odds seem generous given the consistent form at this distance range.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Cloudland:</strong> First-up after 114 days with only trial form, last race rating of 103.4 at 1200m was solid but needs to reproduce that fresh</div><div class="runner-note"><strong>Bandi's Boy:</strong> Recent 1200m rating of 102.3 is competitive but poor trainer A/E ratio and wide barrier from settle position 10 are concerns</div><div class="runner-note"><strong>Well Timed:</strong> First-up after 98 days, best recent 1200m form shows 101.4 rating but poor trainer A/E ratio and inconsistent first-up record</div><div class="runner-note"><strong>Lilac:</strong> Second-up with poor record at this stage, significant 6kg weight rise from last start is a major concern despite early speed</div><div class="runner-note"><strong>Charcoals:</strong> First-up after 141 days with only trial form, last race ratings around 99-101 are below the main contenders</div></div>
+                <div class="summary">Mal Coupe stands out with excellent second-up record and strong first-up win, while Roselyn's Star and Mogo Magic offer value based on recent 1200m form ratings.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Mal Coupe (103.0 at 1100m S7, 101.2 at 1000m G4), Mogo Magic (102.5 at 1200m G4), Roselyn's Star (103.2 at 1100m G4, 102.5 at 1200m G4), Gatsby's (102.3 at 1200m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#12. Mal Coupe</span>
+                    <span class="odds">$3.00</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Superior speed ratings with 103.0 at 1100m S7 and multiple wins at similar distances. Won first-up last start at 1000m G4 with 101.2 rating, excellent second-up record (2 from 3), and gets 4kg weight drop with McDonald.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Mogo Magic</span>
+                    <span class="odds">$9.50</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Consistent ratings around 102+ at 1200m G4 including 102.5 last start. Won at this track/distance combination before (101.1 at 1250m G4). Gets the rail run from barrier 6 and settles close to pace.</div>
+                
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#8. Gatsby's</span>
+                    <span class="odds">$7.50</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong recent form with 102.3 rating winning at 1200m G4 last start, then 100.5 at 1300m G4. In-form stable and jockey combination, though slight weight rise and drawn wide are minor concerns.</div>
+                
+            </div>
+            
+                <div class="other-chances"><div class="other-chances-header">🎯 Other Chances (Bonus Bet Ideas)</div>
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#6. Roselyn's Star</span>
+                        <span class="other-chance-odds">$3.80</span>
+                    </div>
+                    <div class="other-chance-rating">📊 103.2 at 1100m G4, 102.5 at 1200m G4</div>
+                    <div class="other-chance-issue">⚠️ Poor jockey A/E (0.64) despite good trainer, short odds for the risk</div>
+                </div>
+                
+                <div class="other-chance">
+                    <div class="other-chance-header">
+                        <span class="other-chance-horse">#7. Eye Of The Fire</span>
+                        <span class="other-chance-odds">$12.00</span>
+                    </div>
+                    <div class="other-chance-rating">📊 101.7 at 1100m G4, 102.0 at 1200m S5</div>
+                    <div class="other-chance-issue">⚠️ Poor trainer A/E (0.52) and wide barrier 11</div>
+                </div>
+                <div class="no-chance"><span class="no-chance-label">Less likely:</span>Cloudland, Well Timed, Charcoals, Lilac, Bandi's Boy, Hanau</div></div>
+                <div class="summary">Mal Coupe stands out with superior ratings and excellent second-up record. Mogo Magic and Gatsby's offer each-way value with competitive recent form at the distance.</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

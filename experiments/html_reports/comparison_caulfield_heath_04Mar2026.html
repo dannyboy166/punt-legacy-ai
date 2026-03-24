@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prompt Comparison: Caulfield Heath - 04-Mar-2026</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .race {
+            margin-bottom: 40px;
+            background: #16213e;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .race-header {
+            background: #0f3460;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .race-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .race-info {
+            color: #888;
+            font-size: 0.9em;
+        }
+        .columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .column {
+            padding: 20px;
+            border-right: 1px solid #0f3460;
+        }
+        .column:last-child { border-right: none; }
+        .column-header {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #0f3460;
+        }
+        .live { background: #1a1a2e; }
+        .test { background: #1e2a3a; }
+        .contender {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+        .contender-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .horse-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #fff;
+        }
+        .odds {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-bottom: 8px;
+        }
+        .tag-beat { background: #854d0e; color: #fef08a; }
+        .tag-eachway { background: #1e40af; color: #93c5fd; }
+        .tag-value { background: #166534; color: #86efac; }
+        .analysis {
+            color: #ccc;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .tipsheet {
+            color: #fbbf24;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        .summary {
+            color: #888;
+            font-style: italic;
+            padding: 10px 0;
+            font-size: 0.9em;
+        }
+        .top-ratings {
+            background: #0d2137;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #67e8f9;
+        }
+        .top-ratings-label {
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .runner-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .runner-notes-header {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .runner-note {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .runner-note strong {
+            color: #aaa;
+        }
+        .no-picks {
+            color: #888;
+            font-style: italic;
+            padding: 20px 0;
+        }
+        .diff-marker {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        .diff-same { background: #4ade80; }
+        .diff-different { background: #f87171; }
+        .stats {
+            background: #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .stat-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prompt Comparison</h1>
+    <p class="subtitle">Caulfield Heath - 04-Mar-2026</p>
+
+    <div class="stats">
+        <div>
+            <div class="stat-value">1</div>
+            <div class="stat-label">Races</div>
+        </div>
+        <div>
+            <div class="stat-value">1/1</div>
+            <div class="stat-label">Same Top Pick</div>
+        </div>
+        <div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Live Picks</div>
+        </div>
+        <div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Test Picks</div>
+        </div>
+    </div>
+
+    <div class="race">
+        <div class="race-header">
+            <span class="race-title">Race 1 <span class="diff-marker diff-same"></span></span>
+            <span class="race-info">1000m | Good</span>
+        </div>
+        <div class="columns">
+            <div class="column live">
+                <div class="column-header">Live Prompt (v1)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#8. Smoke Screen</span>
+                    <span class="odds">$2.20</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Highest speed rating at 1000m with 101.5 first-up at Ballarat, narrowly beaten by 0.1L. Previous 1000m run at Sandown rated 102.1, showing consistent form at this distance on similar Good tracks.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Sternin</span>
+                    <span class="odds">$8.00</span>
+                </div>
+                <span class="tag tag-eachway">Each-way chance</span>
+                <div class="analysis">Strong 1000m form with ratings of 101.3, 102.3 showing ability at this distance. Beaten only 1L last start at Ballarat in same race as Smoke Screen, with good jockey/trainer A/E ratios supporting the selection.</div>
+                
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Absolute Power:</strong> Speed ratings around 98-99 at 1000-1200m well below the top contenders, first-up after 191 days with poor barrier 7</div><div class="runner-note"><strong>California Flyer:</strong> Rating of 99.7 first-up at 1206m decent but below top pair, poor trainer A/E of 0.85 and adding blinkers suggests issues</div><div class="runner-note"><strong>Spirit Of Gaia:</strong> Best 1000m rating 100.8 first-up but only 97.2 in recent prep, poor jockey A/E of 0.84 and settles back from barrier 6</div><div class="runner-note"><strong>Exit Strategy:</strong> First starter with no form data - impossible to assess against established runners with race form</div><div class="runner-note"><strong>Invincible Lover:</strong> Ratings of 97.0-99.2 at 1000-1100m below the top contenders, weight rise of 2kg and poor recent form being eased</div></div>
+                <div class="summary">Clear two-horse race between Smoke Screen and Sternin based on superior 1000m speed ratings. Smoke Screen gets the nod with highest rating and narrow defeat first-up.</div>
+            </div>
+            <div class="column test">
+                <div class="column-header">Test Prompt (v2)</div>
+                <div class="top-ratings"><div class="top-ratings-label">Top by ratings:</div>Smoke Screen (101.5 at 1000m G4), Sternin (101.3 at 1000m G4), Spirit Of Gaia (100.8 at 1000m G4), California Flyer (99.7 at 1206m G4)</div>
+                
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#8. Smoke Screen</span>
+                    <span class="odds">$2.20</span>
+                </div>
+                <span class="tag tag-beat">The one to beat</span>
+                <div class="analysis">Clear standout with highest rating of 101.5 at exact distance and condition last start, narrowly beaten by 0.1L. Previous 1000m G4 run also strong at 102.1, showing consistent form at this trip.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            
+            <div class="contender">
+                <div class="contender-header">
+                    <span class="horse-name">#9. Sternin</span>
+                    <span class="odds">$8.00</span>
+                </div>
+                <span class="tag tag-value">Value bet</span>
+                <div class="analysis">Strong 101.3 rating at exact distance and condition last start, beaten only 1L. Excellent jockey/trainer A/E ratios (1.32/1.14) suggest market underestimating chances at attractive odds.</div>
+                <div class="tipsheet">⭐ Tipsheet Pick</div>
+            </div>
+            <div class="runner-notes"><div class="runner-notes-header">Other runners:</div><div class="runner-note"><strong>Spirit Of Gaia:</strong> Good 100.8 rating at 1000m G4 first-up but poor jockey A/E (0.85) and wide barrier 6</div><div class="runner-note"><strong>California Flyer:</strong> Decent 99.7 rating at similar trip but trainer A/E poor (0.85) and adding blinkers suggests connections concerned</div><div class="runner-note"><strong>Invincible Lover:</strong> Moderate ratings around 97-99 at this distance/condition, 2kg weight rise from last start</div><div class="runner-note"><strong>Absolute Power:</strong> Best rating only 99.5, well below the top-rated runners at this distance and condition</div><div class="runner-note"><strong>Exit Strategy:</strong> First starter with no race form to assess - unknown quantity</div></div>
+                <div class="summary">Clear two-horse race between Smoke Screen and Sternin based on superior ratings at exact distance and condition</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

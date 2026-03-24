@@ -292,7 +292,9 @@ def get_backtest_prompt(track: str, race_number: int, date: str):
                 prep_str = str(f_prep) if f_prep else "-"
                 trial_str = "TRIAL" if is_trial else "-"
                 margin_str = f"{f_margin}L"
-                if not is_trial and f_margin and f_margin >= 8:
+                # Check stewards report for official "eased" (not margin heuristic)
+                stewards = f.get('stewardsReport', '') or ''
+                if 'eased' in stewards.lower() or 'not persevere' in stewards.lower():
                     margin_str += " ⚠️eased"
 
                 lines.append(f"| {f_date} | {f_track} | {f_dist}m | {f_cond} | {f_pos}/{f_starters} | {margin_str} | {rating_str} | {prep_str} | {trial_str} |")

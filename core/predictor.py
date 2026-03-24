@@ -225,7 +225,7 @@ Focus on **normalized speed ratings** from RACE runs (not trials) at similar dis
 - If a horse has 0 race runs, they are UNKNOWN (first starter)
 - If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
 
-You also have: prep run number, barrier, weight, speedmap/pace data, win/place odds, jockey/trainer A/E ratios, first-up/second-up records, gear changes.
+You also have: prep run number, barrier, weight, speedmap/pace data, win/place odds, jockey/trainer A/E ratios, first-up/second-up records, gear changes, and stewards notes (Notes column) for interference or excuses.
 
 Also include brief notes for non-selected runners explaining why they weren't picked. Focus on:
 - Speed ratings at similar distance and condition vs contenders
@@ -296,7 +296,7 @@ Focus on **normalized speed ratings** from RACE runs (not trials) at similar dis
 - Barrier trials (marked TRIAL) don't count as form — horses don't always try
 - If a horse has 0 race runs, they are UNKNOWN (first starter) — could be brilliant or useless
 
-You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes.
+You also have: win/place odds, jockey/trainer A/E ratios, career record, first-up/second-up records, prep run number, barrier, weight, speedmap/pace data, gear changes, and stewards notes (Notes column) for interference or excuses.
 
 ## Output
 
