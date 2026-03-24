@@ -978,7 +978,7 @@ When the user asks "check [Track] tomorrow" - apply common sense using these pri
 #### Selection Rules
 
 - **Top pick:** Horse whose recent Adj ratings at similar distance/condition are clearly higher than the rest of the field
-- **Roughie angle ($10+):** Consider if they have a relevant run clearly above the field - especially with a weight drop
+- **Value angle:** Consider if they have a relevant run clearly above the field - especially with a weight drop
 - **First/second up:** Check their historical 1st-up or 2nd-up ratings if applicable
 
 #### Secondary Factors (Note but don't overweight)
