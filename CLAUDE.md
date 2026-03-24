@@ -963,26 +963,30 @@ Look at the Adj column for runs at similar distance and condition:
 
 When the user asks "check [Track] tomorrow" - apply common sense using these principles:
 
-#### Primary Factors (Most Important)
+#### Core Principle
 
-1. **Adj ratings are king** - The primary selection metric
-2. **Recency** - Recent ratings weighted more heavily than old runs
+**Best ratings at relevant runs.** Think logically - don't overweight any single factor too aggressively.
+
+#### What to Look For
+
+1. **Adj ratings** - The primary metric. Look for horses rating above the field at relevant distance/condition.
+2. **Recency** - Recent ratings matter more than old runs
 3. **Distance match** - Form at similar distance to today's race
 4. **Condition match** - Form at similar/adjacent conditions (see scale below)
-5. **Consistency** - Horses CONSISTENTLY rating above the field = top pick (not just one peak rating)
+5. **Consistency** - Multiple runs at a high level > one peak rating (but one standout run way above field is still notable)
 
 #### Selection Rules
 
-- **Top pick:** Horse whose recent Adj ratings at similar distance/condition are consistently higher than the rest of the field
-- **Roughie angle:** If a roughie ($10+) has ratings clearly above the field at relevant distance/condition = potential value pick
-- **First/second up:** Check their historical 1st-up or 2nd-up ratings specifically
+- **Top pick:** Horse whose recent Adj ratings at similar distance/condition are clearly higher than the rest of the field
+- **Roughie angle ($10+):** Consider if they have a relevant run clearly above the field - especially with a weight drop
+- **First/second up:** Check their historical 1st-up or 2nd-up ratings if applicable
 
-#### Secondary Factors (Consider but less critical)
+#### Secondary Factors (Note but don't overweight)
 
-- **Weight changes** - Notable increases from last run
+- **Weight changes** - Weight drops can help, notable increases worth noting
 - **Barrier draws** - Inside vs outside at certain tracks/distances
 - **Class rise/drop** - Stepping up significantly or down
-- **Gear changes** - Blinkers/winkers first time can help or hinder
+- **Gear changes** - Blinkers/winkers first time
 - **Days since last run** - Backing up quickly vs fresh
 
 #### Skip Races When
