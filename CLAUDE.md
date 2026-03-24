@@ -965,12 +965,14 @@ When the user asks "check [Track] tomorrow" - apply common sense using these pri
 
 #### Before You Start
 
-**Slow down. Think about each horse's form in context of THIS specific race, rather than hunting for the highest number in the spreadsheet.**
+**Slow down. Look for high ratings, but check they're relevant to THIS race before flagging.**
 
-For each horse, ask: "Is this form actually relevant to the race we're analyzing?" Consider:
+For each rating, ask: "Is this form relevant to the race we're analyzing?"
 - Is the distance similar? (1100m form isn't relevant for a 1600m race)
-- Is it recent? (a year-old run is less relevant)
+- Is it recent enough?
 - Is the condition relevant? (adjacent conditions count)
+
+High rating + relevant = flag it. High rating + not relevant = ignore it.
 
 #### Core Principle
 
