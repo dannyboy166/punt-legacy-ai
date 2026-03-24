@@ -969,11 +969,17 @@ When the user asks "check [Track] tomorrow" - apply common sense using these pri
 
 #### What to Look For
 
-1. **Adj ratings** - The primary metric. Look for horses rating above the field at relevant distance/condition.
+**First:** Scan for any standout ratings clearly above the field at relevant distance/condition. These should always be considered.
+
+**Then:** Look at who is consistently rating at the top of the field.
+
+Both matter - don't ignore a standout rating, but also value consistency.
+
+Key factors:
+1. **Adj ratings** - The primary metric
 2. **Recency** - Recent ratings matter more than old runs
 3. **Distance match** - Form at similar distance to today's race
 4. **Condition match** - Form at similar/adjacent conditions (see scale below)
-5. **Consistency** - Multiple runs at a high level > one peak rating (but one standout run way above field is still notable)
 
 #### Selection Rules
 
