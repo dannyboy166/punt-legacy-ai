@@ -2065,89 +2065,150 @@ class PredictionTracker:
 
             return stats
 
-    def backfill_conditions(self, pf_api) -> dict:
+    def backfill_conditions(self, pf_api, days_back: int = 30) -> dict:
         """
         Backfill track_condition for existing predictions that don't have it.
 
-        Fetches condition from PuntingForm for each unique (track, race_number, race_date).
+        Efficiently fetches condition data by:
+        1. Grouping predictions by (track, race_date)
+        2. Fetching meetings once per date
+        3. Fetching results once per meeting (contains all race conditions)
 
         Args:
             pf_api: PuntingFormAPI instance
+            days_back: Only backfill predictions from last N days (default 30)
 
         Returns:
             Summary dict with counts
         """
         from core.speed import parse_condition_number
+        from datetime import datetime, timedelta
 
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
 
-            # Get unique races without condition
+            # Get unique (track, race_date) pairs without condition, limited to recent
             rows = conn.execute("""
-                SELECT DISTINCT track, race_number, race_date
+                SELECT DISTINCT track, race_date
                 FROM predictions
-                WHERE condition_num IS NULL OR track_condition IS NULL
+                WHERE (condition_num IS NULL OR track_condition IS NULL)
                 ORDER BY race_date DESC
             """).fetchall()
 
             if not rows:
                 return {"message": "No predictions need backfilling", "updated": 0}
 
+            # Group by date for efficient API calls
+            by_date: dict[str, set] = {}
+            for row in rows:
+                date = row['race_date']
+                track = row['track']
+                if date not in by_date:
+                    by_date[date] = set()
+                by_date[date].add(track)
+
+            # Limit to last N days
+            cutoff = datetime.now() - timedelta(days=days_back)
+            dates_to_process = []
+            for date_str in by_date.keys():
+                try:
+                    # Parse dd-MMM-yyyy format
+                    dt = datetime.strptime(date_str, "%d-%b-%Y")
+                    if dt >= cutoff:
+                        dates_to_process.append(date_str)
+                except:
+                    pass  # Skip unparseable dates
+
+            logger.info(f"Backfilling conditions for {len(dates_to_process)} dates (last {days_back} days)")
+
             updated = 0
             errors = []
+            meetings_processed = 0
 
-            for row in rows:
-                track = row['track']
-                race_num = row['race_number']
-                race_date = row['race_date']
+            for race_date in dates_to_process:
+                tracks_needed = by_date[race_date]
 
                 try:
-                    # Find meeting
+                    # Get all meetings for this date (1 API call)
                     meetings = pf_api.get_meetings(race_date)
-                    meeting_id = None
+
+                    # Build lookup: track_name -> meeting_id
+                    meeting_lookup = {}
                     for m in meetings:
-                        if m.get('meetingName', '').lower() == track.lower():
-                            meeting_id = m.get('meetingId')
-                            break
+                        track_info = m.get('track', {})
+                        track_name = track_info.get('name', '').lower() if isinstance(track_info, dict) else ''
+                        if track_name:
+                            meeting_lookup[track_name] = m.get('meetingId')
 
-                    if not meeting_id:
-                        errors.append(f"{track} {race_date}: Meeting not found")
-                        continue
+                    # Process each track we have predictions for
+                    for track in tracks_needed:
+                        track_lower = track.lower()
+                        meeting_id = meeting_lookup.get(track_lower)
 
-                    # Get fields data which has condition
-                    fields_data = pf_api.get_fields(meeting_id, race_num)
-                    races = fields_data.get('races', [])
-                    if not races:
-                        errors.append(f"{track} R{race_num} {race_date}: No race data")
-                        continue
+                        if not meeting_id:
+                            # Try fuzzy match
+                            for m_track, m_id in meeting_lookup.items():
+                                if track_lower in m_track or m_track in track_lower:
+                                    meeting_id = m_id
+                                    break
 
-                    race = races[0]
-                    condition = race.get('trackCondition')
-                    if not condition:
-                        errors.append(f"{track} R{race_num} {race_date}: No condition")
-                        continue
+                        if not meeting_id:
+                            errors.append(f"{track} {race_date}: Meeting not found")
+                            continue
 
-                    condition_num = parse_condition_number(condition)
+                        try:
+                            # Get results for this meeting (1 API call per meeting)
+                            results = pf_api.get_results(meeting_id, 0)
+                            meetings_processed += 1
 
-                    # Update all predictions for this race
-                    cursor = conn.execute("""
-                        UPDATE predictions
-                        SET track_condition = ?, condition_num = ?
-                        WHERE track = ? AND race_number = ? AND race_date = ?
-                    """, (condition, condition_num, track, race_num, race_date))
+                            if not results or len(results) == 0:
+                                errors.append(f"{track} {race_date}: No results data")
+                                continue
 
-                    if cursor.rowcount > 0:
-                        updated += cursor.rowcount
-                        logger.info(f"Backfilled {track} R{race_num} {race_date}: {condition}")
+                            # Extract race conditions
+                            race_results = results[0].get('raceResults', [])
+                            for rr in race_results:
+                                race_num = rr.get('raceNumber')
+                                cond_label = rr.get('trackConditionLabel')
+                                cond_num = rr.get('trackConditionNumber')
+
+                                if not race_num or not cond_label:
+                                    continue
+
+                                # Convert to int
+                                try:
+                                    cond_num = int(cond_num) if cond_num else None
+                                except:
+                                    cond_num = parse_condition_number(cond_label)
+
+                                # Format condition string (e.g., "Soft 5", "Good 4")
+                                condition_str = f"{cond_label} {cond_num}" if cond_num else cond_label
+
+                                # Update predictions for this race
+                                cursor = conn.execute("""
+                                    UPDATE predictions
+                                    SET track_condition = ?, condition_num = ?
+                                    WHERE track = ? AND race_number = ? AND race_date = ?
+                                    AND (condition_num IS NULL OR track_condition IS NULL)
+                                """, (condition_str, cond_num, track, race_num, race_date))
+
+                                if cursor.rowcount > 0:
+                                    updated += cursor.rowcount
+                                    logger.debug(f"Updated {track} R{race_num} {race_date}: {condition_str}")
+
+                        except Exception as e:
+                            errors.append(f"{track} {race_date}: {str(e)}")
 
                 except Exception as e:
-                    errors.append(f"{track} R{race_num} {race_date}: {str(e)}")
+                    errors.append(f"Date {race_date}: {str(e)}")
 
             conn.commit()
 
             return {
-                "message": f"Backfilled {updated} predictions",
+                "message": f"Backfilled {updated} predictions across {meetings_processed} meetings",
                 "updated": updated,
-                "races_processed": len(rows),
-                "errors": errors[:20] if errors else None
+                "dates_processed": len(dates_to_process),
+                "meetings_processed": meetings_processed,
+                "errors": errors[:20] if errors else None,
+                "total_errors": len(errors)
             }
