@@ -1371,6 +1371,58 @@ def get_stats_by_odds(tag: Optional[str] = None, starred_only: bool = False, met
     return tracker.get_stats_by_odds_range(tag=tag, starred_only=starred_only, metro=metro)
 
 
+@app.get("/stats/by-condition")
+def get_stats_by_condition(tag: Optional[str] = None, starred_only: bool = False):
+    """
+    Get performance split by track condition (Good/Soft/Heavy).
+
+    Args:
+        tag: Optional tag filter (e.g., "The one to beat")
+        starred_only: If True, only include tipsheet_pick=1
+
+    Returns dict of condition_group -> stats
+    """
+    return tracker.get_stats_by_condition(tag=tag, starred_only=starred_only)
+
+
+@app.get("/stats/by-condition-detailed")
+def get_stats_by_condition_detailed(tag: Optional[str] = None):
+    """
+    Get performance for each individual condition number (1-10).
+
+    More granular breakdown showing Good 1, Good 2, Good 3, Good 4,
+    Soft 5, Soft 6, Heavy 7, Heavy 8, Heavy 9, Heavy 10.
+
+    Args:
+        tag: Optional tag filter (e.g., "The one to beat")
+
+    Returns dict of condition_num -> stats
+    """
+    return tracker.get_stats_by_condition_detailed(tag=tag)
+
+
+@app.get("/stats/by-condition-tag")
+def get_stats_by_condition_and_tag():
+    """
+    Get performance grouped by condition AND tag.
+
+    Shows how each tag performs on different track conditions.
+
+    Returns dict of condition_group -> tag -> stats
+    """
+    return tracker.get_stats_by_condition_and_tag()
+
+
+@app.post("/tracking/backfill-conditions")
+def backfill_conditions():
+    """
+    Backfill track_condition for existing predictions that don't have it.
+
+    Fetches condition from PuntingForm for each unique race.
+    """
+    return tracker.backfill_conditions(pf_api)
+
+
 @app.get("/picks/by-day")
 def get_picks_for_day(race_date: str):
     """

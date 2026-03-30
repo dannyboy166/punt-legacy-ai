@@ -140,6 +140,16 @@ class PredictionTracker:
                 conn.execute("ALTER TABLE predictions ADD COLUMN pfai_rank INTEGER")
                 logger.info("Added pfai_rank column to predictions table")
 
+            # Migration: Add track_condition column if it doesn't exist
+            if 'track_condition' not in columns:
+                conn.execute("ALTER TABLE predictions ADD COLUMN track_condition TEXT")
+                logger.info("Added track_condition column to predictions table")
+
+            # Migration: Add condition_num column if it doesn't exist
+            if 'condition_num' not in columns:
+                conn.execute("ALTER TABLE predictions ADD COLUMN condition_num INTEGER")
+                logger.info("Added condition_num column to predictions table")
+
             conn.commit()
 
     def store_prediction(
@@ -178,8 +188,9 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class, pfai_rank)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class, pfai_rank,
+                             track_condition, condition_num)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -199,6 +210,8 @@ class PredictionTracker:
                             1 if getattr(contender, 'tipsheet_pick', False) else 0,
                             race_data.class_ if race_data else None,
                             getattr(contender, 'pfai_rank', None),
+                            race_data.condition if race_data else None,
+                            race_data.condition_num if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -221,8 +234,9 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class,
+                             track_condition, condition_num)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -241,6 +255,8 @@ class PredictionTracker:
                             pick.analysis,
                             0,  # tipsheet_pick not applicable for promo/bonus
                             race_data.class_ if race_data else None,
+                            race_data.condition if race_data else None,
+                            race_data.condition_num if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -262,8 +278,9 @@ class PredictionTracker:
                             INSERT OR IGNORE INTO predictions
                             (timestamp, track, race_number, race_date, horse, tab_no,
                              odds, place_odds, tag, confidence, race_confidence,
-                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             confidence_reason, mode, pick_type, analysis, tipsheet_pick, race_class,
+                             track_condition, condition_num)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """, (
                             datetime.now().isoformat(),
                             prediction_output.track,
@@ -282,6 +299,8 @@ class PredictionTracker:
                             pick.analysis,
                             0,  # tipsheet_pick not applicable for promo/bonus
                             race_data.class_ if race_data else None,
+                            race_data.condition if race_data else None,
+                            race_data.condition_num if race_data else None,
                         ))
                         if cursor.rowcount > 0:
                             inserted_ids.append(cursor.lastrowid)
@@ -1782,3 +1801,353 @@ class PredictionTracker:
                 }
 
             return stats
+
+    def get_stats_by_condition(self, tag: Optional[str] = None, starred_only: bool = False) -> dict:
+        """
+        Get performance statistics grouped by track condition.
+
+        Groups conditions into:
+        - Good (1-4): Firm to good tracks
+        - Soft (5-6): Soft tracks
+        - Heavy (7-10): Heavy/wet tracks
+
+        Args:
+            tag: Optional filter by tag (e.g., "The one to beat")
+            starred_only: If True, only include tipsheet_pick=1
+
+        Returns dict of condition_group -> stats
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            query = """
+                SELECT
+                    condition_num,
+                    track_condition,
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick,
+                    tag
+                FROM predictions
+                WHERE outcome_recorded = 1 AND condition_num IS NOT NULL
+            """
+            params = []
+
+            if tag:
+                query += " AND tag = ?"
+                params.append(tag)
+
+            if starred_only:
+                query += " AND tipsheet_pick = 1"
+
+            rows = conn.execute(query, params).fetchall()
+
+            # Group by condition range
+            def get_condition_group(cond_num: int) -> str:
+                if cond_num <= 4:
+                    return "Good (1-4)"
+                elif cond_num <= 6:
+                    return "Soft (5-6)"
+                else:
+                    return "Heavy (7-10)"
+
+            by_group: dict[str, list] = {}
+            for row in rows:
+                group = get_condition_group(row['condition_num'])
+                if group not in by_group:
+                    by_group[group] = []
+                by_group[group].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick'],
+                    'condition_num': row['condition_num'],
+                    'tag': row['tag']
+                })
+
+            # Calculate stats for each group
+            stats = {}
+            # Sort by condition severity
+            group_order = ["Good (1-4)", "Soft (5-6)", "Heavy (7-10)"]
+
+            for group in group_order:
+                if group not in by_group:
+                    continue
+
+                picks = by_group[group]
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                avg_odds = sum(p['odds'] for p in picks) / total
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[group] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1),
+                    'place_rate': round(places / total * 100, 1),
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
+    def get_stats_by_condition_detailed(self, tag: Optional[str] = None) -> dict:
+        """
+        Get performance statistics for each individual condition number (1-10).
+
+        More granular than get_stats_by_condition() - shows each condition separately.
+
+        Args:
+            tag: Optional filter by tag (e.g., "The one to beat")
+
+        Returns dict of condition_num -> stats
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            query = """
+                SELECT
+                    condition_num,
+                    track_condition,
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1 AND condition_num IS NOT NULL
+            """
+            params = []
+
+            if tag:
+                query += " AND tag = ?"
+                params.append(tag)
+
+            rows = conn.execute(query, params).fetchall()
+
+            # Group by exact condition number
+            by_num: dict[int, list] = {}
+            for row in rows:
+                cond_num = row['condition_num']
+                if cond_num not in by_num:
+                    by_num[cond_num] = []
+                by_num[cond_num].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                })
+
+            # Calculate stats for each condition number
+            stats = {}
+            for cond_num in sorted(by_num.keys()):
+                picks = by_num[cond_num]
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                avg_odds = sum(p['odds'] for p in picks) / total
+
+                # Flat bet profit/ROI
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                # Condition label
+                if cond_num <= 4:
+                    label = f"Good {cond_num}"
+                elif cond_num <= 6:
+                    label = f"Soft {cond_num}"
+                else:
+                    label = f"Heavy {cond_num}"
+
+                stats[cond_num] = {
+                    'label': label,
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'starred': starred,
+                    'win_rate': round(wins / total * 100, 1),
+                    'place_rate': round(places / total * 100, 1),
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
+    def get_stats_by_condition_and_tag(self) -> dict:
+        """
+        Get performance statistics grouped by condition AND tag.
+
+        Returns dict of condition_group -> tag -> stats
+        Useful for seeing if certain tags perform better on certain conditions.
+        """
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            rows = conn.execute("""
+                SELECT
+                    condition_num,
+                    tag,
+                    odds,
+                    won,
+                    placed,
+                    tipsheet_pick
+                FROM predictions
+                WHERE outcome_recorded = 1 AND condition_num IS NOT NULL
+            """).fetchall()
+
+            # Group by condition range
+            def get_condition_group(cond_num: int) -> str:
+                if cond_num <= 4:
+                    return "Good (1-4)"
+                elif cond_num <= 6:
+                    return "Soft (5-6)"
+                else:
+                    return "Heavy (7-10)"
+
+            # Nested grouping: condition -> tag -> picks
+            by_condition_tag: dict[str, dict[str, list]] = {}
+            for row in rows:
+                group = get_condition_group(row['condition_num'])
+                tag = row['tag']
+
+                if group not in by_condition_tag:
+                    by_condition_tag[group] = {}
+                if tag not in by_condition_tag[group]:
+                    by_condition_tag[group][tag] = []
+
+                by_condition_tag[group][tag].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed'],
+                    'tipsheet_pick': row['tipsheet_pick']
+                })
+
+            # Calculate stats
+            stats = {}
+            group_order = ["Good (1-4)", "Soft (5-6)", "Heavy (7-10)"]
+
+            for group in group_order:
+                if group not in by_condition_tag:
+                    continue
+
+                stats[group] = {}
+                for tag, picks in by_condition_tag[group].items():
+                    total = len(picks)
+                    wins = sum(1 for p in picks if p['won'])
+                    places = sum(1 for p in picks if p['placed'])
+                    starred = sum(1 for p in picks if p['tipsheet_pick'] == 1)
+                    avg_odds = sum(p['odds'] for p in picks) / total
+
+                    flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                    roi = (flat_profit / total * 100) if total > 0 else 0
+
+                    stats[group][tag] = {
+                        'total': total,
+                        'wins': wins,
+                        'places': places,
+                        'starred': starred,
+                        'win_rate': round(wins / total * 100, 1),
+                        'place_rate': round(places / total * 100, 1),
+                        'avg_odds': round(avg_odds, 2),
+                        'flat_profit': round(flat_profit, 2),
+                        'roi': round(roi, 1),
+                    }
+
+            return stats
+
+    def backfill_conditions(self, pf_api) -> dict:
+        """
+        Backfill track_condition for existing predictions that don't have it.
+
+        Fetches condition from PuntingForm for each unique (track, race_number, race_date).
+
+        Args:
+            pf_api: PuntingFormAPI instance
+
+        Returns:
+            Summary dict with counts
+        """
+        from core.speed import parse_condition_number
+
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+
+            # Get unique races without condition
+            rows = conn.execute("""
+                SELECT DISTINCT track, race_number, race_date
+                FROM predictions
+                WHERE condition_num IS NULL OR track_condition IS NULL
+                ORDER BY race_date DESC
+            """).fetchall()
+
+            if not rows:
+                return {"message": "No predictions need backfilling", "updated": 0}
+
+            updated = 0
+            errors = []
+
+            for row in rows:
+                track = row['track']
+                race_num = row['race_number']
+                race_date = row['race_date']
+
+                try:
+                    # Find meeting
+                    meetings = pf_api.get_meetings(race_date)
+                    meeting_id = None
+                    for m in meetings:
+                        if m.get('meetingName', '').lower() == track.lower():
+                            meeting_id = m.get('meetingId')
+                            break
+
+                    if not meeting_id:
+                        errors.append(f"{track} {race_date}: Meeting not found")
+                        continue
+
+                    # Get fields data which has condition
+                    fields_data = pf_api.get_fields(meeting_id, race_num)
+                    races = fields_data.get('races', [])
+                    if not races:
+                        errors.append(f"{track} R{race_num} {race_date}: No race data")
+                        continue
+
+                    race = races[0]
+                    condition = race.get('trackCondition')
+                    if not condition:
+                        errors.append(f"{track} R{race_num} {race_date}: No condition")
+                        continue
+
+                    condition_num = parse_condition_number(condition)
+
+                    # Update all predictions for this race
+                    cursor = conn.execute("""
+                        UPDATE predictions
+                        SET track_condition = ?, condition_num = ?
+                        WHERE track = ? AND race_number = ? AND race_date = ?
+                    """, (condition, condition_num, track, race_num, race_date))
+
+                    if cursor.rowcount > 0:
+                        updated += cursor.rowcount
+                        logger.info(f"Backfilled {track} R{race_num} {race_date}: {condition}")
+
+                except Exception as e:
+                    errors.append(f"{track} R{race_num} {race_date}: {str(e)}")
+
+            conn.commit()
+
+            return {
+                "message": f"Backfilled {updated} predictions",
+                "updated": updated,
+                "races_processed": len(rows),
+                "errors": errors[:20] if errors else None
+            }
