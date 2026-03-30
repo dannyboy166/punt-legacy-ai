@@ -12,6 +12,7 @@ Endpoints:
     POST /predict                        - Generate prediction for race
     POST /predict-test                   - TEST: Collateral form analysis (not tracked)
     POST /predict-test-adj               - TEST: Track-adjusted ratings (not tracked)
+    POST /predict-test-condition         - TEST: Condition-weighted prompt (not tracked)
     POST /backtest                       - Run backtest on historical races
     GET  /health                         - Health check
 
@@ -35,6 +36,7 @@ from core.race_data import RaceDataPipeline
 from core.predictor import Predictor
 from core.predictor_collateral import CollateralPredictor
 from core.predictor_track_adjusted import TrackAdjustedPredictor
+from core.predictor_condition_weight import ConditionWeightPredictor
 from core.tracking import PredictionTracker
 from core.backtest import run_backtest, run_backtest_meeting, get_race_results
 from api.puntingform import PuntingFormAPI
@@ -71,6 +73,8 @@ pipeline = RaceDataPipeline()
 predictor = Predictor()
 collateral_predictor = CollateralPredictor()  # TEST: collateral form analysis
 track_adjusted_predictor = TrackAdjustedPredictor()  # TEST: track-adjusted ratings
+condition_weight_predictor = ConditionWeightPredictor()  # TEST: condition-weighted prompt
+condition_weight_opus_predictor = ConditionWeightPredictor(model="claude-opus-4-5-20251101")  # TEST: Opus model
 pf_api = PuntingFormAPI()
 tracker = PredictionTracker()
 
@@ -960,6 +964,116 @@ def predict_test_adj(req: PredictionRequest):
             class_=race_data.class_,
             contenders=contenders,
             summary=f"[TEST - Track-Adjusted] {result.summary}",
+            race_confidence=result.race_confidence,
+            confidence_reason=result.confidence_reason,
+            warnings=race_data.warnings,
+            tracking_stored=False,  # Test endpoint - not tracked
+            admin_data=admin_data,
+            runner_notes=result.runner_notes
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict-test-condition", response_model=PredictionResponse)
+def predict_test_condition(req: PredictionRequest):
+    """
+    TEST ENDPOINT: Generate prediction with condition-weighted prompt.
+
+    Uses the EXACT same:
+    - Model (claude-sonnet-4-20250514)
+    - Temperature (0.2)
+    - Max tokens (2000)
+    - Data format (same as /predict)
+    - Response parsing
+
+    The ONLY difference is the system prompt, which better explains:
+    - Ratings are normalized and comparable across conditions
+    - Prioritize runs at similar conditions (CStep within ±2)
+    - Still consider all form, don't filter
+    - Wet-tracker vs dry-tracker patterns
+
+    NOT tracked, NOT stored - for testing purposes only.
+    """
+    try:
+        # Get race data - SAME as /predict
+        race_data, error = pipeline.get_race_data(req.track, req.race_number, req.date, allow_finished=req.allow_finished)
+
+        if error:
+            raise HTTPException(status_code=400, detail=error)
+
+        # Check if odds are available - SAME as /predict
+        runners_with_odds = sum(1 for r in race_data.runners if r.odds)
+        if runners_with_odds == 0:
+            raise HTTPException(
+                status_code=503,
+                detail="Odds not available yet. Please wait for the market to open and try again."
+            )
+
+        # Check if >50% of field has no race form - SAME as /predict
+        total_runners = len(race_data.runners)
+        runners_with_no_form = sum(1 for r in race_data.runners if r.race_runs_count == 0)
+        no_form_percentage = (runners_with_no_form / total_runners * 100) if total_runners > 0 else 0
+
+        if no_form_percentage > 50:
+            return PredictionResponse(
+                mode=req.mode,
+                track=race_data.track,
+                race_number=race_data.race_number,
+                race_name=race_data.race_name,
+                distance=race_data.distance,
+                condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
+                class_=race_data.class_,
+                contenders=[],
+                summary=f"[TEST] This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
+                skipped=True,
+                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history"
+            )
+
+        # Generate prediction with CONDITION-WEIGHT PREDICTOR (modified prompt only)
+        result = condition_weight_predictor.predict(race_data)
+
+        # Build contenders response - SAME as /predict
+        contenders = []
+        for c in result.contenders:
+            place_odds = c.place_odds
+            if not place_odds:
+                for r in race_data.runners:
+                    if r.tab_no == c.tab_no:
+                        place_odds = r.place_odds
+                        break
+
+            contenders.append(Contender(
+                horse=c.horse,
+                tab_no=c.tab_no,
+                odds=c.odds,
+                place_odds=place_odds,
+                tag=c.tag,
+                analysis=c.analysis,
+                confidence=c.confidence,
+                tipsheet_pick=c.tipsheet_pick,
+                pfai_rank=c.pfai_rank,
+            ))
+
+        # Build admin data if requested
+        admin_data = None
+        if req.include_admin_data and contenders:
+            admin_data = build_admin_data(race_data, result.contenders)
+
+        # NOT tracked - this is test only
+        return PredictionResponse(
+            mode="normal",
+            track=race_data.track,
+            race_number=race_data.race_number,
+            race_name=race_data.race_name,
+            distance=race_data.distance,
+            condition=format_condition_abbrev(race_data.condition, race_data.condition_num),
+            class_=race_data.class_,
+            contenders=contenders,
+            summary=f"[TEST - Condition-Weight] {result.summary}",
             race_confidence=result.race_confidence,
             confidence_reason=result.confidence_reason,
             warnings=race_data.warnings,

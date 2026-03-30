@@ -214,24 +214,58 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 - Field is too even with no standouts
 - Insufficient data to make confident assessment
 
+## Understanding the Data
+
+### Speed Ratings
+Ratings are normalized to 100 = benchmark performance. Higher = faster.
+- Ratings are comparable across conditions (102 on Heavy = 102 on Good in terms of speed)
+- BUT horses perform differently on wet vs dry tracks
+- Use the CStep column to find runs at similar conditions - these are most predictive of today's performance
+
+### Form Table Columns
+| Column | Meaning |
+|--------|---------|
+| Dist | Race distance in metres |
+| Cond | Track condition (G4=Good4, S5=Soft5, H8=Heavy8, etc.) |
+| Pos | Finish position / field size |
+| Margin | Lengths behind winner (0L for winner) |
+| Dist% | Distance difference from TODAY's race (+8% = 8% longer, = means same) |
+| CStep | Condition steps from TODAY's track (0=same, -2=drier, +2=wetter) |
+| WtCh | Weight change vs that run. Negative = less weight (easier). Positive = more weight (harder). |
+| Rating | Normalized speed rating (100=par, higher=faster) |
+| Prep | Run number in current prep (1=first-up, 2=second-up, etc.) |
+| Trial | "TRIAL" if barrier trial (not a real race - horses don't always try) |
+| Notes | Stewards report (eased, checked, held up, etc.) |
+
+### Other Data
+- **Jockey/Trainer A/E**: Actual vs Expected - above 1.0 means they beat market expectations
+- **First-up/Second-up record**: Career performance at that prep stage
+- **Speedmap**: Early speed rank and likely settling position
+- **Gear changes**: Equipment changes from last start
+
 ## Key Analysis
 
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar distance and conditions to the race being predicted. More recent runs are more relevant. **Speed ratings matter more than last start wins or career win/place stats.**
+**Compare ratings at similar distance and conditions.** Use the Dist% and CStep columns to identify relevant form. A horse's best rating at a different distance/condition may not reflect their ability today.
 
-**First-up/Second-up horses:** Check their ratings in past runs at the same prep stage (Prep=1 in form table for first-up runs, Prep=2 for second-up). Some horses perform better/worse when fresh. Their career first/second-up record and past second/first-up ratings also help.
+**Prep patterns matter.** Check each horse's Prep column to see where they are in their campaign. Compare to their career first-up/second-up record and their past ratings at that prep stage.
+
+**Notes column can explain bad runs.** "Eased", "checked", "held up" suggest the rating doesn't reflect true ability.
+
+**Weight is simple.** Less weight = easier task. More weight = harder task. Good rating + less weight today = advantage.
+
+**Compare ratings using:** distance (Dist%), conditions (CStep), prep stage, and weight. These are the factors that affect how a rating translates to today's race.
 
 **Critical:**
-- Barrier trials (marked TRIAL) don't count as form - horses don't always try
-- If a horse has 0 race runs, they are UNKNOWN (first starter)
-- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
+- Barrier trials (TRIAL) don't count as form - horses don't always try
+- 0 race runs = UNKNOWN first starter
+- If 50%+ of field has no race form, pick 0 contenders
 
-You also have: prep run number, barrier, weight, speedmap/pace data, win/place odds, jockey/trainer A/E ratios, first-up/second-up records, gear changes, and stewards notes (Notes column) for interference or excuses.
+## Runner Notes
 
-Also include brief notes for non-selected runners explaining why they weren't picked. Focus on:
-- Speed ratings at similar distance and condition vs contenders
-- Significant weight changes from recent runs, bad barrier draw
-- Lack of form at this distance and/or condition
-Avoid generic career stats like "poor strike rate" - be specific to today's race.
+For non-selected runners, briefly explain why they weren't picked:
+- Their ratings at similar distance/condition vs contenders
+- Relevant issues (weight up, poor prep record, wrong conditions)
+Avoid generic career stats - be specific to today's race.
 
 ## Output
 
