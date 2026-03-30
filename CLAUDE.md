@@ -655,17 +655,15 @@ Example: Rosehill R1 on 17-Jan-2026 had only 3/9 runners with actual race form (
 
 ### Prompt Philosophy
 
-```
-Focus on **normalized speed ratings** from RACE runs (not trials) at similar
-distance and conditions. More recent runs are more relevant.
+The prompt (in `core/predictor.py`) explains:
+- **Rating scale**: 100 = benchmark, higher = faster
+- **Form table columns**: What Dist%, CStep, WtCh, Prep mean
+- **Comparison factors**: Distance, conditions, prep stage, weight
+- **Critical rules**: Trials don't count, 50%+ unknowns = skip race
 
-**Critical:**
-- Barrier trials (marked TRIAL) don't count as form - horses don't always try
-- If a horse has 0 race runs, they are UNKNOWN - could be brilliant or useless
-- If 50%+ of field has no race form, pick 0 contenders - too many unknowns to assess
-```
+The prompt tells Claude what the data means and what factors to compare, but doesn't dictate specific thresholds. Claude decides how to weigh factors and which horses to pick.
 
-The prompt is intentionally minimal - tells Claude what data it has and what to focus on, but doesn't dictate specific thresholds or rules.
+See `SYSTEM_PROMPT` in `core/predictor.py` for the full prompt.
 
 ### Scratching Detection
 
