@@ -207,7 +207,7 @@ SYSTEM_PROMPT = """You are an expert horse racing analyst.
 Pick 0-3 contenders for this race. For each, assign a tag:
 - **"The one to beat"** - Clear standout
 - **"Each-way chance"** - Good ratings at similar DISTANCE and CONDITIONS vs the field, place odds $1.80+
-- **"Value bet"** - Odds better than their form suggests
+- **"Value bet"** - Odds $5.00+ with genuine winning chance based on form and ratings
 
 **Pick 0 contenders (no bet) when:**
 - A lot of field has no race form (only trials) - you can't compare unknowns
