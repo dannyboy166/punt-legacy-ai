@@ -1130,6 +1130,95 @@ POST /backfill/pfai-rank
 4. **Value bet** - Avoid regardless of filters
 5. **Bonus Bet** - Small sample but profitable (+67%), worth tracking
 
+---
+
+### Optimal Betting Strategy (April 2026)
+
+Comprehensive analysis of 1,186 "The one to beat" picks (Feb 3 - Apr 1, 2026).
+
+#### The Promo Edge
+
+"The one to beat" has a high 2nd/3rd rate, making it ideal for Money Back 2nd/3rd promos:
+
+| Outcome | Rate | Without Promo | With Promo |
+|---------|------|---------------|------------|
+| 1st (WIN) | 31% | Keep profit | Keep profit |
+| 2nd | 22% | Lose stake | **Get bonus back** |
+| 3rd | 15% | Lose stake | **Get bonus back** |
+| 4th+ | 35% | Lose stake | Lose stake |
+
+**Result:** ~37% of bets return a bonus bet (worth ~75% of stake)
+
+| Scenario | ROI |
+|----------|-----|
+| Without promos | -14.9% |
+| **With promos** | **+12.9%** |
+
+#### By Day of Week
+
+| Day | Picks | Win % | 2nd/3rd % | ROI | +Promo |
+|-----|-------|-------|-----------|-----|--------|
+| **Saturday** | 313 | 33.5% | 34.5% | -4.1% | **+21.8%** ✅ |
+| Monday | 75 | 33.3% | 30.7% | -5.1% | +17.9% ✅ |
+| Wednesday | 211 | 29.4% | 37.4% | -15.8% | +12.2% ✅ |
+| Tuesday | 126 | 30.2% | 36.5% | -15.8% | +11.6% ✅ |
+| Thursday | 127 | 29.1% | 37.0% | -22.0% | +5.7% ⚠️ |
+| Sunday | 160 | 28.1% | 28.7% | -22.5% | -0.9% ❌ |
+| Friday | 174 | 24.7% | 36.2% | -30.9% | -3.8% ❌ |
+
+#### By Track Type
+
+| Type | Picks | Win % | 2nd/3rd % | ROI | +Promo |
+|------|-------|-------|-----------|-----|--------|
+| **Metro** | 497 | 32.2% | 36.0% | -6.2% | **+20.8%** ✅ |
+| Non-Metro | 689 | 28.3% | 33.8% | -22.8% | +2.6% ⚠️ |
+
+#### By Odds Range
+
+| Odds | Picks | Win % | 2nd/3rd % | ROI | +Promo |
+|------|-------|-------|-----------|-----|--------|
+| **$2.00-$2.99** | 395 | 38.7% | 36.7% | -3.7% | **+23.9%** ✅ |
+| $3.00-$4.99 | 450 | 22.0% | 38.0% | -19.7% | +8.8% ⚠️ |
+| Under $2 | 160 | 52.5% | 28.1% | -14.5% | +6.6% ⚠️ |
+| $5.00+ | 181 | 10.5% | 28.2% | -34.0% | -12.8% ❌ |
+
+#### Best Combos
+
+| Combo | Picks | Win % | 2nd/3rd % | ROI | +Promo |
+|-------|-------|-------|-----------|-----|--------|
+| **Sat Metro Under $3** | 112 | **53.6%** | 29.5% | **+21.3%** | **+43.4%** 🔥 |
+| Sat Metro All | 236 | 35.6% | 34.3% | +3.2% | +28.9% ✅ |
+| Friday Metro | 38 | 23.7% | 50.0% | -10.0% | +27.5% ✅ |
+| Wed Non-Metro | 55 | 32.7% | 47.3% | -12.9% | +22.6% ✅ |
+
+#### Simple Rules
+
+**ALWAYS BET (with promos):**
+- ✅ Saturday + Metro + Under $3 odds → **+43.4% ROI**
+- ✅ Saturday + Metro (any odds) → **+28.9% ROI**
+
+**GOOD TO BET (with promos):**
+- ✅ Any Metro track → +20.8%
+- ✅ $2-$3 odds range → +23.9%
+- ✅ Mon/Tue/Wed → +11-18%
+
+**AVOID:**
+- ❌ Friday (especially non-metro) → negative even with promos
+- ❌ Sunday → breakeven at best
+- ❌ $5+ odds → -12.8% even with promos
+- ❌ Non-metro without promos → -22.8%
+
+#### The Optimal Strategy
+
+> **Bet "The one to beat" on Saturday metro races under $3, always with Money Back 2nd/3rd promos.**
+>
+> - 112 picks sample
+> - 53.6% win rate
+> - +21.3% ROI without promos
+> - **+43.4% ROI with promos**
+
+---
+
 ### Pending Improvements
 
 - [ ] Add PFAI filter for Each-way chance at metro
