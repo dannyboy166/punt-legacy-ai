@@ -1424,6 +1424,20 @@ def get_stats_by_pfai_rank(tag: Optional[str] = None):
     return tracker.get_stats_by_pfai_rank(tag=tag)
 
 
+@app.get("/stats/by-pfai-rank-metro")
+def get_stats_by_pfai_rank_and_metro(tag: Optional[str] = None, metro: Optional[bool] = None):
+    """
+    Get performance statistics grouped by PFAI rank, filtered by metro/non-metro.
+
+    Args:
+        tag: Optional filter by tag (e.g., "The one to beat")
+        metro: If true, only metro tracks. If false, only non-metro.
+
+    Returns dict of pfai_rank -> stats.
+    """
+    return tracker.get_stats_by_pfai_rank_and_metro(tag=tag, metro=metro)
+
+
 @app.get("/stats/by-tag-pfai")
 def get_stats_by_tag_and_pfai(pfai_rank: int = 1):
     """

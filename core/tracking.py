@@ -1535,6 +1535,91 @@ class PredictionTracker:
 
             return stats
 
+    def get_stats_by_pfai_rank_and_metro(self, tag: Optional[str] = None, metro: Optional[bool] = None) -> dict:
+        """
+        Get performance statistics grouped by PFAI rank, optionally filtered by metro/non-metro.
+
+        Args:
+            tag: Optional tag filter (e.g., "The one to beat")
+            metro: If True, only metro tracks. If False, only non-metro. If None, all tracks.
+
+        Returns:
+            Dict of pfai_rank -> stats with win/place rates and ROI.
+        """
+        metro_tracks = {
+            "randwick", "rosehill", "canterbury", "warwick farm", "royal randwick",
+            "flemington", "caulfield", "moonee valley", "sandown", "sandown-hillside",
+            "sandown-lakeside", "pakenham",
+            "eagle farm", "doomben", "gold coast",
+            "morphettville", "morphettville parks",
+            "ascot", "belmont", "belmont park",
+            "hobart", "launceston",
+        }
+
+        def is_metro(track_name: str) -> bool:
+            track_lower = track_name.lower().strip()
+            return any(m in track_lower for m in metro_tracks)
+
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            query = """
+                SELECT track, pfai_rank, odds, won, placed
+                FROM predictions
+                WHERE outcome_recorded = 1 AND pfai_rank IS NOT NULL
+            """
+            params = []
+            if tag:
+                query += " AND tag = ?"
+                params.append(tag)
+
+            rows = conn.execute(query, params).fetchall()
+
+            # Filter by metro if specified
+            filtered_rows = []
+            for row in rows:
+                track_is_metro = is_metro(row['track'])
+                if metro is None:
+                    filtered_rows.append(row)
+                elif metro and track_is_metro:
+                    filtered_rows.append(row)
+                elif not metro and not track_is_metro:
+                    filtered_rows.append(row)
+
+            # Group by PFAI rank
+            by_rank: dict[int, list] = {}
+            for row in filtered_rows:
+                rank = row['pfai_rank']
+                if rank not in by_rank:
+                    by_rank[rank] = []
+                by_rank[rank].append({
+                    'odds': row['odds'],
+                    'won': row['won'],
+                    'placed': row['placed']
+                })
+
+            # Calculate stats for each rank
+            stats = {}
+            for rank, picks in sorted(by_rank.items()):
+                total = len(picks)
+                wins = sum(1 for p in picks if p['won'])
+                places = sum(1 for p in picks if p['placed'])
+                avg_odds = sum(p['odds'] for p in picks) / total if total > 0 else 0
+                flat_profit = sum(p['odds'] - 1 if p['won'] else -1 for p in picks)
+                roi = (flat_profit / total * 100) if total > 0 else 0
+
+                stats[rank] = {
+                    'total': total,
+                    'wins': wins,
+                    'places': places,
+                    'win_rate': round(wins / total * 100, 1) if total > 0 else 0,
+                    'place_rate': round(places / total * 100, 1) if total > 0 else 0,
+                    'avg_odds': round(avg_odds, 2),
+                    'flat_profit': round(flat_profit, 2),
+                    'roi': round(roi, 1),
+                }
+
+            return stats
+
     def get_stats_by_tag_and_pfai(self, pfai_rank: int = 1) -> dict:
         """
         Get performance of each tag filtered to a specific PFAI rank.
