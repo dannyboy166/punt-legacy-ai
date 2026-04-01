@@ -959,6 +959,186 @@ Look at the Adj column for runs at similar distance and condition:
 
 ---
 
+## AI Predictor Performance Analysis (April 2026)
+
+Comprehensive analysis of ~4000+ predictions from Feb 3 - Apr 1, 2026.
+
+### Quick Stats Commands
+
+```bash
+# From racing-tips-platform directory:
+npm run stats                      # Overall summary
+npm run stats -- --by-tag          # Performance by tag
+npm run stats -- --by-tipsheet     # ⭐ Starred vs regular picks
+npm run stats -- --pending         # Predictions still awaiting outcomes
+npm run sync-outcomes              # Sync results from PuntingForm
+
+# Direct API queries (Railway production):
+curl -s "https://punt-legacy-ai-production.up.railway.app/stats/summary"
+curl -s "https://punt-legacy-ai-production.up.railway.app/stats/by-tag"
+curl -s "https://punt-legacy-ai-production.up.railway.app/stats/by-pfai-rank-metro?tag=The%20one%20to%20beat&metro=true"
+```
+
+### Overall Performance Summary
+
+| Metric | Value |
+|--------|-------|
+| Total predictions | ~4100 |
+| Results recorded | ~3400 |
+| Still pending | ~700 (mostly small country tracks) |
+
+### Performance by Tag (All Tracks)
+
+| Tag | Picks | Win % | Place % | Avg Odds | ROI |
+|-----|-------|-------|---------|----------|-----|
+| The one to beat | 852 | 32.6% | 61.0% | $3.51 | -6.2% |
+| Each-way chance | 619 | 14.5% | 41.2% | $6.19 | -14.2% |
+| Main danger | 230 | 22.2% | 53.5% | $4.22 | -4.0% |
+| Value bet | 405 | 9.1% | 32.1% | $9.82 | -37.7% |
+| Bonus Bet | 45 | 22.2% | 48.9% | $8.31 | +67.3% |
+
+**Key insight:** "Bonus Bet" tag (longshots at $5+) is profitable but low volume.
+
+### Metro vs Non-Metro Performance
+
+**Metro tracks:** Randwick, Rosehill, Canterbury, Warwick Farm, Flemington, Caulfield, Moonee Valley, Sandown, Pakenham, Eagle Farm, Doomben, Gold Coast, Morphettville, Ascot, Belmont, Hobart, Launceston
+
+#### The One to Beat
+
+| Location | Picks | Win % | ROI |
+|----------|-------|-------|-----|
+| Metro | 350 | 34.6% | **-1.9%** |
+| Non-metro | 502 | 31.3% | -9.2% |
+
+**Metro is nearly breakeven** for main picks.
+
+### PFAI Rank Analysis
+
+PFAI = PuntingForm AI ranking (1 = their top pick). Used to filter non-metro tipsheet stars.
+
+#### The One to Beat @ Metro by PFAI Rank
+
+| PFAI Rank | Picks | Win % | Avg Odds | ROI |
+|-----------|-------|-------|----------|-----|
+| #1 | 134 | 34.3% | $3.17 | -8.4% |
+| #2 | 85 | 43.5% | $3.33 | **+12.0%** |
+| #3 | 34 | 35.3% | $3.67 | -4.1% |
+| #4 | 39 | 20.5% | $4.32 | -29.7% |
+| #5 | 32 | 34.4% | $3.75 | +13.0% |
+| **1-3 Total** | **253** | **37.5%** | - | **-1.0%** |
+| **4+ Total** | **97** | **26.8%** | - | **-4.4%** |
+
+#### The One to Beat @ Non-Metro by PFAI Rank
+
+| PFAI Rank | Picks | Win % | Avg Odds | ROI |
+|-----------|-------|-------|----------|-----|
+| #1 | 141 | 38.3% | $3.16 | +8.7% |
+| #2 | 107 | 35.5% | $3.18 | -2.7% |
+| #3 | 68 | 27.9% | $4.06 | -8.2% |
+| #4 | 74 | 25.7% | $3.76 | **-43.4%** |
+| #5+ | 100+ | 20-25% | $4-5 | **-40% to -51%** |
+| **1-3 Total** | **316** | **34.8%** | - | **+0.1%** |
+| **4+ Total** | **186** | **25.8%** | - | **-22.0%** |
+
+**Key insight:** Non-metro PFAI #4+ is disaster zone (-40% to -50% ROI). This is why the tipsheet star filter exists.
+
+### Other Tags @ Metro by PFAI Rank
+
+#### Each-Way Chance @ Metro
+
+| Filter | Picks | Win % | ROI |
+|--------|-------|-------|-----|
+| All | 331 | 16.0% | -7.9% |
+| PFAI 1-3 | 196 | 19.9% | **+2.2%** |
+| PFAI 4+ | 135 | 10.4% | -22.6% |
+
+**Recommendation:** Consider adding PFAI 1-3 filter for Each-way chance on metro too.
+
+#### Value Bet @ Metro
+
+| Filter | Picks | Win % | ROI |
+|--------|-------|-------|-----|
+| All | 214 | 9.3% | -47.0% |
+| PFAI 1-3 | 68 | 13.2% | -33.7% |
+| PFAI 4+ | 146 | 7.5% | -53.3% |
+
+**Note:** Value bet is terrible across the board. PFAI filter helps slightly but still deeply negative.
+
+#### Main Danger @ Metro
+
+| Filter | Picks | Win % | ROI |
+|--------|-------|-------|-----|
+| All | 115 | 30.4% | **+6.1%** |
+| PFAI 1-3 | 73 | 26.0% | -16.8% |
+| PFAI 4+ | 42 | 38.1% | +46.0% |
+
+**Note:** Weird result - PFAI 4+ does better. Small sample likely explains this anomaly.
+
+### Tipsheet Star (⭐) Logic
+
+The `tipsheet_pick` flag indicates picks Claude would genuinely bet on.
+
+**Metro tracks:** Claude's tipsheet_pick is used as-is (no PFAI filter)
+
+**Non-metro tracks:** For "The one to beat" only:
+```python
+if tipsheet_pick and tag == "The one to beat":
+    if not is_metro_track(track):
+        if pfai_rank is None or pfai_rank > 3:
+            tipsheet_pick = False  # Remove the star
+```
+
+So non-metro "The one to beat" needs BOTH:
+1. ✅ Claude thinks it's value at the price
+2. ✅ PFAI agrees (rank 1, 2, or 3)
+
+**Why this filter?** Non-metro PFAI #4+ had -43% to -51% ROI - pure noise.
+
+### Data Sources
+
+- **Predictions stored:** Railway SQLite (`punt-legacy-ai-production.up.railway.app`)
+- **Results from:** PuntingForm API via `/outcomes/sync`
+- **PFAI ranks:** Backfilled from PuntingForm via `/backfill/pfai-rank`
+- **Tracking start date:** Feb 3, 2026
+
+### API Endpoints for Analysis
+
+```bash
+# Overall stats
+GET /stats/summary
+
+# By tag
+GET /stats/by-tag
+
+# By PFAI rank with metro filter
+GET /stats/by-pfai-rank-metro?tag=The%20one%20to%20beat&metro=true
+GET /stats/by-pfai-rank-metro?tag=Each-way%20chance&metro=true
+GET /stats/by-pfai-rank-metro?tag=Value%20bet&metro=true
+
+# Sync outcomes for a date
+POST /outcomes/sync?race_date=01-Apr-2026
+
+# Backfill PFAI ranks (if missing)
+POST /backfill/pfai-rank
+```
+
+### Key Recommendations
+
+1. **Metro "The one to beat"** - Nearly breakeven (-1.9%), no filter needed
+2. **Non-metro "The one to beat"** - Keep PFAI 1-3 filter (turns -22% into +0.1%)
+3. **Each-way chance @ Metro** - Consider adding PFAI 1-3 filter (+2.2% vs -22.6%)
+4. **Value bet** - Avoid regardless of filters
+5. **Bonus Bet** - Small sample but profitable (+67%), worth tracking
+
+### Pending Improvements
+
+- [ ] Add PFAI filter for Each-way chance at metro
+- [ ] Consider removing Value bet tag entirely
+- [ ] Track starred vs non-starred performance separately
+- [ ] Build automated weekly performance reports
+
+---
+
 ## Next Steps
 
 1. ~~Historical backtesting~~ ✅ Done (experiments/backtest.py)
@@ -968,5 +1148,6 @@ Look at the Adj column for runs at similar distance and condition:
 5. ~~Claude Code export~~ ✅ Done (tools/export_for_claude_code.py)
 6. ~~Daily Picks Workflow~~ ✅ Done (manual Claude Code routine)
 7. ~~Simple Daily Picks System~~ ✅ Done (condition proximity documented)
-8. Performance dashboard improvements
-9. User customization options
+8. ~~Performance analysis~~ ✅ Done (April 2026 - see above)
+9. Performance dashboard improvements
+10. User customization options
