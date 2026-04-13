@@ -410,15 +410,13 @@ else:
 ============================================================
 ```
 
-### Natural Tags
+### Tags
 
-Claude uses natural language tags - not forced categories. Examples:
-- "The one to beat"
-- "Value pick"
-- "Main danger"
-- "First-up specialist"
-- "Course specialist"
-- "Each-way chance" (win odds $4+, place odds $1.80+)
+The predictor uses these specific tags:
+- **"The one to beat"** - Clear standout on ratings at similar distance and conditions vs the field
+- **"Each-way chance"** - Good ratings at similar distance/conditions, place odds $1.80+
+- **"Value bet"** - Odds $5.00+ AND ratings competitive with top of field (not just any longshot)
+- **"Main danger"** - Second-best pick when there's a clear standout
 
 ---
 
@@ -427,10 +425,14 @@ Claude uses natural language tags - not forced categories. Examples:
 **Let Claude be the expert.**
 
 The prompt is intentionally simple - it explains what the data means, but doesn't force Claude to follow rigid rules. Claude decides:
-- How many contenders (1-3)
+- How many contenders (0-3)
 - What tags to use
 - How to weight different factors (speed ratings, A/E, prep patterns, etc.)
-- Whether to mention each-way (win odds $4+, place odds $1.80+)
+- Whether to skip a race entirely (0 picks)
+
+**Key data:**
+- **Adj column** (venue-adjusted ratings) - Primary data for comparing horses. Normalizes track quality so Randwick vs country tracks are comparable.
+- **Jockey A/E** - A/E > 1.0 is positive, A/E < 0.85 is a red flag. Trainer A/E is de-emphasized.
 
 **Why contenders instead of "BET/NO BET"?**
 
@@ -789,46 +791,62 @@ cat /tmp/races.txt | pbcopy
 | Column | What It Means |
 |--------|---------------|
 | **Rating** | Normalized by distance + condition. 100 = expected speed. 102 = 2% faster than expected. |
-| **Adj** | Further normalized by track quality. Makes ratings comparable across venues (e.g., Randwick vs Yass). |
+| **Adj** | Further normalized by track quality. Makes ratings comparable across venues (e.g., Randwick vs Yass). **Use this column.** |
 
-### Analysis Methodology
+### Analysis Methodology (Simplified)
 
-#### 1. Look at Adj ratings at similar distance and conditions
-- Find runs at similar distance and conditions to the race being predicted
-- Use your judgment on what's most relevant from their form
-- More recent runs are **a lot** more relevant than older runs
+**Goal:** Scan races and find clear standouts on ratings. Not every race has a play.
 
-#### 2. Understanding the ratings
-- **Rating column** = normalized by distance + condition (100 = expected speed)
-- **Adj column** = further normalized by track quality (some tracks are faster/slower than others)
-- **Ignore finishing position** - a higher rating is better regardless of where they finished
-- **Ignore margin for non-winners** - already baked into the rating
-- **Winners by big margins** - they may have eased off, could be better than rating shows
-- **Eased runs (⚠️eased)** - from official stewards report, horse wasn't fully pushed, actual ability is likely higher than the rating shown
+#### Step 1: Look at recent Adj ratings at similar-ish distance/condition
 
-#### 3. Compare across the field
-For each horse, look at their recent Adj ratings at similar conditions and distance:
-- Who has the highest recent Adj?
-- Is the trend improving or declining?
+For each horse, find their **most recent runs** at similar distance and conditions to today's race.
 
-#### 4. Assign picks
+- **Recency matters most** - last 1-3 runs are far more relevant than older runs
+- If the most recent run was at a completely different distance/condition, look at the 2nd/3rd/4th most recent run that IS relevant
+- Similar-ish distance is fine
 
-**"The one to beat" ⭐** = The horse you think will WIN based on best recent Adj ratings at similar distances and conditions to the race being predicted. **Only star it if it's a clear standout AND you would bet on it yourself at those odds.**
+#### Step 2: Find the standout
 
-**"Value bet" / "Each-way chance"** = Similar Adj ratings to the top picks but at much bigger odds
+Compare the recent relevant Adj ratings across the field:
+
+#### Step 3: Weight relief is a bonus
+
+**Don't overanalyze weight.** But if a horse with standout ratings ALSO has a significant weight drop, that's a bonus signal - especially for roughies.
+
+#### Understanding the ratings
+
+- **100 = expected speed** for that distance/condition
+- **Higher Adj = better** regardless of finishing position
+- **Ignore margin** - already baked into the rating
+- **⚠️eased** = horse wasn't fully pushed, actual ability likely higher
+- **TRIAL runs don't count** - horses don't try in trials
+
+#### Step 4: Check the Notes column
+
+The **Notes** column contains stewards reports - always check these for context on why a rating might be misleading:
+
+- **"Missed the jump"** - slow start, rating underestimates ability
+- **"Ran wide without cover"** - burned extra energy, true ability higher
+- **"Held up"** - couldn't get clear run, unlucky
+- **"Eased down"** - jockey stopped pushing, horse wasn't tested
+- **"Contacted at start"** - interference affected performance
+
+**Example:** Horse has 102, 101, 98 Adj ratings. The 98 has notes "missed jump, wide throughout" - that run was compromised. True form is closer to 101-102.
+
+### What Makes a Value Bet
+
+A roughie ($10+) with:
+1. **Standout recent Adj** - clearly among the best in the field
+2. **Weight relief** (bonus, not required)
+3. **Odds that don't reflect the ratings**
 
 ### Common Mistakes to Avoid
 
-1. ❌ Looking at best historical rating instead of recent
-2. ❌ Caring about finishing position
-3. ❌ Including runs at irrelevant distances
-4. ❌ Weighting old runs (6+ months) too heavily
-
-### Pick Tags
-
-- **"The one to beat"** ⭐ - Clear standout based on ratings (tipsheet pick)
-- **"Each-way chance"** - Good ratings, place odds $1.80+
-- **"Value bet"** - Odds better than form suggests
+1. ❌ Looking at best-ever rating instead of **recent** ratings
+2. ❌ Being too rigid on exact distance
+3. ❌ Ignoring a horse because they haven't run the exact distance
+4. ❌ Overthinking weight - it's a bonus, not the primary factor
+5. ❌ Trying to find a bet in every race - skip if no clear standout
 
 ### How to Use Claude Code for Predictions
 
@@ -865,14 +883,7 @@ Output format per race:
 | ROI (flat stake) | **+42.8%** |
 | Top picks placed (1-4) | 7/9 |
 
-**What worked:**
-- Quality races with clear ratings leaders (R5, R6, R7) - all won
-- Favourites with dominant Adj ratings delivered
 
-**What didn't work:**
-- 2YO races (Golden Slipper) - wet track form didn't predict
-- $81 upset (R4 Beskar) - anomaly, ratings couldn't predict
-- Leaders in wet can outperform inferior ratings (R3)
 
 ### Files
 
@@ -1219,10 +1230,30 @@ Comprehensive analysis of 1,186 "The one to beat" picks (Feb 3 - Apr 1, 2026).
 
 ---
 
+### Predictor Upgrade (April 14, 2026)
+
+Deployed significant predictor improvements after backtesting:
+
+**Changes:**
+1. **Venue-adjusted ratings (Adj column)** - Now the primary data. Normalizes track quality so ratings are comparable across all venues.
+2. **TTOB definition tightened** - "Clear standout on ratings at similar DISTANCE and CONDITIONS vs the field"
+3. **Value bet definition tightened** - Must have "ratings competitive with top of field", not just any longshot
+4. **Jockey A/E emphasis** - A/E < 0.85 flagged as red flag, trainer A/E de-emphasized
+
+**Backtesting results:**
+| Test | OLD | NEW |
+|------|-----|-----|
+| Metro Apr 11 (Randwick, Caulfield, Doomben) | 4/21 (19%) | **8/25 (32%)** |
+| Non-metro Apr 9-10 (extra picks) | - | 9/14 winners, +6.70 units |
+| Eagle Farm Apr 8 | VB Saint Aldwyn $8.50 | **WON** |
+
+**Key finding:** Venue-adjusted ratings help most on metro tracks where track quality varies significantly.
+
+---
+
 ### Pending Improvements
 
 - [ ] Add PFAI filter for Each-way chance at metro
-- [ ] Consider removing Value bet tag entirely
 - [ ] Track starred vs non-starred performance separately
 - [ ] Build automated weekly performance reports
 
