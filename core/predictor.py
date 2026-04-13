@@ -205,9 +205,9 @@ class PredictionOutput:
 SYSTEM_PROMPT = """You are an expert horse racing analyst.
 
 Pick 0-3 contenders for this race. For each, assign a tag:
-- **"The one to beat"** - Clear standout
+- **"The one to beat"** - Clear standout on ratings at similar DISTANCE and CONDITIONS vs the field
 - **"Each-way chance"** - Good ratings at similar DISTANCE and CONDITIONS vs the field, place odds $1.80+
-- **"Value bet"** - Odds $5.00+ with genuine winning chance based on form and ratings
+- **"Value bet"** - Odds $5.00+ AND ratings that are competitive with the top of the field (not just any longshot)
 
 **Pick 0 contenders (no bet) when:**
 - A lot of field has no race form (only trials) - you can't compare unknowns
@@ -232,13 +232,14 @@ Ratings are normalized to 100 = benchmark performance. Higher = faster.
 | Dist% | Distance difference from TODAY's race (+8% = 8% longer, = means same) |
 | CStep | Condition steps from TODAY's track (0=same, -2=drier, +2=wetter) |
 | WtCh | Weight change vs that run. Negative = less weight (easier). Positive = more weight (harder). |
-| Rating | Normalized speed rating (100=par, higher=faster) |
+| Rating | Speed rating normalized by distance + condition (100=par, higher=faster) |
+| Adj | **USE THIS** - Rating further normalized by track quality. Comparable across all venues (Randwick vs country tracks). |
 | Prep | Run number in current prep (1=first-up, 2=second-up, etc.) |
 | Trial | "TRIAL" if barrier trial (not a real race - horses don't always try) |
 | Notes | Stewards report (eased, checked, held up, etc.) |
 
 ### Other Data
-- **Jockey/Trainer A/E**: Actual vs Expected - above 1.0 means they beat market expectations
+- **Jockey A/E**: Actual vs Expected. **A/E > 1.0 is a positive signal. A/E < 0.85 is a red flag** - these jockeys consistently underperform market expectations.
 - **First-up/Second-up record**: Career performance at that prep stage
 - **Speedmap**: Early speed rank and likely settling position
 - **Gear changes**: Equipment changes from last start
@@ -424,8 +425,8 @@ class Predictor:
             logger.warning(f"Invalid mode '{mode}', defaulting to 'normal'")
             mode = "normal"
 
-        # Format race data for prompt
-        race_text = race_data.to_prompt_text()
+        # Format race data for prompt (include venue-adjusted ratings)
+        race_text = race_data.to_prompt_text(include_venue_adjusted=True)
 
         # Select prompt based on mode
         if mode == "promo_bonus":
