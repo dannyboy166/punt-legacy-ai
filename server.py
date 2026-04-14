@@ -380,6 +380,12 @@ def build_admin_data(race_data, contenders) -> dict:
                 "notes": run.stewards_report,  # Stewards notes (e.g., "Began awkwardly")
             })
 
+        # Calculate weight change from last race run
+        weight_change = None
+        race_form_runs = [f for f in runner.form if not f.is_barrier_trial]
+        if race_form_runs and race_form_runs[0].weight and runner.weight:
+            weight_change = round(runner.weight - race_form_runs[0].weight, 1)
+
         all_runners_form[runner.name] = {
             "tab_no": runner.tab_no,
             "odds": runner.odds,
@@ -387,6 +393,9 @@ def build_admin_data(race_data, contenders) -> dict:
             "barrier": runner.barrier,  # Today's barrier
             "total_form_runs": runner.race_runs_count,
             "is_contender": runner.tab_no in contender_tabs,
+            "jockey": runner.jockey,
+            "jockey_a2e": round(runner.jockey_a2e, 2) if runner.jockey_a2e else None,
+            "weight_change": weight_change,  # +/- kg since last run
             "all_runs": all_runs,  # ALL runs with is_relevant flag
         }
 
