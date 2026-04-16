@@ -4,7 +4,7 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 4 Complete - Predictor Working
+**Status:** Phase 5 Complete - V6 Predictor Optimized (46% TTOB win rate, +22% ROI)
 
 ---
 
@@ -102,8 +102,10 @@ punt-legacy-ai/
 │   └── puntingform_odds_issue.md  # Known issue ✅
 ├── experiments/           # Experimental features
 │   ├── bet_type_predictor.py   # v2 predictor (0-3 picks, skips bad races) ✅
-│   └── backtest.py             # Backtesting script ✅
+│   ├── backtest.py             # Backtesting script ✅
+│   └── ab_test.py              # A/B testing framework ✅
 └── data/                  # Example responses, test data
+    └── ab_results/        # A/B test results (JSON)
 ```
 
 ---
@@ -298,36 +300,42 @@ rating = calculate_speed_rating(
 
 For each runner, Claude sees **raw form data** - no pre-calculated averages. Claude uses its own reasoning to identify patterns.
 
-**Example runner data:**
+**Example runner data (V6 configuration):**
 
 ```
 ### 3. So You Ready
 Barrier: 1 | Weight: 59kg
 Odds: $3.30 win / $1.45 place → 30.3% implied
 Jockey: Jay Ford (A/E: 0.49)
-Trainer: Ms K Buchanan (A/E: 0.89)
 Career: 13: 1-1-0 (8% win)
 **FIRST UP** (career 1st-up record: 3: 0-0-0)
 Form: 4 race runs, 1 trials
 
-| Date | Track | Dist | Cond | Pos | Margin | Rating | Prep | Trial |
-|------|-------|------|------|-----|--------|--------|------|-------|
-| 26-Dec | Beaumont | 2100m | G4 | 6/12 | 2.1L | 1.003 | 3 | - |
-| 10-Dec | Wyong | 1600m | G4 | 6/6 | 11.8L | 0.990 | 2 | - |
-| 20-Nov | Newcastle | 1400m | G4 | 7/8 | 10.7L | 0.972 | 1 | - |
-| 05-Nov | Rosehill | 1000m | G3 | 2/8 | 1.5L | N/A | - | TRIAL |
-| 12-Jun | Gosford | 2100m | S6 | 1/9 | 3L | 0.996 | 5 | - |
+| Date | Track | Dist | Cond | Adj | Prep | Trial |
+|------|-------|------|------|-----|------|-------|
+| 26-Dec | Beaumont | 2100m | G4 | 100.3 | 3 | - |
+| 10-Dec | Wyong | 1600m | G4 | 99.0 | 2 | - |
+| 20-Nov | Newcastle | 1400m | G4 | 97.2 | 1 | - |
+| 05-Nov | Rosehill | 1000m | G3 | N/A | - | TRIAL |
+| 12-Jun | Gosford | 2100m | S6 | 99.6 | 5 | - |
 ```
+
+**V6 configuration (recommended):**
+- **Adj column only** - Venue-adjusted rating (100 = benchmark). No Rating column.
+- **No Pos/Margin columns** - Already captured in Adj rating
+- **No Trainer A/E** - Not predictive enough (removed)
+- Jockey A/E kept - More predictive than trainer
+- Barrier, weight, career stats, prep pattern retained
 
 **Data includes:**
 - Barrier, weight (no age/sex - removed as not critical)
 - Win AND place odds from Ladbrokes
-- Jockey/trainer A/E ratios
+- Jockey A/E ratio (trainer removed in V6)
 - Career record + first-up/second-up record
 - Form summary with race run count and trial count
-- Last 10 runs with speed ratings, prep run number, and barrier trial flag
+- Last 10 runs with Adj rating, prep run number, and barrier trial flag
 
-**Key principle:** No pre-calculated averages. Claude analyzes which runs are relevant based on today's race conditions.
+**Key principle:** Less noise = better predictions. V6 testing showed +30% ROI improvement over V0.
 
 ---
 
@@ -430,9 +438,17 @@ The prompt is intentionally simple - it explains what the data means, but doesn'
 - How to weight different factors (speed ratings, A/E, prep patterns, etc.)
 - Whether to skip a race entirely (0 picks)
 
-**Key data:**
-- **Adj column** (venue-adjusted ratings) - Primary data for comparing horses. Normalizes track quality so Randwick vs country tracks are comparable.
-- **Jockey A/E** - A/E > 1.0 is positive, A/E < 0.85 is a red flag. Trainer A/E is de-emphasized.
+**Key data (V6 configuration - see A/B Testing Results):**
+- **Adj column ONLY** (venue-adjusted ratings) - Primary data for comparing horses. Normalizes track quality so Randwick vs country tracks are comparable. Rating column is removed to reduce noise.
+- **Jockey A/E** - A/E > 1.0 is positive, A/E < 0.85 is a red flag.
+- **Trainer A/E** - Removed from V6 (not predictive enough).
+- **Pos/Margin columns** - Removed from V6 (already baked into Adj rating).
+
+**Why V6 works better:**
+- Less noise = better focus on what matters (Adj ratings)
+- Margin is already captured in the Adj rating
+- Trainer A/E wasn't predictive enough to justify the noise
+- Simpler data helps Claude identify clear standouts
 
 **Why contenders instead of "BET/NO BET"?**
 
@@ -443,7 +459,7 @@ The prompt is intentionally simple - it explains what the data means, but doesn'
 
 **Speed ratings are RELATIVE:**
 
-Compare within the field only. If everyone is 0.98 and one horse is 0.99, that horse is best. No absolute thresholds like "must be 1.015+".
+Compare within the field only. If everyone is 98 and one horse is 99, that horse is best. No absolute thresholds like "must be 101.5+".
 
 ---
 
@@ -644,6 +660,9 @@ python experiments/bet_type_predictor.py --track "Randwick" --race 4 --date "19-
 
 # Backtesting (uses PuntingForm SP odds for finished races)
 python experiments/backtest.py "Rosehill" 2 "17-Jan-2026"
+
+# A/B testing multiple variations (see ab_test.py)
+python experiments/ab_test.py
 ```
 
 ### When It Skips a Race (0 Contenders)
@@ -768,10 +787,12 @@ Odds: $4.50 win / $1.80 place → 22.2% implied
 Jockey: J Smith (A/E: 1.12)
 ...
 
-| Date | Track | Dist | Cond | Pos | Margin | Rating | Adj | Prep | Trial |
-|------|-------|------|------|-----|--------|--------|-----|------|-------|
-| 15-Mar | Canterbury | 1200m | G4 | 2/9 | 1.5L | 101.2 | 100.5 | 3 | - |
+| Date | Track | Dist | Cond | Adj | Prep | Trial |
+|------|-------|------|------|-----|------|-------|
+| 15-Mar | Canterbury | 1200m | G4 | 100.5 | 3 | - |
 ```
+
+**Note:** V6 configuration shows only Adj column (no Rating, Pos, or Margin columns).
 
 ### Workflow
 
@@ -790,8 +811,9 @@ cat /tmp/races.txt | pbcopy
 
 | Column | What It Means |
 |--------|---------------|
-| **Rating** | Normalized by distance + condition. 100 = expected speed. 102 = 2% faster than expected. |
-| **Adj** | Further normalized by track quality. Makes ratings comparable across venues (e.g., Randwick vs Yass). **Use this column.** |
+| **Adj** | Venue-adjusted rating. Normalized by distance, condition, AND track quality. Makes ratings comparable across all venues (e.g., Randwick vs Yass). **This is the primary column - use this.** 100 = benchmark. Higher = faster. |
+
+**Note:** The V6 predictor configuration shows only Adj (no Rating column). Rating was removed because Adj is strictly better - it includes all the same normalization plus venue quality adjustment.
 
 ### Analysis Methodology (Simplified)
 
@@ -1251,11 +1273,128 @@ Deployed significant predictor improvements after backtesting:
 
 ---
 
+### A/B Testing Results (April 16, 2026)
+
+Comprehensive A/B testing of 188 races comparing 5 predictor variations.
+
+#### Variations Tested
+
+| ID | Name | Description |
+|----|------|-------------|
+| **V0** | Production | Current live predictor (from Railway database) |
+| **V1** | Baseline | Rating + Adj columns, Pos/Margin, full trainer/jockey A/E |
+| **V3** | No Pos/Margin | Same as V1 but removes Pos and Margin columns from form table |
+| **V6** | Lean | **WINNER** - Adj only (no Rating), no Pos/Margin, no Trainer A/E, full prompt |
+| **V7** | Lean + Minimal | Same as V6 but with minimal prompt |
+
+#### V6 Configuration (Recommended)
+
+The winning configuration simplifies the data Claude receives:
+
+| Feature | V0/V1 (Old) | V6 (New) |
+|---------|-------------|----------|
+| Rating column | ✅ Shown | ❌ Removed |
+| Adj column | ✅ Shown | ✅ **Primary data** |
+| Pos column | ✅ Shown | ❌ Removed |
+| Margin column | ✅ Shown | ❌ Removed |
+| Jockey A/E | ✅ Shown | ✅ Shown |
+| Trainer A/E | ✅ Shown | ❌ Removed |
+| Prompt style | Detailed | Full (same as V1) |
+
+**Why V6 works:** Less noise = better focus. The Adj column already captures performance (margin is baked in). Removing redundant columns helps Claude identify clear standouts.
+
+#### Results: The One To Beat (188 Races)
+
+| Variation | Picks | Win % | Place % | Avg Odds | ROI |
+|-----------|-------|-------|---------|----------|-----|
+| **V6: Lean** | 150 | **46.0%** | 74.0% | $3.19 | **+22.2%** ✅ |
+| V7: Lean+Minimal | 185 | 41.6% | 67.6% | $3.55 | +19.6% |
+| V3: No Pos/Margin | 162 | 43.2% | 72.2% | $3.26 | +19.6% |
+| V1: Baseline | 174 | 37.4% | 73.6% | $3.29 | +2.0% |
+| **V0: Production** | 171 | 33.3% | 62.6% | $3.56 | **-8.7%** ❌ |
+
+**V6 vs V0 improvement:**
+- Win rate: 33.3% → 46.0% (+12.7%)
+- ROI: -8.7% → +22.2% (+30.9%)
+
+#### Results by Location (TTOB)
+
+**Metro (73 races):**
+| Variation | Picks | Win % | ROI |
+|-----------|-------|-------|-----|
+| V3: No Pos/Margin | 66 | 43.9% | **+28.6%** |
+| V7: Lean+Minimal | 73 | 39.7% | +16.8% |
+| V6: Lean | 57 | 42.1% | +14.3% |
+| V1: Baseline | 71 | 35.2% | -2.4% |
+| V0: Production | 65 | 30.8% | -11.6% |
+
+**Non-Metro (115 races):**
+| Variation | Picks | Win % | ROI |
+|-----------|-------|-------|-----|
+| **V6: Lean** | 93 | **48.4%** | **+27.0%** |
+| V7: Lean+Minimal | 112 | 42.9% | +21.5% |
+| V3: No Pos/Margin | 96 | 42.7% | +13.5% |
+| V1: Baseline | 103 | 38.8% | +5.0% |
+| V0: Production | 106 | 34.9% | -6.9% |
+
+**Key insight:** V6 dominates non-metro (+27.0% ROI). V3 wins metro (+28.6% ROI).
+
+#### Results: Value Bet (188 Races)
+
+| Variation | Picks | Win % | Avg Odds | ROI |
+|-----------|-------|-------|----------|-----|
+| **V6: Lean** | 156 | 12.8% | $12.54 | **+6.7%** ✅ |
+| V1: Baseline | 130 | 12.3% | $11.80 | -12.6% |
+| V3: No Pos/Margin | 140 | 10.7% | $12.17 | -18.2% |
+| V7: Lean+Minimal | 187 | 11.2% | $12.50 | -27.3% |
+| V0: Production | 65 | 7.7% | $9.65 | -49.8% |
+
+**V6 is the only profitable variation for Value bets.**
+
+#### Results: All Picks Combined (188 Races)
+
+| Variation | Picks | Win % | ROI |
+|-----------|-------|-------|-----|
+| V6: Lean | 458 | 23.6% | **-2.6%** |
+| V7: Lean+Minimal | 551 | 23.2% | -7.8% |
+| V3: No Pos/Margin | 475 | 23.2% | -9.4% |
+| V0: Production | 470 | 24.0% | -10.8% |
+| V1: Baseline | 489 | 22.9% | -13.1% |
+
+#### Test Data Files
+
+Results stored in `data/ab_results/`:
+- `ab_test_v6v7_20260415_223245.json` - 88 races (V6, V7 only)
+- `ab_test_20260415_143936.json` - 36 races (V1-V5)
+- `ab_test_20260415_171131.json` - 52 races (V1-V5)
+- `ab_test_v1367_20260416_070633.json` - 50 races (V1, V3, V6, V7)
+- `ab_test_balanced_20260416_095104.json` - 50 races (V1, V3, V6, V7) - 25 metro, 25 non-metro
+
+#### Backtesting Methodology
+
+The backtesting is legitimate:
+1. **Form data** comes from PuntingForm API - only historical runs before race day
+2. **Predictions** made by Claude using historical data only
+3. **Results** fetched separately from actual race outcomes
+4. **No future data** used in predictions
+
+#### Recommendations
+
+1. **Deploy V6 to production** - Best overall performer
+2. **TTOB is the star tag** - 46% win rate, +22% ROI
+3. **Value bet works with V6** - Only profitable variation (+6.7%)
+4. **Non-metro is where V6 shines** - 48.4% win rate, +27% ROI
+5. **Consider V3 for metro-only** - Slightly better at +28.6% ROI
+
+---
+
 ### Pending Improvements
 
+- [ ] Deploy V6 configuration to production
 - [ ] Add PFAI filter for Each-way chance at metro
 - [ ] Track starred vs non-starred performance separately
 - [ ] Build automated weekly performance reports
+- [ ] Consider hybrid approach (V3 for metro, V6 for non-metro)
 
 ---
 
@@ -1269,5 +1408,8 @@ Deployed significant predictor improvements after backtesting:
 6. ~~Daily Picks Workflow~~ ✅ Done (manual Claude Code routine)
 7. ~~Simple Daily Picks System~~ ✅ Done (condition proximity documented)
 8. ~~Performance analysis~~ ✅ Done (April 2026 - see above)
-9. Performance dashboard improvements
-10. User customization options
+9. ~~A/B Testing~~ ✅ Done (April 16, 2026 - 188 races, V6 wins)
+10. **Deploy V6 to production** - 46% win rate, +22% ROI on TTOB
+11. Performance dashboard improvements
+12. User customization options
+13. Consider hybrid V3/V6 (V3 for metro, V6 for non-metro)

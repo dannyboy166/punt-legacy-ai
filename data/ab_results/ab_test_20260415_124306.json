@@ -1,0 +1,1164 @@
+{
+  "test_time": "2026-04-15T12:37:00.261959",
+  "variations_tested": [
+    "v1_baseline",
+    "v2_adj_only",
+    "v3_no_pos_margin",
+    "v4_no_trainer_ae",
+    "v5_minimal_prompt"
+  ],
+  "races_tested": 5,
+  "races": [
+    {
+      "track": "Kembla Grange",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "full_results": {
+        "penalties": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "coulter": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 1.8
+        },
+        "crudo": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 19
+        },
+        "master aron": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 8.5
+        },
+        "mission wise": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "ol' mate coop": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 3.5
+        },
+        "zougotme": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 8
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "The one to beat",
+              "analysis": "Strong recent form with a close third (0.7L) at this exact track and distance in similar conditions just 5 days ago, rating 100.8. Consistent placegetter with 5 seconds and 5 thirds from 13 starts, showing he's competitive at this level.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Each-way chance",
+              "analysis": "Ran second (0.3L) in the same race as Ol' Mate Coop 5 days ago at this track and distance, also rating 100.8. Has been placing consistently this prep with two seconds from four starts, and jockey Brock Ryan has excellent A/E of 1.33.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Two horses stand out having run 1st and 2nd in the same race here 5 days ago. Coulter has limited form with only 2 race runs, making assessment difficult despite short odds.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Coulter",
+              "tab_no": 4,
+              "odds": 1.8,
+              "tag": "The one to beat",
+              "analysis": "Strong 50% win rate from limited starts with a close second at Hawkesbury over 1300m last start. The rating of 9965.8 at similar conditions is competitive, and the step up to 1400m suits.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Ran a strong second at this track and distance last start, beaten only 0.3L. Previous second at Hawkesbury over 1300m shows consistent form at the right trip with competitive ratings.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Coulter stands out with strong win rate and good recent form, while Zougotme offers value after a close second here last start",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|--..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent form with ratings of 100.8, 102.1, and 101.5 in last three starts at similar conditions. Consistent performer who has been placing regularly and looks well-suited to this distance and soft track.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Matched Ol' Mate Coop's 100.8 rating last start at this track and distance. Has shown good form at similar conditions with ratings around 100+ and jockey Brock Ryan has excellent A/E of 1.33.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Coulter is heavily favored but has very limited race experience with only 2 runs. The value appears to be with the more experienced horses who have proven form at these conditions.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|-..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Consistent placegetter with strong recent form including a close third (0.7L) at this track and distance last start. Has shown ability at 1400m with multiple placings and good jockey booking with Bell (A/E 1.15).",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Ran second by just 0.3L at this track and distance last start, showing he's ready to win. Strong jockey booking with Ryan (A/E 1.33) and has been competitive in recent starts including a close second at Hawkesbury.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Coulter is short-priced favorite but has very limited form with only 2 race runs. The value appears to be with the consistent placegetters who have proven form at the distance.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|-----..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Coulter",
+              "tab_no": 4,
+              "odds": 1.8,
+              "tag": "The one to beat",
+              "analysis": "Strong recent form with 2nd at Hawkesbury (Adj 99.7) at similar distance. 50% win rate from limited starts and represents top trainer Bjorn Baker. Despite limited experience, quality is evident.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Each-way chance",
+              "analysis": "Consistent placegetter with strong recent form - 2nd last start at this track/distance and 2nd at Hawkesbury (Adj 99.5). Jockey Brock Ryan has excellent A/E ratio of 1.33. Good value at the odds.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with 3rd last start at this track/distance. Multiple placings show reliability. Mitchell Bell (A/E 1.15) is a positive jockey booking. Solid each-way chance at fair odds.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Coulter looks the class runner with strong recent form and 50% strike rate despite limited starts. Zougotme and Ol' Mate Coop both ran well last start at this track/distance and offer each-way value. The race lacks depth with several horses showing modest form.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|..."
+        }
+      }
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 4,
+      "date": "31-Mar-2026",
+      "full_results": {
+        "lightning glory": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 2.6
+        },
+        "bondasong": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 26
+        },
+        "erin jo": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 2.2
+        },
+        "greyt thinker": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 15
+        },
+        "azure angel": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 6.5
+        },
+        "salma's star": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 11
+        },
+        "valentino prince": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 151
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact distance and conditions (1250m G4 Newcastle) in October with a 99.0 rating, showing clear form advantage. Despite poor jockey stats, the horse has proven ability at these specific conditions and distance.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1400m G4 with 101.7 rating and has solid form at similar distances. Trainer Lees has positive A/E of 1.09, though jockey stats are concerning.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Ran well at this exact track/distance in November (4th, 1.6L) with 98.8 rating and won first-up last prep. At $11 odds with competitive ratings, offers value despite apprentice jockey.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at exact conditions, while Salma's Star offers value at long odds with competitive form at track/distance.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|--..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact track and distance (Newcastle 1250m G4) first-up last prep with a 10019.7 rating. Despite poor jockey/trainer stats, the horse has clear form advantage having proven itself in these exact conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Ran well for 4th at Newcastle 1250m G4 (10004.4 rating) and won first-up last prep at 1000m. Gets significant weight relief (53.5kg) and has shown ability at the distance, offering value at double-digit odds.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at the exact track/distance/conditions. Salma's Star offers value with competitive ratings and weight relief.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|----..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Strong ratings at similar conditions with 102.1 at Gosford 1100m and 101.1 at Queanbeyan 1000m. The exact distance win at Newcastle 1250m G4 shows she handles these conditions well, despite modest rating of 98.8.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Excellent form at this exact distance and condition with 99.0 rating at Newcastle 1250m G4. Follow-up runs of 101.4 and 102.8 show improvement, and the jockey/trainer combination concerns are offset by clear form superiority.",
+              "tipsheet_pick": false,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Lightning Glory has the best form at these exact conditions but poor jockey/trainer stats make backing risky. Salma's Star offers value with competitive ratings and good distance form.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|---..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact distance and track in October with a 99.0 rating, then improved to 102.8 at Wyong over 1350m. Fresh off trials and has the best form at similar conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1400m with solid 101.7 rating and has consistent form around 101+ at similar distances. Barrier 1 is a significant advantage despite jockey concerns.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Last run at this exact track/distance produced 98.8 rating which is competitive, and won trial since. Gets significant weight relief and has upside at big odds.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at track and distance. Erin Jo offers place value from barrier 1 despite jockey concerns. Salma's Star represents value with competitive ratings and weight relief.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won this exact track/distance in October with Adj 10019.7. Recent trials show good form and the step up from 1000m to 1250m suits. Proven at the venue and conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won at 1400m in January and placed at Randwick 1300m with solid Adj 9991.4. The step back to 1250m from longer trips should suit. Barrier 1 is a big advantage.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Good recent form at this track/distance with Adj 10004.4 when 4th. Won at 1000m in October with strong Adj 10052.4. The 53.5kg weight and apprentice claim makes this attractive value.",
+              "tipsheet_pick": false,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory has the best credentials having won at this exact venue and distance. Erin Jo brings strong form from longer trips and gets barrier 1. Salma's Star offers value with good recent form at the track and significant weight relief.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|--..."
+        }
+      }
+    },
+    {
+      "track": "Mornington",
+      "race_number": 7,
+      "date": "05-Apr-2026",
+      "full_results": {
+        "lim's teide": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 4.6
+        },
+        "brullen": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 4.4
+        },
+        "aussie adaptor": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 8.5
+        },
+        "gracious diva": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 8
+        },
+        "phantom prince": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 19
+        },
+        "charming di": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 61
+        },
+        "magnardo": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 2.4
+        },
+        "moose jaw": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "citaleon": {
+          "position": 9,
+          "won": false,
+          "placed": false,
+          "sp": 151
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Magnardo",
+              "tab_no": 10,
+              "odds": 2.4,
+              "tag": "The one to beat",
+              "analysis": "Dominant recent form with 6 wins from last 9 starts including 3 straight wins to start this prep. Strong adjusted ratings around 10300+ in recent wins at similar distances, well clear of this field.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Brullen",
+              "tab_no": 2,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with strong form at the distance including a 2nd at 1209m (rating 10054.7) and win at 1209m Mildura (rating 10255.5). Place strike rate of 43% suggests good each-way value.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Phantom Prince",
+              "tab_no": 7,
+              "odds": 19.0,
+              "tag": "Value bet",
+              "analysis": "Won last start at Stony Creek over 1000m and has positive jockey/trainer combination (A/E 1.43 and 1.48). At $19 odds, represents value despite inconsistent form given the win potential.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Magnardo stands out clearly with dominant recent form and superior ratings. Brullen offers solid each-way value with consistent distance form, while Phantom Prince provides longshot value with positive connections.",
+          "prompt_preview": "# Mornington Race 7: \nDistance: 1200m | Condition: G4 | Class: Benchmark 56; | Field: 9 | Pace: moderate\n\nForm status: 9/9 have race form\n## Runners\n\n### 1. Lim's Teide\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Nadia Daniels (A/E: 0.78)\nTrainer: D Meagher (A/E: 0.96)\nCareer: 4: 1-0-1 (25% win)\nBarrier: 1 | Weight: 59.5kg\nSpeed Rank: 1 | Settles: 2\nForm: 3 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|-----..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Magnardo",
+              "tab_no": 10,
+              "odds": 2.4,
+              "tag": "The one to beat",
+              "analysis": "Dominant form with 6 wins from last 9 starts including recent 1008m win at Woolamai. Strong ratings around 10300+ at similar distances with excellent jockey/trainer combination (A/E 1.46/1.21).",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Brullen",
+              "tab_no": 2,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with strong 1200m form including recent second at exact distance/conditions (10054.7 rating). Multiple placings at this trip with solid ratings around 10040-10060.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Phantom Prince",
+              "tab_no": 7,
+              "odds": 19.0,
+              "tag": "Value bet",
+              "analysis": "Won last start at 1000m and has excellent jockey/trainer combination (A/E 1.43/1.48). Previous 1200m form shows competitive ratings around 10040+ when conditions suit.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Clear standout in Magnardo with dominant recent form, supported by consistent Brullen and value chance Phantom Prince with strong connections",
+          "prompt_preview": "# Mornington Race 7: \nDistance: 1200m | Condition: G4 | Class: Benchmark 56; | Field: 9 | Pace: moderate\n\nForm status: 9/9 have race form\n## Runners\n\n### 1. Lim's Teide\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Nadia Daniels (A/E: 0.78)\nTrainer: D Meagher (A/E: 0.96)\nCareer: 4: 1-0-1 (25% win)\nBarrier: 1 | Weight: 59.5kg\nSpeed Rank: 1 | Settles: 2\nForm: 3 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Magnardo",
+              "tab_no": 10,
+              "odds": 2.4,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with excellent jockey/trainer combination (A/E 1.46/1.21) and strong recent form including a 100.0 rating at this exact distance/condition on 26-Dec. The significant weight drop to 56.5kg makes this even more appealing.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Phantom Prince",
+              "tab_no": 7,
+              "odds": 19.0,
+              "tag": "Value bet",
+              "analysis": "Outstanding jockey/trainer combo with A/E of 1.43/1.48 suggests strong stable confidence. Recent runs show competitive ratings around 97-98 at similar conditions, making the $19 odds generous for a horse with proven ability at this level.",
+              "tipsheet_pick": true,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Magnardo stands out clearly on ratings and connections, while Phantom Prince offers excellent value with top-tier jockey/trainer stats at long odds.",
+          "prompt_preview": "# Mornington Race 7: \nDistance: 1200m | Condition: G4 | Class: Benchmark 56; | Field: 9 | Pace: moderate\n\nForm status: 9/9 have race form\n## Runners\n\n### 1. Lim's Teide\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Nadia Daniels (A/E: 0.78)\nTrainer: D Meagher (A/E: 0.96)\nCareer: 4: 1-0-1 (25% win)\nBarrier: 1 | Weight: 59.5kg\nSpeed Rank: 1 | Settles: 2\nForm: 3 race runs\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|------..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Magnardo",
+              "tab_no": 10,
+              "odds": 2.4,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with 8 wins from 19 starts and excellent recent form including 5 wins from last 6 starts. Strong jockey booking with Cartwright (A/E 1.46) and gets significant weight relief at 56.5kg.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Brullen",
+              "tab_no": 2,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with strong ratings at this distance including a win at 1209m (98.4 rating) and multiple placings at similar trips. Form line reads well with recent second at Werribee over 1408m.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Phantom Prince",
+              "tab_no": 7,
+              "odds": 19.0,
+              "tag": "Value bet",
+              "analysis": "Won last start at Stony Creek over 1000m and has strong jockey booking with Maskiell (A/E 1.43). The 19.00 odds look generous for a horse that showed ability with that recent win.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Magnardo looks the clear standout with exceptional recent form and strong jockey booking. Brullen offers solid each-way value with consistent form at the distance.",
+          "prompt_preview": "# Mornington Race 7: \nDistance: 1200m | Condition: G4 | Class: Benchmark 56; | Field: 9 | Pace: moderate\n\nForm status: 9/9 have race form\n## Runners\n\n### 1. Lim's Teide\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Nadia Daniels (A/E: 0.78)\nTrainer: D Meagher\nCareer: 4: 1-0-1 (25% win)\nBarrier: 1 | Weight: 59.5kg\nSpeed Rank: 1 | Settles: 2\nForm: 3 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|---..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Magnardo",
+              "tab_no": 10,
+              "odds": 2.4,
+              "tag": "The one to beat",
+              "analysis": "Dominant form with 5 wins from last 8 starts, including recent 1008m win at Woolamai with strong 10334.2 rating. Excellent strike rate (42% wins) and proven at this distance. Gets significant weight relief (56.5kg) and has Luke Cartwright (A/E 1.46) aboard.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Brullen",
+              "tab_no": 2,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with strong recent form including 2nd at Werribee (10060.6 rating) and win at Mildura (10255.5). Settles on pace which suits moderate tempo. Has placed 10 times from 23 starts showing reliability.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Phantom Prince",
+              "tab_no": 7,
+              "odds": 19.0,
+              "tag": "Value bet",
+              "analysis": "Last start winner at Stony Creek over 1000m with solid form at this distance. Jason Maskiell has excellent A/E of 1.43. At $19 odds, offers significant value despite inconsistent recent form. Third-up and drawn well.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Magnardo looks the standout with dominant recent form and significant weight relief. His 5 wins from 8 starts and strong speed ratings make him hard to beat. Brullen provides the main danger with consistent form and pace advantage, while Phantom Prince offers value as a last-start winner with a top jockey at long odds.",
+          "prompt_preview": "# Mornington Race 7: \nDistance: 1200m | Condition: G4 | Class: Benchmark 56; | Field: 9 | Pace: moderate\n\nForm status: 9/9 have race form\n## Runners\n\n### 1. Lim's Teide\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Nadia Daniels (A/E: 0.78)\nTrainer: D Meagher\nCareer: 4: 1-0-1 (25% win)\nBarrier: 1 | Weight: 59.5kg\nSpeed Rank: 1 | Settles: 2\nForm: 3 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|------|-----..."
+        }
+      }
+    },
+    {
+      "track": "Morphettville Parks",
+      "race_number": 3,
+      "date": "21-Mar-2026",
+      "full_results": {
+        "dramaticus": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 3
+        },
+        "marcolt": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 26
+        },
+        "i am piki": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 6
+        },
+        "mrs secombe": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 14
+        },
+        "more than hope": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 4.2
+        },
+        "sassy for sure": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 3.1
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Dramaticus",
+              "tab_no": 1,
+              "odds": 3.0,
+              "tag": "The one to beat",
+              "analysis": "Clear speed leader with best adjusted ratings around 101+ at similar distances. Strong jockey booking with Brooke King (A/E 1.17) and consistent form including a close third at 1600m last start.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Sassy For Sure",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1200m and ran well when fourth at this exact distance last time out. Trainer P Stokes has excellent A/E of 1.12 and gets significant weight relief.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Dramaticus stands out clearly on ratings with consistent 100+ figures at similar conditions. Sassy For Sure offers place value having run well at this track and distance recently.",
+          "prompt_preview": "# Morphettville Parks Race 3: \nDistance: 1250m | Condition: G4 | Class: Restricted 66; | Field: 6 | Pace: moderate\n\nForm status: 6/6 have race form\n## Runners\n\n### 1. Dramaticus\nOdds: $3.00 win / $1.70 place \u2192 33.3% implied\nJockey: Brooke King (A/E: 1.17)\nTrainer: T & C McEvoy (A/E: 0.99)\nCareer: 17: 4-1-4 (24% win)\nBarrier: 1 | Weight: 57kg\nSpeed Rank: 1 | Settles: 3\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Dramaticus",
+              "tab_no": 1,
+              "odds": 3.0,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with highest speed rank and strong recent form including a close third at Ararat over 1600m. Positive jockey booking with Brooke King (A/E 1.17) and drawn perfectly in barrier 1.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "I Am Piki",
+              "tab_no": 3,
+              "odds": 6.0,
+              "tag": "Each-way chance",
+              "analysis": "Last start winner at Murray Bridge over 1200m shows this horse is in good form. The step up to 1250m suits and gets a good weight drop, though jockey Jake Toeroek's A/E of 0.79 is concerning.",
+              "tipsheet_pick": false,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Dramaticus stands out clearly on ratings and form with excellent jockey booking. I Am Piki offers each-way value as a last start winner stepping up in distance.",
+          "prompt_preview": "# Morphettville Parks Race 3: \nDistance: 1250m | Condition: G4 | Class: Restricted 66; | Field: 6 | Pace: moderate\n\nForm status: 6/6 have race form\n## Runners\n\n### 1. Dramaticus\nOdds: $3.00 win / $1.70 place \u2192 33.3% implied\nJockey: Brooke King (A/E: 1.17)\nTrainer: T & C McEvoy (A/E: 0.99)\nCareer: 17: 4-1-4 (24% win)\nBarrier: 1 | Weight: 57kg\nSpeed Rank: 1 | Settles: 3\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|--..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Dramaticus",
+              "tab_no": 1,
+              "odds": 3.0,
+              "tag": "The one to beat",
+              "analysis": "Clear speed leader with consistent 100+ ratings at similar distances and conditions. Strong jockey booking with Brooke King (A/E 1.17) and proven form at the distance range.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "More Than Hope",
+              "tab_no": 6,
+              "odds": 4.2,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with three recent runs at Morphettville 1050m showing steady 99+ ratings. Light weight of 55kg and good early speed position make this a solid each-way chance.",
+              "tipsheet_pick": false,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Dramaticus stands out with superior ratings and proven form at the distance. More Than Hope offers each-way value with consistent local form.",
+          "prompt_preview": "# Morphettville Parks Race 3: \nDistance: 1250m | Condition: G4 | Class: Restricted 66; | Field: 6 | Pace: moderate\n\nForm status: 6/6 have race form\n## Runners\n\n### 1. Dramaticus\nOdds: $3.00 win / $1.70 place \u2192 33.3% implied\nJockey: Brooke King (A/E: 1.17)\nTrainer: T & C McEvoy (A/E: 0.99)\nCareer: 17: 4-1-4 (24% win)\nBarrier: 1 | Weight: 57kg\nSpeed Rank: 1 | Settles: 3\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|-..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Dramaticus",
+              "tab_no": 1,
+              "odds": 3.0,
+              "tag": "The one to beat",
+              "analysis": "Clear speed leader with consistent 100+ ratings at similar distances and conditions. Strong jockey booking with Brooke King (A/E 1.17) and drawn perfectly in barrier 1.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Sassy For Sure",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "Each-way chance",
+              "analysis": "Last start ran well for 4th at this exact track and distance with a 99.5 rating. Won over 1200m at Mornington in similar conditions and gets significant weight relief.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Dramaticus stands out with superior ratings at similar conditions and distance, while Sassy For Sure offers place value having run well here recently",
+          "prompt_preview": "# Morphettville Parks Race 3: \nDistance: 1250m | Condition: G4 | Class: Restricted 66; | Field: 6 | Pace: moderate\n\nForm status: 6/6 have race form\n## Runners\n\n### 1. Dramaticus\nOdds: $3.00 win / $1.70 place \u2192 33.3% implied\nJockey: Brooke King (A/E: 1.17)\nTrainer: T & C McEvoy\nCareer: 17: 4-1-4 (24% win)\nBarrier: 1 | Weight: 57kg\nSpeed Rank: 1 | Settles: 3\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|-----..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Dramaticus",
+              "tab_no": 1,
+              "odds": 3.0,
+              "tag": "The one to beat",
+              "analysis": "Top speed rank with solid adjusted ratings around 101 at similar distances. Recent 3rd at Ararat over 1600m shows good form stepping back to 1250m. Barrier 1 advantage with experienced jockey.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Sassy For Sure",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "Each-way chance",
+              "analysis": "Strong adjusted rating of 102+ when winning at Mornington over 1200m. Recent 4th at this track/distance shows familiarity. Light weight of 55kg is a significant advantage.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Marcolt",
+              "tab_no": 2,
+              "odds": 26.0,
+              "tag": "Value bet",
+              "analysis": "Excellent adjusted rating of 102+ when winning at Naracoorte. Recent trial win suggests return to form. At $26 odds, represents significant value despite inconsistent recent form.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Dramaticus leads on speed ratings and barrier draw. Sassy For Sure offers each-way value with strong form at similar distances. Marcolt's trial win and high rating when last successful makes him a speculative value play at long odds.",
+          "prompt_preview": "# Morphettville Parks Race 3: \nDistance: 1250m | Condition: G4 | Class: Restricted 66; | Field: 6 | Pace: moderate\n\nForm status: 6/6 have race form\n## Runners\n\n### 1. Dramaticus\nOdds: $3.00 win / $1.70 place \u2192 33.3% implied\nJockey: Brooke King (A/E: 1.17)\nTrainer: T & C McEvoy\nCareer: 17: 4-1-4 (24% win)\nBarrier: 1 | Weight: 57kg\nSpeed Rank: 1 | Settles: 3\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|..."
+        }
+      }
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "full_results": {
+        "cloudland": {
+          "position": 11,
+          "won": false,
+          "placed": false,
+          "sp": 51
+        },
+        "our gold hope": {
+          "position": 10,
+          "won": false,
+          "placed": false,
+          "sp": 61
+        },
+        "bandi's boy": {
+          "position": 9,
+          "won": false,
+          "placed": false,
+          "sp": 41
+        },
+        "wonder boy": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 26
+        },
+        "lilac": {
+          "position": 12,
+          "won": false,
+          "placed": false,
+          "sp": 20
+        },
+        "charcoals": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 20
+        },
+        "althoff": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 41
+        },
+        "overriding": {
+          "position": 13,
+          "won": false,
+          "placed": false,
+          "sp": 51
+        },
+        "captain furai": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 3.4
+        },
+        "sir dinadan": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 41
+        },
+        "our queen": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 3.1
+        },
+        "amreekiyah": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 4.4
+        },
+        "cool jakey": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 10
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Our Queen",
+              "tab_no": 13,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Strong recent win at Warwick Farm over 1100m in S6 conditions, showing good form first-up. Has won 4 from 7 starts with excellent strike rate and gets significant weight relief with 53.5kg. Tim Clark's strong A/E of 1.22 adds confidence.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Captain Furai",
+              "tab_no": 11,
+              "odds": 3.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with win two starts back at Rosehill 1300m and solid third last start at this track/distance. Chris Waller stable in good form and James McDonald's strong A/E of 1.16 is positive. Gets barrier 1 advantage.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Amreekiyah",
+              "tab_no": 14,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Won well at Randwick 1400m two starts back and ran solid second last start at this track/distance. Peter Snowden's excellent A/E of 1.33 is a strong positive despite jockey concerns. Gets same weight relief as Our Queen at 53.5kg.",
+              "tipsheet_pick": false,
+              "actual_position": 7,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Clear standouts with Our Queen and Captain Furai both showing strong recent form at similar distances. Our Queen gets the nod as the one to beat with her excellent strike rate and recent win.",
+          "prompt_preview": "# Rosehill Race 4: \nDistance: 1400m | Condition: S9 | Class: Benchmark 88; | Field: 13 | Pace: moderate\n\nForm status: 13/13 have race form\n## Runners\n\n### 1. Cloudland\nOdds: $51.00 win / $18.50 place \u2192 2.0% implied\nJockey: William A Stanley (A/E: 1.39)\nTrainer: K A Lees (A/E: 0.98)\nCareer: 29: 8-5-3 (28% win)\nBarrier: 10 | Weight: 58kg\nSpeed Rank: 9 | Settles: 4\nForm: 4 race runs, 6 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Captain Furai",
+              "tab_no": 11,
+              "odds": 3.4,
+              "tag": "The one to beat",
+              "analysis": "Strong recent form with 3rd at this track/distance last start (10111.2 rating) and won at 1300m two starts back. Consistent ratings around 10110-10126 at similar conditions with Waller/McDonald combination.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Our Queen",
+              "tab_no": 13,
+              "odds": 3.1,
+              "tag": "Each-way chance",
+              "analysis": "Impressive 4 wins from 7 starts but last win was at shorter 1100m trip. Limited form at 1400m with 6th placing, though gets significant weight relief at 53.5kg.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Amreekiyah",
+              "tab_no": 14,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Excellent recent form with 2nd last start at this exact track/distance (10120.0 rating) and won over 1400m two starts back. Strong Snowden stable form and competitive ratings.",
+              "tipsheet_pick": true,
+              "actual_position": 7,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Captain Furai stands out with consistent form at the distance and strong Waller stable. Amreekiyah ran well here last start and has proven 1400m form. Our Queen has excellent strike rate but question marks over the distance.",
+          "prompt_preview": "# Rosehill Race 4: \nDistance: 1400m | Condition: S9 | Class: Benchmark 88; | Field: 13 | Pace: moderate\n\nForm status: 13/13 have race form\n## Runners\n\n### 1. Cloudland\nOdds: $51.00 win / $18.50 place \u2192 2.0% implied\nJockey: William A Stanley (A/E: 1.39)\nTrainer: K A Lees (A/E: 0.98)\nCareer: 29: 8-5-3 (28% win)\nBarrier: 10 | Weight: 58kg\nSpeed Rank: 9 | Settles: 4\nForm: 4 race runs, 6 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|-..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Our Queen",
+              "tab_no": 13,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Strong form with 4 wins from 7 starts and excellent ratings at similar distances. Recent 102.0 rating at 1100m on S6 conditions shows she handles wet tracks well. Gets significant weight relief at 53.5kg.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Cool Jakey",
+              "tab_no": 15,
+              "odds": 10.0,
+              "tag": "Value bet",
+              "analysis": "Outstanding recent form with 104.3 and 104.0 ratings at exactly this distance. The 8-9kg weight rise is concerning but his class ratings are superior to most of the field. Strong value at $10.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Amreekiyah",
+              "tab_no": 14,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with solid 101.9 rating last start at this exact track and distance. Four wins from 11 starts shows genuine ability and gets weight relief to 53.5kg.",
+              "tipsheet_pick": false,
+              "actual_position": 7,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Strong race with clear form lines. Our Queen looks the standout with excellent strike rate and proven wet track ability, while Cool Jakey offers great value despite weight concerns.",
+          "prompt_preview": "# Rosehill Race 4: \nDistance: 1400m | Condition: S9 | Class: Benchmark 88; | Field: 13 | Pace: moderate\n\nForm status: 13/13 have race form\n## Runners\n\n### 1. Cloudland\nOdds: $51.00 win / $18.50 place \u2192 2.0% implied\nJockey: William A Stanley (A/E: 1.39)\nTrainer: K A Lees (A/E: 0.98)\nCareer: 29: 8-5-3 (28% win)\nBarrier: 10 | Weight: 58kg\nSpeed Rank: 9 | Settles: 4\nForm: 4 race runs, 6 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Our Queen",
+              "tab_no": 13,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Strong recent win at Warwick Farm over 1100m in soft conditions, stepping up to 1400m which suits based on previous form. Excellent jockey booking with Tim Clark (A/E 1.22) and gets significant weight relief at 53.5kg.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Captain Furai",
+              "tab_no": 11,
+              "odds": 3.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with strong recent form including a win at this track/distance in February. James McDonald booking (A/E 1.16) is positive and the horse has shown it handles these conditions well.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Cool Jakey",
+              "tab_no": 15,
+              "odds": 10.0,
+              "tag": "Value bet",
+              "analysis": "Won well at Randwick over 1400m in January and has competitive ratings despite carrying top weight. Joshua Parr has strong A/E of 1.16 and the horse's best form is at this distance.",
+              "tipsheet_pick": false,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Our Queen looks the standout with excellent recent form and significant weight advantage. Captain Furai provides the main danger with consistent form at the track/distance.",
+          "prompt_preview": "# Rosehill Race 4: \nDistance: 1400m | Condition: S9 | Class: Benchmark 88; | Field: 13 | Pace: moderate\n\nForm status: 13/13 have race form\n## Runners\n\n### 1. Cloudland\nOdds: $51.00 win / $18.50 place \u2192 2.0% implied\nJockey: William A Stanley (A/E: 1.39)\nTrainer: K A Lees\nCareer: 29: 8-5-3 (28% win)\nBarrier: 10 | Weight: 58kg\nSpeed Rank: 9 | Settles: 4\nForm: 4 race runs, 6 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|----..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Our Queen",
+              "tab_no": 13,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Impressive 57% strike rate with 4 wins from 7 starts. Recent Warwick Farm win at 1100m shows she's in form. Gets significant weight relief (53.5kg) and has Tim Clark aboard. Speed rating of 10030.8 at Canterbury is competitive for this grade. Drawn well in barrier 3.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Captain Furai",
+              "tab_no": 11,
+              "odds": 3.4,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with 31% strike rate. Recent form solid with 3rd at this track/distance last start (Adj 10111.2). Won well at Rosehill 1300m two starts back. James McDonald is a positive and gets into the race well from barrier 1. Chris Waller stable in good form.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Cool Jakey",
+              "tab_no": 15,
+              "odds": 10.0,
+              "tag": "Value bet",
+              "analysis": "Strong speed ratings including 10373.9 at Canberra and 10297.0 at Randwick in recent starts. Won well at Randwick 1400m three starts back. Carries top weight (63kg) but Joshua Parr rides well. At $10 offers value given his ability when right.",
+              "tipsheet_pick": false,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Our Queen looks the standout with her excellent strike rate and weight advantage. Captain Furai provides the main danger with consistent form and ideal barrier draw. Cool Jakey offers value at longer odds with strong recent speed figures despite the weight burden.",
+          "prompt_preview": "# Rosehill Race 4: \nDistance: 1400m | Condition: S9 | Class: Benchmark 88; | Field: 13 | Pace: moderate\n\nForm status: 13/13 have race form\n## Runners\n\n### 1. Cloudland\nOdds: $51.00 win / $18.50 place \u2192 2.0% implied\nJockey: William A Stanley (A/E: 1.39)\nTrainer: K A Lees\nCareer: 29: 8-5-3 (28% win)\nBarrier: 10 | Weight: 58kg\nSpeed Rank: 9 | Settles: 4\nForm: 4 race runs, 6 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------..."
+        }
+      }
+    }
+  ]
+}

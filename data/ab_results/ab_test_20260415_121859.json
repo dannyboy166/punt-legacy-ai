@@ -1,0 +1,238 @@
+{
+  "test_time": "2026-04-15T12:17:41.673239",
+  "variations_tested": [
+    "v1_baseline",
+    "v2_adj_only",
+    "v3_no_pos_margin",
+    "v4_no_trainer_ae",
+    "v5_minimal_prompt"
+  ],
+  "races_tested": 5,
+  "races": [
+    {
+      "track": "Kembla Grange",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "actual_results": [
+        {
+          "horse": "Coulter",
+          "tag": "Main danger",
+          "odds": 1.85,
+          "won": 1,
+          "placed": 1,
+          "finishing_position": 1
+        },
+        {
+          "horse": "Zougotme",
+          "tag": "The one to beat",
+          "odds": 6.5,
+          "won": 0,
+          "placed": 0,
+          "finishing_position": 4
+        }
+      ],
+      "variations": {
+        "v1_baseline": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v2_adj_only": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v3_no_pos_margin": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v4_no_trainer_ae": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v5_minimal_prompt": {
+          "error": "Track condition not available",
+          "contenders": []
+        }
+      }
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 4,
+      "date": "31-Mar-2026",
+      "actual_results": [
+        {
+          "horse": "Erin Jo",
+          "tag": "Main danger",
+          "odds": 3.1,
+          "won": 0,
+          "placed": 1,
+          "finishing_position": 2
+        },
+        {
+          "horse": "Lightning Glory",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": 1,
+          "placed": 1,
+          "finishing_position": 1
+        }
+      ],
+      "variations": {
+        "v1_baseline": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v2_adj_only": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v3_no_pos_margin": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v4_no_trainer_ae": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v5_minimal_prompt": {
+          "error": "Track condition not available",
+          "contenders": []
+        }
+      }
+    },
+    {
+      "track": "Mornington",
+      "race_number": 7,
+      "date": "05-Apr-2026",
+      "actual_results": [
+        {
+          "horse": "Magnardo",
+          "tag": "Promo Play",
+          "odds": 2.6,
+          "won": 1,
+          "placed": 1,
+          "finishing_position": 1
+        },
+        {
+          "horse": "Phantom Prince",
+          "tag": "Bonus Bet",
+          "odds": 17.0,
+          "won": 0,
+          "placed": 0,
+          "finishing_position": 6
+        }
+      ],
+      "variations": {
+        "v1_baseline": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v2_adj_only": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v3_no_pos_margin": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v4_no_trainer_ae": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v5_minimal_prompt": {
+          "error": "Track condition not available",
+          "contenders": []
+        }
+      }
+    },
+    {
+      "track": "Morphettville Parks",
+      "race_number": 3,
+      "date": "21-Mar-2026",
+      "actual_results": [
+        {
+          "horse": "Dramaticus",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": 0,
+          "placed": 0,
+          "finishing_position": 3
+        }
+      ],
+      "variations": {
+        "v1_baseline": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v2_adj_only": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v3_no_pos_margin": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v4_no_trainer_ae": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v5_minimal_prompt": {
+          "error": "Track condition not available",
+          "contenders": []
+        }
+      }
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "actual_results": [
+        {
+          "horse": "Our Queen",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": 0,
+          "placed": 0,
+          "finishing_position": 4
+        },
+        {
+          "horse": "Amreekiyah",
+          "tag": "Main danger",
+          "odds": 4.4,
+          "won": 0,
+          "placed": 0,
+          "finishing_position": 7
+        },
+        {
+          "horse": "Captain Furai",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": 1,
+          "placed": 1,
+          "finishing_position": 1
+        }
+      ],
+      "variations": {
+        "v1_baseline": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v2_adj_only": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v3_no_pos_margin": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v4_no_trainer_ae": {
+          "error": "Track condition not available",
+          "contenders": []
+        },
+        "v5_minimal_prompt": {
+          "error": "Track condition not available",
+          "contenders": []
+        }
+      }
+    }
+  ]
+}

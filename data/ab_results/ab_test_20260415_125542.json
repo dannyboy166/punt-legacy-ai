@@ -1,0 +1,1007 @@
+{
+  "test_time": "2026-04-15T13:25:51.685090",
+  "variations_tested": [
+    "v1_baseline",
+    "v2_adj_only",
+    "v3_no_pos_margin",
+    "v4_no_trainer_ae",
+    "v5_minimal_prompt"
+  ],
+  "races_tested": 8,
+  "races": [
+    {
+      "track": "Randwick",
+      "race_number": 8,
+      "date": "04-Apr-2026",
+      "full_results": {
+        "gringotts": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 12
+        },
+        "pericles": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 15
+        },
+        "headley grange": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 16
+        },
+        "evaporate": {
+          "position": 9,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "linebacker": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 20
+        },
+        "militarize": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 41
+        },
+        "autumn boy": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 10
+        },
+        "steparty": {
+          "position": 12,
+          "won": false,
+          "placed": false,
+          "sp": 19
+        },
+        "vivy air": {
+          "position": 10,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "attica": {
+          "position": 13,
+          "won": false,
+          "placed": false,
+          "sp": 26
+        },
+        "cristal clear": {
+          "position": 15,
+          "won": false,
+          "placed": false,
+          "sp": 51
+        },
+        "scheelite": {
+          "position": 16,
+          "won": false,
+          "placed": false,
+          "sp": 101
+        },
+        "encap": {
+          "position": 14,
+          "won": false,
+          "placed": false,
+          "sp": 81
+        },
+        "hellsing": {
+          "position": 11,
+          "won": false,
+          "placed": false,
+          "sp": 201
+        },
+        "sheza alibi": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 1.9
+        },
+        "sixties": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 20
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Sheza Alibi",
+              "tab_no": 15,
+              "odds": 1.9,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with 104.4 rating at exact distance/conditions last start, winning by 3.2L. 70% career strike rate and proven at this level with consistent high ratings.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Vivy Air",
+              "tab_no": 9,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent form with 104.5 rating at exact distance in November and won at 1800m last prep. Current prep third at 1500m with solid 102.7 rating suggests competitive chance at good odds.",
+              "tipsheet_pick": true,
+              "actual_position": 10,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Sheza Alibi is the clear standout with superior ratings at this distance and conditions. Vivy Air offers value with proven form at the trip and competitive ratings despite longer odds.",
+          "prompt_preview": "# Randwick Race 8: \nDistance: 1600m | Condition: S9 | Class: Open; | Field: 16 | Pace: moderate\n\nForm status: 16/16 have race form\n## Runners\n\n### 1. Gringotts\nOdds: $12.00 win / $4.85 place \u2192 8.3% implied\nJockey: Nash Rawiller (A/E: 0.85)\nTrainer: C Maher (A/E: 1.20)\nCareer: 29: 12-6-4 (41% win)\nBarrier: 2 | Weight: 58.5kg\nSpeed Rank: 25 | Settles: 9\nForm: 7 race runs, 3 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|---..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Sheza Alibi",
+              "tab_no": 15,
+              "odds": 1.9,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with exceptional ratings at the distance - 10340.5 adjusted rating when winning at Randwick 1600m last start is significantly superior to the field. Won 7 of 10 starts with strong form at similar conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Vivy Air",
+              "tab_no": 9,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent form with wins at Rosehill 1800m (10234.2) and Randwick 1600m (10170.3) showing competitive ratings at the distance. Gets significant weight relief and trainer Maher has strong strike rate.",
+              "tipsheet_pick": true,
+              "actual_position": 10,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Evaporate",
+              "tab_no": 4,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Solid second at Flemington 1600m (10292.4 rating) and won at Randwick 1600m in April with 10214.3 rating. Hayes stable in good form and competitive ratings at the distance despite poor last start.",
+              "tipsheet_pick": false,
+              "actual_position": 9,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Sheza Alibi is the clear standout with superior ratings at the distance. Two value chances emerge from the longer odds with competitive form at similar conditions.",
+          "prompt_preview": "# Randwick Race 8: \nDistance: 1600m | Condition: S9 | Class: Open; | Field: 16 | Pace: moderate\n\nForm status: 16/16 have race form\n## Runners\n\n### 1. Gringotts\nOdds: $12.00 win / $4.85 place \u2192 8.3% implied\nJockey: Nash Rawiller (A/E: 0.85)\nTrainer: C Maher (A/E: 1.20)\nCareer: 29: 12-6-4 (41% win)\nBarrier: 2 | Weight: 58.5kg\nSpeed Rank: 25 | Settles: 9\nForm: 7 race runs, 3 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|-----..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Sheza Alibi",
+              "tab_no": 15,
+              "odds": 1.9,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with 104.4 rating at exact distance/conditions last start at Randwick 1600m G4. Strong 70% career win rate and dominated similar fields recently.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Gringotts",
+              "tab_no": 1,
+              "odds": 12.0,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with solid ratings around 102-104 at the distance. Two runs at Randwick 1600m show competitive form including 102.9 rating in December.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Pericles",
+              "tab_no": 2,
+              "odds": 15.0,
+              "tag": "Value bet",
+              "analysis": "Strong ratings at the distance including 104.6 at Randwick 1600m G4 and 103.6 at similar trip. Quality jockey Craig Williams (A/E 1.19) adds appeal at generous odds.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Sheza Alibi is the clear standout with superior ratings at exact conditions. Pericles offers value with strong distance form at attractive odds.",
+          "prompt_preview": "# Randwick Race 8: \nDistance: 1600m | Condition: S9 | Class: Open; | Field: 16 | Pace: moderate\n\nForm status: 16/16 have race form\n## Runners\n\n### 1. Gringotts\nOdds: $12.00 win / $4.85 place \u2192 8.3% implied\nJockey: Nash Rawiller (A/E: 0.85)\nTrainer: C Maher (A/E: 1.20)\nCareer: 29: 12-6-4 (41% win)\nBarrier: 2 | Weight: 58.5kg\nSpeed Rank: 25 | Settles: 9\nForm: 7 race runs, 3 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|----..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Sheza Alibi",
+              "tab_no": 15,
+              "odds": 1.9,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with 104.4 rating at exact distance on G4 track last start, winning by 3.2L. Previous win at 1400m shows versatility and 70% career strike rate demonstrates class.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Vivy Air",
+              "tab_no": 9,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Strong 102.7 rating at similar distance last start finishing 3rd by 0.6L. Previous wins at 1600m including 104.5 rating on S7 track show ability at this trip.",
+              "tipsheet_pick": true,
+              "actual_position": 10,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Autumn Boy",
+              "tab_no": 7,
+              "odds": 10.0,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 2000m and ran 2nd at this exact distance with 103.9 rating. Light weight of 52kg and proven at the distance make him competitive.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Sheza Alibi is the clear standout with superior ratings at the exact conditions. Vivy Air offers value with competitive form at the distance.",
+          "prompt_preview": "# Randwick Race 8: \nDistance: 1600m | Condition: S9 | Class: Open; | Field: 16 | Pace: moderate\n\nForm status: 16/16 have race form\n## Runners\n\n### 1. Gringotts\nOdds: $12.00 win / $4.85 place \u2192 8.3% implied\nJockey: Nash Rawiller (A/E: 0.85)\nTrainer: C Maher\nCareer: 29: 12-6-4 (41% win)\nBarrier: 2 | Weight: 58.5kg\nSpeed Rank: 25 | Settles: 9\nForm: 7 race runs, 3 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|-..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Sheza Alibi",
+              "tab_no": 15,
+              "odds": 1.9,
+              "tag": "The one to beat",
+              "analysis": "Dominant form with 7 wins from 10 starts (70% strike rate). Last start winner at Randwick 1600m with superior Adj rating of 10340.5. Previous win at Caulfield 1400m shows versatility. Light weight of 49kg is a significant advantage. Only concern is jockey Melham's poor A/E ratio of 0.66.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Autumn Boy",
+              "tab_no": 7,
+              "odds": 10.0,
+              "tag": "Each-way chance",
+              "analysis": "Last start winner at Rosehill 2000m stepping back to 1600m. Strong recent form with 2nd at Randwick 1600m (Adj 10290.1) behind quality opposition. Light weight of 52kg and inside barrier draw are positives. Waller stable in good form.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Sixties",
+              "tab_no": 16,
+              "odds": 20.0,
+              "tag": "Value bet",
+              "analysis": "Last start winner at Rosehill 1500m with solid Adj rating of 10065.0. Strong recent form including wins at Flemington 1400m and Rosehill 1200m. Light weight of 49kg is a major advantage. Wide barrier is the main negative but has shown ability to overcome draws.",
+              "tipsheet_pick": false,
+              "actual_position": 8,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Sheza Alibi looks the clear standout with dominant form and a significant weight advantage. Autumn Boy offers each-way value as a last-start winner stepping back in distance, while Sixties represents excellent value at $20 given recent winning form and minimum weight.",
+          "prompt_preview": "# Randwick Race 8: \nDistance: 1600m | Condition: S9 | Class: Open; | Field: 16 | Pace: moderate\n\nForm status: 16/16 have race form\n## Runners\n\n### 1. Gringotts\nOdds: $12.00 win / $4.85 place \u2192 8.3% implied\nJockey: Nash Rawiller (A/E: 0.85)\nTrainer: C Maher\nCareer: 29: 12-6-4 (41% win)\nBarrier: 2 | Weight: 58.5kg\nSpeed Rank: 25 | Settles: 9\nForm: 7 race runs, 3 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|------|---..."
+        }
+      }
+    },
+    {
+      "track": "Pinjarra",
+      "race_number": 3,
+      "date": "22-Mar-2026",
+      "full_results": {
+        "golden chatter": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 5
+        },
+        "quokka rocka": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 12
+        },
+        "the sessione": {
+          "position": 12,
+          "won": false,
+          "placed": false,
+          "sp": 41
+        },
+        "gig master": {
+          "position": 13,
+          "won": false,
+          "placed": false,
+          "sp": 81
+        },
+        "sandsational": {
+          "position": 11,
+          "won": false,
+          "placed": false,
+          "sp": 51
+        },
+        "kentucky drive": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 16
+        },
+        "mamma says so": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 3.1
+        },
+        "valanne dawn": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 12
+        },
+        "effortlessly": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 6.5
+        },
+        "shooters": {
+          "position": 10,
+          "won": false,
+          "placed": false,
+          "sp": 151
+        },
+        "bahnbougle baby": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 11
+        },
+        "american boogie": {
+          "position": 14,
+          "won": false,
+          "placed": false,
+          "sp": 151
+        },
+        "my breanna": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "snipelisa": {
+          "position": 9,
+          "won": false,
+          "placed": false,
+          "sp": 7
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Mamma Says So",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with consistent form at similar distances, including two recent seconds at 1000m and 1100m with ratings around 99. The step up to 1200m suits and she's shown improvement through her prep.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Golden Chatter",
+              "tab_no": 1,
+              "odds": 5.0,
+              "tag": "Each-way chance",
+              "analysis": "Won on debut at Belmont Park and ran a solid fourth last start with a 98.4 rating at 1000m. The step up to 1200m is the query but has shown ability and gets Ramoly who has a strong strike rate.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Limited race form across the field with many runners having only trials, but Mamma Says So stands out with consistent placings and solid ratings. Golden Chatter offers value as the only winner in the field.",
+          "prompt_preview": "# Pinjarra Race 3: \nDistance: 1200m | Condition: G4 | Class: Maiden; | Field: 14 | Pace: moderate\n\nForm status: 10/14 have race form\n## Runners\n\n### 1. Golden Chatter\nOdds: $5.00 win / $2.40 place \u2192 20.0% implied\nJockey: Laqdar Ramoly (A/E: 1.21)\nTrainer: Meryl Hayley (A/E: 0.77)\nCareer: 4: 1-0-0 (25% win)\nBarrier: 12 | Weight: 57kg\nSpeed Rank: 2 | Settles: 9\nForm: 2 race runs, 4 trials \u26a0\ufe0f LIMITED\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Mamma Says So",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Has the best recent form with two seconds from three starts this prep, including a close second at Ascot over 1000m. The step up to 1200m looks ideal given her strong finish at Bunbury over 1100m.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Golden Chatter",
+              "tab_no": 1,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Won on debut at Belmont Park and has shown ability in limited race exposure. The step up to 1200m should suit and Ramoly's strong A/E of 1.21 is a positive.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Field has too many unknowns with 10/14 runners having limited race form. Only backing the two horses with clear race form advantages.",
+          "prompt_preview": "# Pinjarra Race 3: \nDistance: 1200m | Condition: G4 | Class: Maiden; | Field: 14 | Pace: moderate\n\nForm status: 10/14 have race form\n## Runners\n\n### 1. Golden Chatter\nOdds: $5.00 win / $2.40 place \u2192 20.0% implied\nJockey: Laqdar Ramoly (A/E: 1.21)\nTrainer: Meryl Hayley (A/E: 0.77)\nCareer: 4: 1-0-0 (25% win)\nBarrier: 12 | Weight: 57kg\nSpeed Rank: 2 | Settles: 9\nForm: 2 race runs, 4 trials \u26a0\ufe0f LIMITED\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Mamma Says So",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with consistent ratings around 99-100 at similar distances and conditions. Won at Bunbury over 1200m with a 100.5 rating and has shown improvement through this prep with recent 99+ ratings.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Golden Chatter",
+              "tab_no": 1,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Limited race experience but showed solid 98+ ratings in both starts at similar conditions. Strong jockey booking with Ramoly (A/E 1.21) and the step up to 1200m could suit.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Field has too many unknowns with 4/14 having no race form, but Mamma Says So stands out clearly on ratings with Golden Chatter offering some value despite limited experience.",
+          "prompt_preview": "# Pinjarra Race 3: \nDistance: 1200m | Condition: G4 | Class: Maiden; | Field: 14 | Pace: moderate\n\nForm status: 10/14 have race form\n## Runners\n\n### 1. Golden Chatter\nOdds: $5.00 win / $2.40 place \u2192 20.0% implied\nJockey: Laqdar Ramoly (A/E: 1.21)\nTrainer: Meryl Hayley (A/E: 0.77)\nCareer: 4: 1-0-0 (25% win)\nBarrier: 12 | Weight: 57kg\nSpeed Rank: 2 | Settles: 9\nForm: 2 race runs, 4 trials \u26a0\ufe0f LIMITED\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Mamma Says So",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with consistent form including two recent seconds at Ascot and Bunbury. Rating of 99+ in recent starts shows she's competitive at this level and distance.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Golden Chatter",
+              "tab_no": 1,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Won on debut and has solid ratings around 98+ at similar distances. Strong jockey booking with Ramoly (A/E 1.21) adds confidence at attractive odds.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Limited race with 10/14 having race form and many runners with only trial experience. Mamma Says So stands out with consistent placings and good ratings, while Golden Chatter offers value as a debut winner.",
+          "prompt_preview": "# Pinjarra Race 3: \nDistance: 1200m | Condition: G4 | Class: Maiden; | Field: 14 | Pace: moderate\n\nForm status: 10/14 have race form\n## Runners\n\n### 1. Golden Chatter\nOdds: $5.00 win / $2.40 place \u2192 20.0% implied\nJockey: Laqdar Ramoly (A/E: 1.21)\nTrainer: Meryl Hayley\nCareer: 4: 1-0-0 (25% win)\nBarrier: 12 | Weight: 57kg\nSpeed Rank: 2 | Settles: 9\nForm: 2 race runs, 4 trials \u26a0\ufe0f LIMITED\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|---..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Mamma Says So",
+              "tab_no": 7,
+              "odds": 3.1,
+              "tag": "The one to beat",
+              "analysis": "Clear form advantage with consistent placings including recent 2nd at Ascot (Adj 9969.8) and 2nd at Bunbury (Adj 10089.5). Only horse with multiple race wins and strong recent form at this distance. Wide barrier (14) is a concern but class edge is significant.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Effortlessly",
+              "tab_no": 9,
+              "odds": 6.5,
+              "tag": "Each-way chance",
+              "analysis": "Solid recent form with 2nd at Bunbury over 1400m (Adj 10008.7) showing ability to handle distance increases. Good barrier (7) and settles forward (2nd). Recent trial keeps him sharp and the step up to 1200m looks suitable.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Golden Chatter",
+              "tab_no": 1,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Last start winner with good speed ratings when racing. The Ascot run (Adj 9892.6) shows competitive form at this level. Jockey Ramoly has strong A/E ratio (1.21). Wide barrier is negative but the class from that win gives confidence.",
+              "tipsheet_pick": false,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Mamma Says So stands out with superior race form and consistent placings at this level. The wide barrier is a concern but the class edge is significant in a weak maiden field. Effortlessly offers each-way value with good recent form over longer trips, while Golden Chatter brings winning form despite the wide draw.",
+          "prompt_preview": "# Pinjarra Race 3: \nDistance: 1200m | Condition: G4 | Class: Maiden; | Field: 14 | Pace: moderate\n\nForm status: 10/14 have race form\n## Runners\n\n### 1. Golden Chatter\nOdds: $5.00 win / $2.40 place \u2192 20.0% implied\nJockey: Laqdar Ramoly (A/E: 1.21)\nTrainer: Meryl Hayley\nCareer: 4: 1-0-0 (25% win)\nBarrier: 12 | Weight: 57kg\nSpeed Rank: 2 | Settles: 9\nForm: 2 race runs, 4 trials \u26a0\ufe0f LIMITED\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|-----..."
+        }
+      }
+    },
+    {
+      "track": "Sunshine Coast",
+      "race_number": 4,
+      "date": "29-Mar-2026",
+      "full_results": {
+        "san jose boy": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 4.6
+        },
+        "italian dancer": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 9
+        },
+        "retainer": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 4.4
+        },
+        "pireonti": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 6.5
+        },
+        "decimus": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 6
+        },
+        "more for ready": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 7
+        },
+        "grey impact": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 5
+        },
+        "eight cylinders": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 201
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "San Jose Boy",
+              "tab_no": 1,
+              "odds": 4.6,
+              "tag": "The one to beat",
+              "analysis": "Won last start at Ipswich 1700m on Good4 with a 101.1 rating, showing he's in career-best form. Has strong form at similar distances with consistent ratings around 100, and the step up to Soft9 shouldn't be an issue given his versatility across conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Retainer",
+              "tab_no": 3,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at Sunshine Coast 1400m on Heavy10 and has been competitive in recent runs with ratings consistently around 100-101. The step up to 1600m looks suitable given previous form at longer distances, though jockey A/E of 0.85 is a slight concern.",
+              "tipsheet_pick": false,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Grey Impact",
+              "tab_no": 8,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Ran second at both Sunshine Coast and Rockhampton recently with strong ratings of 100.8 and 101.1. Gets significant weight relief (52kg) and has Jett Newman (A/E 1.29) aboard, making the $5.00 odds attractive for a horse showing consistent form.",
+              "tipsheet_pick": true,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "San Jose Boy stands out as the form horse with a last-start win and consistent ratings. Retainer and Grey Impact offer solid each-way and value prospects respectively.",
+          "prompt_preview": "# Sunshine Coast Race 4: \nDistance: 1600m | Condition: S9 | Class: Class 4; | Field: 8 | Pace: moderate\n\nForm status: 8/8 have race form\n## Runners\n\n### 1. San Jose Boy\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Ben E Thompson (A/E: 1.17)\nTrainer: Jack Bruce (A/E: 0.84)\nCareer: 18: 3-5-3 (17% win)\nBarrier: 8 | Weight: 59kg\nSpeed Rank: 7 | Settles: 6\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|-..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "San Jose Boy",
+              "tab_no": 1,
+              "odds": 4.6,
+              "tag": "The one to beat",
+              "analysis": "Clear standout with excellent recent form including a win at 1700m on Good track. His adjusted rating of 10115.3 from the February win is significantly higher than the field, and he's proven at this distance range with multiple placings at 1666-1700m.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Retainer",
+              "tab_no": 3,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "In excellent form with a recent win at 1400m in Heavy conditions and strong placings. The step up to 1600m suits as shown by previous form, and the 3kg weight drop to 55kg is a significant advantage.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Grey Impact",
+              "tab_no": 8,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent placings including a close second at Rockhampton over 1400m. The light weight of 52kg and positive jockey booking with Newman (A/E 1.29) makes this competitive value at $5.00 odds.",
+              "tipsheet_pick": false,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "San Jose Boy stands out with superior ratings and recent win form. Retainer offers solid each-way value with excellent recent form and weight relief. Grey Impact provides value at longer odds with consistent placing form.",
+          "prompt_preview": "# Sunshine Coast Race 4: \nDistance: 1600m | Condition: S9 | Class: Class 4; | Field: 8 | Pace: moderate\n\nForm status: 8/8 have race form\n## Runners\n\n### 1. San Jose Boy\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Ben E Thompson (A/E: 1.17)\nTrainer: Jack Bruce (A/E: 0.84)\nCareer: 18: 3-5-3 (17% win)\nBarrier: 8 | Weight: 59kg\nSpeed Rank: 7 | Settles: 6\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|---..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "More For Ready",
+              "tab_no": 7,
+              "odds": 7.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent form with ratings of 101+ in last 4 starts including a 101.3 at this exact distance/track in heavy conditions. The step up to soft 9 suits based on previous heavy track performance, and the ratings are competitive with the top of the field.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Grey Impact",
+              "tab_no": 8,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Consistent ratings around 100-102 with good form at similar distances, including a 101.1 at Rockhampton over 1400m in soft conditions. The 52kg weight and barrier 1 provide tactical advantages, while jockey Newman has strong A/E of 1.29.",
+              "tipsheet_pick": true,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Two value plays identified with competitive ratings and favorable odds. More For Ready shows strong recent heavy track form that should translate to soft conditions, while Grey Impact offers tactical advantages from the rail with consistent form.",
+          "prompt_preview": "# Sunshine Coast Race 4: \nDistance: 1600m | Condition: S9 | Class: Class 4; | Field: 8 | Pace: moderate\n\nForm status: 8/8 have race form\n## Runners\n\n### 1. San Jose Boy\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Ben E Thompson (A/E: 1.17)\nTrainer: Jack Bruce (A/E: 0.84)\nCareer: 18: 3-5-3 (17% win)\nBarrier: 8 | Weight: 59kg\nSpeed Rank: 7 | Settles: 6\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|--..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "San Jose Boy",
+              "tab_no": 1,
+              "odds": 4.6,
+              "tag": "The one to beat",
+              "analysis": "Won last start at Ipswich 1700m on Good4 with a strong 101.1 rating, showing excellent form this prep. Has proven ability at similar distances and conditions, with consistent ratings around 100 when fit.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Grey Impact",
+              "tab_no": 8,
+              "odds": 5.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent form with second placings at 1400m, posting good ratings of 100.8 and 101.1. Gets significant weight relief with 52kg and has excellent jockey booking with Newman (A/E 1.29).",
+              "tipsheet_pick": true,
+              "actual_position": 6,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Retainer",
+              "tab_no": 3,
+              "odds": 4.4,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at Sunshine Coast 1400m in Heavy conditions with 100.2 rating. Has good recent form and proven ability at the track, though jockey Tierney has concerning A/E of 0.85.",
+              "tipsheet_pick": false,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            }
+          ],
+          "summary": "San Jose Boy stands out with his last start win and consistent ratings. Grey Impact offers value with good recent form and weight relief.",
+          "prompt_preview": "# Sunshine Coast Race 4: \nDistance: 1600m | Condition: S9 | Class: Class 4; | Field: 8 | Pace: moderate\n\nForm status: 8/8 have race form\n## Runners\n\n### 1. San Jose Boy\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Ben E Thompson (A/E: 1.17)\nTrainer: Jack Bruce\nCareer: 18: 3-5-3 (17% win)\nBarrier: 8 | Weight: 59kg\nSpeed Rank: 7 | Settles: 6\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "San Jose Boy",
+              "tab_no": 1,
+              "odds": 4.6,
+              "tag": "The one to beat",
+              "analysis": "Strong recent form with a dominant win at Ipswich (101.15 adj rating) over 1700m in similar G4 company. Has proven ability at this distance range and class level. The step up from G4 to S9 is manageable, and the 1600m suits his racing pattern.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Decimus",
+              "tab_no": 6,
+              "odds": 6.0,
+              "tag": "Each-way chance",
+              "analysis": "Solid recent form with good adjusted ratings (101.39 at Toowoomba, 100.88 at Gatton). Has won at this distance range before and the drop in weight to 55.5kg with Angela Jones (1.15 A/E) is a positive. The step up in class is the main concern.",
+              "tipsheet_pick": false,
+              "actual_position": 7,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "More For Ready",
+              "tab_no": 7,
+              "odds": 7.0,
+              "tag": "Value bet",
+              "analysis": "Consistent recent form with multiple placings in stronger company. The 100.75 rating at Warwick and 100.87 at Doomben in G3 company suggests ability to compete at this level. Brandon Lerena booking and the distance should suit.",
+              "tipsheet_pick": false,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "San Jose Boy stands out with his recent dominant win and proven form at this distance/class. Decimus offers each-way value with solid ratings and weight relief, while More For Ready represents value having competed well in stronger company recently.",
+          "prompt_preview": "# Sunshine Coast Race 4: \nDistance: 1600m | Condition: S9 | Class: Class 4; | Field: 8 | Pace: moderate\n\nForm status: 8/8 have race form\n## Runners\n\n### 1. San Jose Boy\nOdds: $4.60 win / $2.26 place \u2192 21.7% implied\nJockey: Ben E Thompson (A/E: 1.17)\nTrainer: Jack Bruce\nCareer: 18: 3-5-3 (17% win)\nBarrier: 8 | Weight: 59kg\nSpeed Rank: 7 | Settles: 6\nForm: 9 race runs, 1 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|-..."
+        }
+      }
+    },
+    {
+      "track": "Scone",
+      "race_number": 2,
+      "date": "20-Mar-2026",
+      "full_results": {
+        "mellencamp": {
+          "position": 8,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "hammoon sensation": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 5.5
+        },
+        "set to prophet": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "olympian": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 1.6
+        },
+        "be guided": {
+          "position": 10,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "our warrior": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "yacht girl": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 6
+        },
+        "corpsman": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 21
+        },
+        "smart lily": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "dartbrook": {
+          "position": 9,
+          "won": false,
+          "placed": false,
+          "sp": 81
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Set To Prophet",
+              "tab_no": 3,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Two wins at 1400m including one at Armidale in soft conditions with strong adjusted ratings of 10139.5 and 10109.1. Recent form shows competitive ratings around 100 at similar distances, making the $21 odds generous for a horse with proven ability at this trip.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Yacht Girl",
+              "tab_no": 9,
+              "odds": 6.0,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent second at Beaumont over 1200m with good adjusted rating of 10071.7, and has shown consistent form around the 100 rating mark. Barrier 1 with Christian Reith (A/E 1.26) is a positive, though the step up to 1400m on soft track presents some query.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Olympian is heavily favored but has very limited race form (only 2 runs) making assessment difficult. Set To Prophet offers value with proven 1400m form and strong ratings, while Yacht Girl presents each-way appeal from the rail despite distance concerns.",
+          "prompt_preview": "# Scone Race 2: \nDistance: 1400m | Condition: S9 | Class: Benchmark 58; | Field: 10 | Pace: moderate\n\nForm status: 10/10 have race form\n## Runners\n\n### 1. Mellencamp\nOdds: $21.00 win / $8.00 place \u2192 4.8% implied\nJockey: Deon Le Roux (A/E: 0.95)\nTrainer: A M Boyle (A/E: 1.09)\nCareer: 46: 6-3-7 (13% win)\nBarrier: 6 | Weight: 59kg\nSpeed Rank: 4 | Settles: 3\nForm: 10 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|--..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Set To Prophet",
+              "tab_no": 3,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Strong recent form with two wins at 1400m including one at Armidale in soft conditions (rating 10139.5). The step up to S9 conditions suits based on his Heavy track win at Inverell (rating 10151.2).",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Yacht Girl",
+              "tab_no": 9,
+              "odds": 6.0,
+              "tag": "Each-way chance",
+              "analysis": "Consistent performer with good recent placing at Beaumont 1200m (rating 10071.7). Barrier 1 is a significant advantage and Christian Reith's strong A/E of 1.26 adds confidence.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Olympian is heavily favored but has limited form with only 2 race runs. Set To Prophet offers excellent value with proven form at the distance and conditions, while Yacht Girl presents a solid each-way option from the rail.",
+          "prompt_preview": "# Scone Race 2: \nDistance: 1400m | Condition: S9 | Class: Benchmark 58; | Field: 10 | Pace: moderate\n\nForm status: 10/10 have race form\n## Runners\n\n### 1. Mellencamp\nOdds: $21.00 win / $8.00 place \u2192 4.8% implied\nJockey: Deon Le Roux (A/E: 0.95)\nTrainer: A M Boyle (A/E: 1.09)\nCareer: 46: 6-3-7 (13% win)\nBarrier: 6 | Weight: 59kg\nSpeed Rank: 4 | Settles: 3\nForm: 10 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|----..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Yacht Girl",
+              "tab_no": 9,
+              "odds": 6.0,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent form with ratings of 99-102 at similar distances and conditions. Christian Reith has excellent A/E of 1.26 and the mare has shown consistent improvement through her prep.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Set To Prophet",
+              "tab_no": 3,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Solid ratings around 99-101 at the distance with good form at Scone. Recent run at Armidale in similar soft conditions produced a competitive 98.6 rating, making the $21 odds generous.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Yacht Girl stands out with consistent ratings and strong jockey booking. Set To Prophet offers value at big odds with competitive form. Olympian is too short given limited race experience (only 2 starts).",
+          "prompt_preview": "# Scone Race 2: \nDistance: 1400m | Condition: S9 | Class: Benchmark 58; | Field: 10 | Pace: moderate\n\nForm status: 10/10 have race form\n## Runners\n\n### 1. Mellencamp\nOdds: $21.00 win / $8.00 place \u2192 4.8% implied\nJockey: Deon Le Roux (A/E: 0.95)\nTrainer: A M Boyle (A/E: 1.09)\nCareer: 46: 6-3-7 (13% win)\nBarrier: 6 | Weight: 59kg\nSpeed Rank: 4 | Settles: 3\nForm: 10 race runs\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|------|---..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Hammoon Sensation",
+              "tab_no": 2,
+              "odds": 5.5,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent form with two wins from last three starts at similar distances. Excellent jockey booking with Leeshelle Small (A/E 1.64) and the 1400m distance suits perfectly based on recent victories.",
+              "tipsheet_pick": true,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Set To Prophet",
+              "tab_no": 3,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Two wins at exactly this distance in recent starts with solid ratings around 99-101. The 21.00 odds look generous for a horse that has proven form at 1400m and gets into the race well at the weights.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Olympian is heavily favored but has very limited race form (only 2 runs). Hammoon Sensation offers solid each-way value with proven form at the distance, while Set To Prophet looks over the odds given recent 1400m wins.",
+          "prompt_preview": "# Scone Race 2: \nDistance: 1400m | Condition: S9 | Class: Benchmark 58; | Field: 10 | Pace: moderate\n\nForm status: 10/10 have race form\n## Runners\n\n### 1. Mellencamp\nOdds: $21.00 win / $8.00 place \u2192 4.8% implied\nJockey: Deon Le Roux (A/E: 0.95)\nTrainer: A M Boyle\nCareer: 46: 6-3-7 (13% win)\nBarrier: 6 | Weight: 59kg\nSpeed Rank: 4 | Settles: 3\nForm: 10 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|------|------|..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Olympian",
+              "tab_no": 4,
+              "odds": 1.6,
+              "tag": "The one to beat",
+              "analysis": "Lightly raced 4-start gelding with 50% strike rate. Won last start at Muswellbrook over 1280m in good style, stepping up nicely from maiden grade. Limited exposed form but what we've seen suggests significant ability. Ashley Morgan's record (A/E 0.81) is a slight concern but the horse's natural talent should overcome.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Hammoon Sensation",
+              "tab_no": 2,
+              "odds": 5.5,
+              "tag": "Each-way chance",
+              "analysis": "Impressive 43% strike rate with 3 wins from 7 starts. Won two in a row at Coonamble (1600m) and Dubbo (1400m) in spring before spell. Recent trial win at Scone suggests ready to fire fresh. Leeshelle Small's excellent A/E of 1.64 adds confidence. Distance and conditions suit perfectly.",
+              "tipsheet_pick": false,
+              "actual_position": 3,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Set To Prophet",
+              "tab_no": 3,
+              "odds": 21.0,
+              "tag": "Value bet",
+              "analysis": "Consistent performer with strong recent form including wins at Armidale (1400m) and Scone (1600m). Adjusted ratings of 10139.5 and 10200.0 are competitive for this grade. Last start 7th at Armidale was solid enough, and the step back to Benchmark 58 from higher grades looks favorable. Big odds for a horse with proven ability at the distance.",
+              "tipsheet_pick": false,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Olympian looks the standout despite limited exposure, with his winning form and natural progression suggesting he's the class runner. Hammoon Sensation offers the main danger with proven form and strong jockey booking, while Set To Prophet represents excellent value given his recent winning form at this level.",
+          "prompt_preview": "# Scone Race 2: \nDistance: 1400m | Condition: S9 | Class: Benchmark 58; | Field: 10 | Pace: moderate\n\nForm status: 10/10 have race form\n## Runners\n\n### 1. Mellencamp\nOdds: $21.00 win / $8.00 place \u2192 4.8% implied\nJockey: Deon Le Roux (A/E: 0.95)\nTrainer: A M Boyle\nCareer: 46: 6-3-7 (13% win)\nBarrier: 6 | Weight: 59kg\nSpeed Rank: 4 | Settles: 3\nForm: 10 race runs\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|------|------|--..."
+        }
+      }
+    }
+  ]
+}

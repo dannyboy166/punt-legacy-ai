@@ -1,0 +1,439 @@
+{
+  "test_time": "2026-04-15T12:50:15.639676",
+  "variations_tested": [
+    "v1_baseline",
+    "v2_adj_only",
+    "v3_no_pos_margin",
+    "v4_no_trainer_ae",
+    "v5_minimal_prompt"
+  ],
+  "races_tested": 2,
+  "races": [
+    {
+      "track": "Kembla Grange",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "full_results": {
+        "penalties": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "coulter": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 1.8
+        },
+        "crudo": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 19
+        },
+        "master aron": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 8.5
+        },
+        "mission wise": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 31
+        },
+        "ol' mate coop": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 3.5
+        },
+        "zougotme": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 8
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Consistent placegetter with strong recent form including a close third at this track and distance last start. Has multiple placings at similar conditions and the 102.1 rating at Sapphire Coast shows competitive ability.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Ran second at this exact track and distance last start, beaten only 0.3L. Strong jockey booking with Brock Ryan (A/E 1.33) and has shown consistent form with multiple placings at similar distances.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Coulter is heavily favored but has limited race experience with concerning jockey/trainer strike rates. The value appears to be with the experienced placegetters who have proven form at the track and distance.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Coulter",
+              "tab_no": 4,
+              "odds": 1.8,
+              "tag": "The one to beat",
+              "analysis": "Strong 50% win rate from limited starts with solid second at Hawkesbury over 1300m last start, beaten just 0.5L. The rating of 9965.8 at similar conditions shows competitive form, though jockey A/E of 0.81 is a concern.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Ran excellent second at this track and distance last start, beaten just 0.3L, and has strong jockey Brock Ryan (A/E 1.33). Previous second at Hawkesbury over 1300m with rating 9954.9 shows consistent form at the level.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Consistent placegetter with third at this track and distance last start, beaten just 0.7L. Strong jockey Mitchell Bell (A/E 1.15) and solid recent form including second at Coffs Harbour over 1305m.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Coulter looks the standout despite jockey concerns, with Zougotme offering excellent value after a narrow defeat here last start",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|--..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent form with ratings of 100.8-102.1 in last 3 starts at similar conditions. Last start at this track/distance produced 100.8 rating, showing he handles these exact conditions well.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Matched Ol' Mate Coop's 100.8 rating last start at this exact track/distance. Has shown consistent form around 100+ rating at similar conditions and gets excellent jockey Brock Ryan (A/E 1.33).",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Two horses stand out with identical 100.8 ratings last start at this exact track/distance. Coulter has limited form with only 2 race runs making assessment difficult.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker (A/E: 0.40)\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|-..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Strong recent form with third at this track/distance just 6 days ago, beaten only 0.7L. Has been consistently placing with 5 seconds and 5 thirds from 13 starts, showing reliable form at this level.",
+              "tipsheet_pick": true,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Ran second at this exact track/distance 6 days ago, beaten only 0.3L in what appears the strongest form line. Jockey Brock Ryan has excellent A/E of 1.33 and the horse has been competitive in recent starts.",
+              "tipsheet_pick": true,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Race revolves around the last start at Kembla 1400m where Zougotme and Ol' Mate Coop ran 2nd and 3rd. Coulter has limited form but strong connections, while others lack competitive recent form at the distance.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|-----..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Coulter",
+              "tab_no": 4,
+              "odds": 1.8,
+              "tag": "The one to beat",
+              "analysis": "Strong recent form with 2nd at Hawkesbury over 1300m (Adj 99.7) stepping up to ideal 1400m. Two wins from four starts shows class, and Bjorn Baker stable in good form. Despite limited experience, the quality is evident.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Ol' Mate Coop",
+              "tab_no": 9,
+              "odds": 3.5,
+              "tag": "Each-way chance",
+              "analysis": "Consistent placegetter with strong recent 3rd at this track over this distance. Multiple placings show he's competitive at this level. Mitchell Bell's positive A/E (1.15) adds confidence. Good each-way value at the odds.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Zougotme",
+              "tab_no": 11,
+              "odds": 8.0,
+              "tag": "Value bet",
+              "analysis": "Narrow 2nd (0.3L) at this track over this distance last start shows he's ready to win. Previous 2nd at Hawkesbury over 1300m (Adj 99.5) indicates good form. Brock Ryan's excellent A/E (1.33) is a major positive. Value at $8.",
+              "tipsheet_pick": false,
+              "actual_position": 4,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Coulter looks the class runner despite limited experience, with two wins from four starts and strong recent form. Ol' Mate Coop offers solid each-way value as a consistent placegetter, while Zougotme presents excellent value after a narrow defeat here last start with the in-form Brock Ryan aboard.",
+          "prompt_preview": "# Kembla Grange Race 2: \nDistance: 1400m | Condition: S9 | Class: Maiden; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Penalties\nOdds: $31.00 win / $11.50 place \u2192 3.2% implied\nJockey: Rebecca Bronett Prag (A/E: 0.94)\nTrainer: K J Parker\nCareer: 16: 0-3-2 (0% win)\nBarrier: 7 | Weight: 56kg\nSpeed Rank: 1 | Settles: 1\nForm: 8 race runs, 2 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|..."
+        }
+      }
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 4,
+      "date": "31-Mar-2026",
+      "full_results": {
+        "lightning glory": {
+          "position": 1,
+          "won": true,
+          "placed": true,
+          "sp": 2.6
+        },
+        "bondasong": {
+          "position": 4,
+          "won": false,
+          "placed": false,
+          "sp": 26
+        },
+        "erin jo": {
+          "position": 2,
+          "won": false,
+          "placed": true,
+          "sp": 2.2
+        },
+        "greyt thinker": {
+          "position": 7,
+          "won": false,
+          "placed": false,
+          "sp": 15
+        },
+        "azure angel": {
+          "position": 3,
+          "won": false,
+          "placed": true,
+          "sp": 6.5
+        },
+        "salma's star": {
+          "position": 5,
+          "won": false,
+          "placed": false,
+          "sp": 11
+        },
+        "valentino prince": {
+          "position": 6,
+          "won": false,
+          "placed": false,
+          "sp": 151
+        }
+      },
+      "variations": {
+        "v1_baseline": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact distance and track in October with a 99.0 rating, then improved to 102.8 at Wyong over 1350m. Fresh off trials and has the best form at similar conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1400m with 101.7 rating and has solid form around this distance with ratings of 100.9-101.3. Trainer Lees has positive A/E and barrier 1 is ideal.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Fourth at this exact track/distance with 98.8 rating, then improved significantly to 102.1 at Gosford. Gets 5kg weight relief and recent trial win suggests ready to fire.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at track and distance, while Salma's Star offers value with improving ratings and significant weight relief.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|--..."
+        },
+        "v2_adj_only": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact distance and conditions (1250m G4 Newcastle) in October with a solid 10019.7 rating. Recent trials show good form and the horse has proven ability at the trip.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Ran well for 4th at this exact track and distance in November with a competitive 10004.4 rating. Recent trial win shows good form and the 3.5kg weight drop is significant.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at these exact conditions. Salma's Star offers value with similar form at the track/distance and significant weight relief.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|----..."
+        },
+        "v3_no_pos_margin": {
+          "contenders": [
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Strong ratings at similar conditions with 102.1 at Gosford 1100m and 101.1 at Queanbeyan 1000m showing competitive form. Gets significant weight relief at 53.5kg and has won before at this level.",
+              "tipsheet_pick": true,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            },
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "Each-way chance",
+              "analysis": "Solid ratings including 102.8 at Wyong 1350m and exact course/distance form with 99.0 rating at Newcastle 1250m. However, jockey A/E of 0.71 is concerning for the short odds.",
+              "tipsheet_pick": false,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Salma's Star offers value with competitive ratings and significant weight advantage, while Lightning Glory has the form but poor jockey stats make the odds unappealing",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle (A/E: 0.82)\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|---..."
+        },
+        "v4_no_trainer_ae": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact distance and conditions (1250m G4 Newcastle) in October with a 99.0 rating, showing clear form advantage. Despite poor jockey stats, the horse has proven ability at these specific conditions and distance.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1400m G4 with solid 101.7 rating and has consistent form around the 100+ mark at similar distances. The step back to 1250m from longer trips should suit, though jockey A/E is concerning.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            }
+          ],
+          "summary": "Lightning Glory stands out with proven form at exact conditions, while Erin Jo offers place value despite jockey concerns. Other runners lack competitive ratings or have insufficient race form.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial |\n|------|------|------|..."
+        },
+        "v5_minimal_prompt": {
+          "contenders": [
+            {
+              "horse": "Lightning Glory",
+              "tab_no": 1,
+              "odds": 2.6,
+              "tag": "The one to beat",
+              "analysis": "Won at this exact track/distance in October with a solid 10019.7 rating. Recent trials show good form and the step up from 1000m to 1250m suits. Proven at the venue and conditions.",
+              "tipsheet_pick": true,
+              "actual_position": 1,
+              "actual_won": true,
+              "actual_placed": true
+            },
+            {
+              "horse": "Erin Jo",
+              "tab_no": 3,
+              "odds": 2.2,
+              "tag": "Each-way chance",
+              "analysis": "Won last start at 1400m and has shown ability at this level with a 9991.4 rating at Randwick. The slight drop back to 1250m from barrier 1 with Collett aboard is appealing despite recent trial being ordinary.",
+              "tipsheet_pick": false,
+              "actual_position": 2,
+              "actual_won": false,
+              "actual_placed": true
+            },
+            {
+              "horse": "Salma's Star",
+              "tab_no": 8,
+              "odds": 11.0,
+              "tag": "Value bet",
+              "analysis": "Good recent form with solid ratings around 10000+ and won trial last start. The 53.5kg weight is a significant advantage and has shown ability at this track/distance combination. Each-way value at the odds.",
+              "tipsheet_pick": false,
+              "actual_position": 5,
+              "actual_won": false,
+              "actual_placed": false
+            }
+          ],
+          "summary": "Lightning Glory has the best credentials having won at this exact venue and distance. Erin Jo brings strong recent form from longer trips while Salma's Star offers value with light weight and consistent ratings around par.",
+          "prompt_preview": "# Newcastle Race 4: \nDistance: 1250m | Condition: G4 | Class: Class 1; | Field: 7 | Pace: moderate\n\nForm status: 7/7 have race form\n## Runners\n\n### 1. Lightning Glory\nOdds: $2.60 win / $1.56 place \u2192 38.5% implied\nJockey: Nick Heywood (A/E: 0.71)\nTrainer: Nathan Doyle\nCareer: 4: 2-0-1 (50% win)\nBarrier: 5 | Weight: 59.5kg\nSpeed Rank: 3 | Settles: 1\nForm: 3 race runs, 4 trials\n\n| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Adj | Prep | Trial |\n|------|------|------|------|--..."
+        }
+      }
+    }
+  ]
+}
