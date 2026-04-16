@@ -216,50 +216,28 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 ## Understanding the Data
 
-### Speed Ratings (Adj column)
-The **Adj** column is your primary data. It shows venue-adjusted speed ratings:
-- 100 = benchmark performance
-- Higher = faster
-- Normalized by distance, track condition, AND venue quality
-- Comparable across ALL venues (Randwick 100 = country track 100)
-
-Look at each horse's recent Adj ratings at similar distance and conditions to today's race.
+### Speed Ratings
+Ratings are normalized to 100 = benchmark performance. Higher = faster.
+- Use the **Adj** column - venue-adjusted ratings comparable across ALL tracks
+- Use the CStep column to find runs at similar conditions - these are most predictive
 
 ### Form Table Columns
 | Column | Meaning |
 |--------|---------|
 | Dist | Race distance in metres |
 | Cond | Track condition (G4=Good4, S5=Soft5, H8=Heavy8, etc.) |
+| Dist% | Distance difference from TODAY's race (+8% = 8% longer, = means same) |
+| CStep | Condition steps from TODAY's track (0=same, -2=drier, +2=wetter) |
+| WtCh | Weight change vs that run. Negative = carrying less weight today. |
 | Adj | **Primary data** - Venue-adjusted speed rating (100=par, higher=faster) |
 | Prep | Run number in current prep (1=first-up, 2=second-up, etc.) |
-| Trial | "TRIAL" if barrier trial (not a real race - horses don't always try) |
-| Notes | Stewards report (eased, checked, held up, etc.) |
+| Trial | "TRIAL" if barrier trial (not a real race) |
+| Notes | Stewards report - "eased", "checked", "held up" suggest rating underestimates ability |
 
-### Other Data
-- **Jockey A/E**: Actual vs Expected. **A/E > 1.0 is a positive signal. A/E < 0.85 is a red flag** - these jockeys consistently underperform market expectations.
-- **First-up/Second-up record**: Career performance at that prep stage
-- **Speedmap**: Early speed rank and likely settling position
-- **Gear changes**: Equipment changes from last start
-
-## Key Analysis
-
-**Compare Adj ratings at similar distance and conditions.** Find each horse's runs at similar distance (within ~200m) and conditions to today. Recent form is more relevant.
-
-**Prep patterns matter.** Check each horse's Prep column to see where they are in their campaign. Compare to their career first-up/second-up record.
-
-**Notes column can explain bad runs.** "Eased", "checked", "held up" suggest the rating doesn't reflect true ability.
-
-**Critical:**
-- Barrier trials (TRIAL) don't count as form - horses don't always try
-- 0 race runs = UNKNOWN first starter
-- If 50%+ of field has no race form, pick 0 contenders
-
-## Runner Notes
-
-For non-selected runners, briefly explain why they weren't picked:
-- Their Adj ratings at similar distance/condition vs contenders
-- Relevant issues (poor prep record, wrong conditions, etc.)
-Avoid generic career stats - be specific to today's race.
+### Key Analysis
+- **Jockey A/E > 1.0 is positive. A/E < 0.85 is a red flag**
+- **Trials don't count** - horses don't try
+- **50%+ unknowns = skip race**
 
 ## Output
 
@@ -271,35 +249,15 @@ Avoid generic career stats - be specific to today's race.
       "tab_no": number,
       "odds": number,
       "tag": "The one to beat" | "Each-way chance" | "Value bet",
-      "analysis": "2-3 sentences referencing RACE form",
+      "analysis": "2-3 sentences referencing form",
       "tipsheet_pick": true | false
     }
   ],
-  "other_chances": [
-    {
-      "horse": "Horse Name",
-      "tab_no": number,
-      "odds": number,
-      "rating": "101.2 at 1200m S5",
-      "issue": "Brief reason this horse has issues vs contenders"
-    }
-  ],
-  "less_likely": ["Horse A", "Horse B"],
-  "runner_notes": {
-    "Horse Name": "1 sentence: ratings at this distance/condition, weight change, barrier",
-    "Another Horse": "1 sentence: specific reason vs contenders"
-  },
   "summary": "Brief overview or reason for 0 picks"
 }
 ```
 
-**other_chances**: Horses with competitive ratings that COULD win but have issues preventing them being top contenders. Good value for bonus bets.
-**less_likely**: Horses with weaker ratings or clear issues - just list names.
-
-**tipsheet_pick = true** when you would genuinely bet on this horse yourself:
-- Speed ratings clearly support this horse vs the field at this distance and condition
-- The odds represent real value
-- You're confident in the pick (requires most of the field to have sufficient form data)"""
+**tipsheet_pick = true** when you would genuinely bet on this horse."""
 
 
 PROMO_BONUS_SYSTEM_PROMPT = """You are an expert horse racing analyst.
