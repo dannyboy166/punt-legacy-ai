@@ -1,0 +1,4679 @@
+{
+  "races": [
+    {
+      "track": "Kembla Grange",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Coulter",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Ol' Mate Coop",
+          "tag": "Each-way chance",
+          "odds": 3.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 4,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Salma's Star",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Azure Angel",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Mornington",
+      "race_number": 7,
+      "date": "05-Apr-2026",
+      "picks": [
+        {
+          "horse": "Magnardo",
+          "tag": "The one to beat",
+          "odds": 2.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Gracious Diva",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Morphettville Parks",
+      "race_number": 3,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "I Am Piki",
+          "tag": "Value bet",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Sassy For Sure",
+          "tag": "Each-way chance",
+          "odds": 3.1,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Cool Jakey",
+          "tag": "The one to beat",
+          "odds": 10.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Our Queen",
+          "tag": "Each-way chance",
+          "odds": 3.1,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Captain Furai",
+          "tag": "Each-way chance",
+          "odds": 3.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Randwick",
+      "race_number": 8,
+      "date": "04-Apr-2026",
+      "picks": [
+        {
+          "horse": "Sheza Alibi",
+          "tag": "The one to beat",
+          "odds": 1.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Gringotts",
+          "tag": "Each-way chance",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Pinjarra",
+      "race_number": 3,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Mamma Says So",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Kentucky Drive",
+          "tag": "Value bet",
+          "odds": 16.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Sunshine Coast",
+      "race_number": 4,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Decimus",
+          "tag": "The one to beat",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "More For Ready",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "San Jose Boy",
+          "tag": "Each-way chance",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Scone",
+      "race_number": 2,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Set To Prophet",
+          "tag": "Value bet",
+          "odds": 21.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Yacht Girl",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Kyneton",
+      "race_number": 5,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Final Quarter",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Real Intrigue",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 3,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "High Alert",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 13
+        },
+        {
+          "horse": "Hardanger",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Armidale",
+      "race_number": 5,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Visualise",
+          "tag": "The one to beat",
+          "odds": 2.15,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Zelestial",
+          "tag": "Each-way chance",
+          "odds": 3.7,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Morphettville Parks",
+      "race_number": 9,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Mystic Wonder",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Nicish",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Townsville",
+      "race_number": 7,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Carpaccio",
+          "tag": "The one to beat",
+          "odds": 3.2,
+          "won": false,
+          "placed": false,
+          "position": 14
+        },
+        {
+          "horse": "Rhegion",
+          "tag": "Each-way chance",
+          "odds": 3.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 8,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Spicy Miss",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 13
+        },
+        {
+          "horse": "Campione D'italia",
+          "tag": "Value bet",
+          "odds": 19.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Chayan",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 3,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Regal Gent",
+          "tag": "The one to beat",
+          "odds": 3.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Cries And Whispers",
+          "tag": "Value bet",
+          "odds": 19.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 5,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Upstage",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Silky Seth",
+          "tag": "Each-way chance",
+          "odds": 3.4,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 6,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "No Overtaking",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Bama Slama",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Belmont Park",
+      "race_number": 4,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Pony Up",
+          "tag": "The one to beat",
+          "odds": 2.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Hard Solo",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Sky River",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Warwick Farm",
+      "race_number": 2,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Above The Law",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "I Am Overs",
+          "tag": "Value bet",
+          "odds": 26.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 1,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Spoilt Rotten",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 1,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Cavalry",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Sarapo",
+          "tag": "Each-way chance",
+          "odds": 2.9,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Scoop The Pool",
+          "tag": "Each-way chance",
+          "odds": 4.4,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Wyong",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Pearl Of Dubai",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Pomelo Chamomile",
+          "tag": "Value bet",
+          "odds": 19.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 3,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Grammar Lad",
+          "tag": "The one to beat",
+          "odds": 3.2,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Cyber City",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        },
+        {
+          "horse": "French Endeavour",
+          "tag": "Value bet",
+          "odds": 16.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Yarra Glen",
+      "race_number": 4,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Galactic Force",
+          "tag": "The one to beat",
+          "odds": 2.1,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Prince De Vega",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 10,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Inkaruna",
+          "tag": "The one to beat",
+          "odds": 2.35,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Monte Supreme",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "More Territories",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 11
+        }
+      ]
+    },
+    {
+      "track": "Echuca",
+      "race_number": 1,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Meka Vibe",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Sparkles",
+          "tag": "Value bet",
+          "odds": 18.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Ipswich",
+      "race_number": 5,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Acapulco Girl",
+          "tag": "The one to beat",
+          "odds": 1.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Brave Horatius",
+          "tag": "Each-way chance",
+          "odds": 3.6,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Big Demeanor",
+          "tag": "Value bet",
+          "odds": 21.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 2,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Ceretti",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Pearls In June",
+          "tag": "Each-way chance",
+          "odds": 3.8,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Roma",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Thundering Soul",
+          "tag": "The one to beat",
+          "odds": 2.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "I'm Nelson",
+          "tag": "Value bet",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 12
+        },
+        {
+          "horse": "Bontobewild",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Strathalbyn",
+      "race_number": 2,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Silent Legacy",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Zou Doll",
+          "tag": "Each-way chance",
+          "odds": 3.2,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 7,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Hey Bella",
+          "tag": "The one to beat",
+          "odds": 2.9,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Wondering Spirit",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Move The Torana",
+          "tag": "Value bet",
+          "odds": 4.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 1,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Show County",
+          "tag": "The one to beat",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Annie's Rose",
+          "tag": "Each-way chance",
+          "odds": 2.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 8,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Artful Girl",
+          "tag": "The one to beat",
+          "odds": 7.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Delrico",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Baccarat Rouge",
+          "tag": "Value bet",
+          "odds": 41.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 6,
+      "date": "16-Mar-2026",
+      "picks": [
+        {
+          "horse": "Yes Yes Boss",
+          "tag": "The one to beat",
+          "odds": 3.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Dubalene",
+          "tag": "Each-way chance",
+          "odds": 2.3,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 1,
+      "date": "11-Apr-2026",
+      "picks": [
+        {
+          "horse": "Unloading",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Launceston",
+      "race_number": 2,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "California Flyer",
+          "tag": "The one to beat",
+          "odds": 2.15,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Dubai Affair",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 9,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Dominant Darcy",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Cindersea",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Sale",
+      "race_number": 3,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lowestoft",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Chronic",
+          "tag": "Each-way chance",
+          "odds": 4.4,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Whatta Man",
+          "tag": "Value bet",
+          "odds": 6.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 6,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Panova",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Salty Pearl",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Sandown-Lakeside",
+      "race_number": 8,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Alero",
+          "tag": "Each-way chance",
+          "odds": 3.4,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Legio Ten",
+          "tag": "Value bet",
+          "odds": 19.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Hawkesbury",
+      "race_number": 4,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lang Park",
+          "tag": "Value bet",
+          "odds": 15.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Sir Loyne",
+          "tag": "Each-way chance",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Caulfield Heath",
+      "race_number": 1,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Loud Charlie",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Light Moves",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 10,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "King's Secret",
+          "tag": "The one to beat",
+          "odds": 2.8,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Mal Coupe",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Roselyn's Star",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Toowoomba",
+      "race_number": 5,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "The Deputy",
+          "tag": "The one to beat",
+          "odds": 5.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Snitzond",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Bairnsdale",
+      "race_number": 1,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Wentworth Falls",
+          "tag": "The one to beat",
+          "odds": 1.45,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Sacre Bleu",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Sandown-Lakeside",
+      "race_number": 4,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lady Thinkabell",
+          "tag": "The one to beat",
+          "odds": 2.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Pink Chandon",
+          "tag": "Each-way chance",
+          "odds": 9.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Caulfield",
+      "race_number": 7,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Damask Rose",
+          "tag": "Each-way chance",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "On Display",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Gold Coast Poly",
+      "race_number": 1,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Namara",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Alkebulan",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Caulfield Heath",
+      "race_number": 2,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "All Business",
+          "tag": "The one to beat",
+          "odds": 3.3,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Vianarra",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Caulfield",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bluestone",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Zibulon",
+          "tag": "Value bet",
+          "odds": 9.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Cranbourne",
+      "race_number": 6,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Serinda",
+          "tag": "The one to beat",
+          "odds": 4.2,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Jackie's Maid",
+          "tag": "Each-way chance",
+          "odds": 3.1,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Warwick Farm",
+      "race_number": 4,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Knights Armour",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Subarctic",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Hobart",
+      "race_number": 1,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lawrenny Boys",
+          "tag": "The one to beat",
+          "odds": 2.15,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Dina Tycoon",
+          "tag": "Each-way chance",
+          "odds": 3.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Balaklava",
+      "race_number": 4,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Leliyn",
+          "tag": "The one to beat",
+          "odds": 3.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Tikkamos",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 2,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Saint Aldwyn",
+          "tag": "The one to beat",
+          "odds": 2.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Reconciliate",
+          "tag": "Each-way chance",
+          "odds": 2.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Warrnambool",
+      "race_number": 5,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Romantic Miss",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Frose",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Terang",
+      "race_number": 6,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Tangoette",
+          "tag": "The one to beat",
+          "odds": 2.25,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Frose",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 6,
+      "date": "11-Apr-2026",
+      "picks": [
+        {
+          "horse": "Lunaite",
+          "tag": "The one to beat",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 13
+        },
+        {
+          "horse": "Celestial Blaze",
+          "tag": "Each-way chance",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Armidale",
+      "race_number": 4,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Breukelen",
+          "tag": "The one to beat",
+          "odds": 2.05,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Ropewalker",
+          "tag": "Value bet",
+          "odds": 13.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Strathalbyn",
+      "race_number": 4,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Crespiano",
+          "tag": "The one to beat",
+          "odds": 1.95,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Valued",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Albany",
+      "race_number": 4,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sir Dreamalot",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Royal Accolade",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Shooting Spirit",
+          "tag": "Value bet",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Pinjarra",
+      "race_number": 10,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Seindeel",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Mangifera",
+          "tag": "Each-way chance",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Worcester",
+          "tag": "Value bet",
+          "odds": 61.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Albany",
+      "race_number": 7,
+      "date": "19-Mar-2026",
+      "picks": [
+        {
+          "horse": "War Matters",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Duchees Demerit",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Albury",
+      "race_number": 4,
+      "date": "19-Mar-2026",
+      "picks": [
+        {
+          "horse": "Under The Hat",
+          "tag": "The one to beat",
+          "odds": 4.2,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Sunroe",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 9
+        },
+        {
+          "horse": "Just Like Liam",
+          "tag": "Value bet",
+          "odds": 31.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Port Lincoln",
+      "race_number": 4,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sports Choice",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Another Bride",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Morphettville Parks",
+      "race_number": 4,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bring Forth",
+          "tag": "The one to beat",
+          "odds": 3.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "The True Believer",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Muswellbrook",
+      "race_number": 8,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "Rivkin",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Hulu",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Randwick-Kensington",
+      "race_number": 7,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Glad You Think So",
+          "tag": "The one to beat",
+          "odds": 4.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Kenmare Bay",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Gentileschi",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 6,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Master Zous",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "He's Cool",
+          "tag": "The one to beat",
+          "odds": 2.9,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Flemington",
+      "race_number": 5,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Zakouma",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Politely Dun",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Port Lincoln",
+      "race_number": 1,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Golden Tunes",
+          "tag": "The one to beat",
+          "odds": 1.35,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Vasilias",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 7,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Simply Outrageous",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Vianarra",
+          "tag": "Each-way chance",
+          "odds": 11.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Yarra Glen",
+      "race_number": 8,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Written Royalty",
+          "tag": "The one to beat",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Justdoit",
+          "tag": "Each-way chance",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Moree",
+      "race_number": 5,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Flying Celica",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Visualise",
+          "tag": "Each-way chance",
+          "odds": 2.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Cairns",
+      "race_number": 6,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sweet Kisses",
+          "tag": "The one to beat",
+          "odds": 4.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Arctic Bear",
+          "tag": "Each-way chance",
+          "odds": 2.8,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Launceston",
+      "race_number": 2,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "I'm A Machine",
+          "tag": "The one to beat",
+          "odds": 2.45,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Team Heist",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 2,
+      "date": "16-Mar-2026",
+      "picks": [
+        {
+          "horse": "Czech Her Out",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "On Any Tuesday",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Cairns",
+      "race_number": 2,
+      "date": "26-Mar-2026",
+      "picks": []
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 1,
+      "date": "21-Mar-2026",
+      "picks": []
+    },
+    {
+      "track": "Geelong",
+      "race_number": 6,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Empire Song",
+          "tag": "The one to beat",
+          "odds": 2.45,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Superliv",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Hamilton",
+      "race_number": 6,
+      "date": "07-Apr-2026",
+      "picks": [
+        {
+          "horse": "Kamezali",
+          "tag": "The one to beat",
+          "odds": 3.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Judge Kellie",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Goulburn",
+      "race_number": 5,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Samurai",
+          "tag": "The one to beat",
+          "odds": 3.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Miss Stalwart",
+          "tag": "Each-way chance",
+          "odds": 9.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Rocco Lini",
+          "tag": "Each-way chance",
+          "odds": 2.6,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Beaumont",
+      "race_number": 3,
+      "date": "23-Mar-2026",
+      "picks": [
+        {
+          "horse": "Warbreccan",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Zo Frilling",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 7,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Searchin' Times",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Streamlined",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Pinjarra",
+      "race_number": 9,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Rocking Society",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Snazzler",
+          "tag": "Value bet",
+          "odds": 16.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        },
+        {
+          "horse": "Soldanelle",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Kembla Grange",
+      "race_number": 1,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Zamazing",
+          "tag": "The one to beat",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Ivy Princess",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Strathalbyn",
+      "race_number": 7,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Morlaix",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Ekanite",
+          "tag": "Value bet",
+          "odds": 15.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Sale",
+      "race_number": 6,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bold Suitor",
+          "tag": "The one to beat",
+          "odds": 1.95,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Yeah Right",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Bendigo",
+      "race_number": 8,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "Louis Barthas",
+          "tag": "The one to beat",
+          "odds": 4.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Dancing Dolly",
+          "tag": "Each-way chance",
+          "odds": 1.7,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Launceston",
+      "race_number": 6,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Artillery Fire",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Jenni The Cat",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Hawkesbury",
+      "race_number": 7,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Magicon",
+          "tag": "The one to beat",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "King Kikau",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Pro Velocity",
+          "tag": "Value bet",
+          "odds": 31.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Morphettville",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Signature Scent",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "She's My Ex",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Rockhampton",
+      "race_number": 2,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Pride Of Venus",
+          "tag": "Value bet",
+          "odds": 4.2,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Saraqael",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Mt Gambier",
+      "race_number": 6,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Unseen Ruler",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Any Luck",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Flemington",
+      "race_number": 6,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "My Gladiola",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Legacy Bound",
+          "tag": "Each-way chance",
+          "odds": 4.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Educated",
+          "tag": "Value bet",
+          "odds": 4.4,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 1,
+      "date": "16-Mar-2026",
+      "picks": [
+        {
+          "horse": "Wan Lost",
+          "tag": "The one to beat",
+          "odds": 1.9,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Rockbarton Spear",
+          "tag": "Each-way chance",
+          "odds": 3.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Caulfield Heath",
+      "race_number": 5,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Curse It",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "All So Clear",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Bayou Music",
+          "tag": "Value bet",
+          "odds": 3.9,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 9,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sepals",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Welwal",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Enxuto",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 2,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "So Much Serenity",
+          "tag": "The one to beat",
+          "odds": 2.7,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Playing Free",
+          "tag": "Value bet",
+          "odds": 20.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Warren",
+      "race_number": 3,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Ultra White",
+          "tag": "Each-way chance",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Adviser",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "The Git Up",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 2,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sirsa Nuwa",
+          "tag": "The one to beat",
+          "odds": 2.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Miss Como",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Beaumont",
+      "race_number": 6,
+      "date": "23-Mar-2026",
+      "picks": [
+        {
+          "horse": "Into Brooklyn",
+          "tag": "Each-way chance",
+          "odds": 3.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Blue Suede Hooves",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Rockhampton",
+      "race_number": 4,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bo Bo Beware",
+          "tag": "The one to beat",
+          "odds": 5.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "General Wolffe",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Terang",
+      "race_number": 8,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Eleanor Dumont",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Sara's Rocket",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 7,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Via Vegas",
+          "tag": "The one to beat",
+          "odds": 2.1,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Where's The Fire",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Caulfield",
+      "race_number": 4,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Getta Good Feeling",
+          "tag": "The one to beat",
+          "odds": 1.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Next Jen",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Albury",
+      "race_number": 6,
+      "date": "19-Mar-2026",
+      "picks": [
+        {
+          "horse": "Black Storm",
+          "tag": "The one to beat",
+          "odds": 2.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Associate",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "County Kilkenny",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Oakbank",
+      "race_number": 4,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Limbering",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Scandalist",
+          "tag": "Value bet",
+          "odds": 6.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Flemington",
+      "race_number": 2,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Cafe Au Lait",
+          "tag": "The one to beat",
+          "odds": 3.3,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Exit",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 2,
+      "date": "11-Apr-2026",
+      "picks": [
+        {
+          "horse": "Ramp It Up",
+          "tag": "The one to beat",
+          "odds": 1.7,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Eclair Awesome",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 5,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Hot Majesty",
+          "tag": "The one to beat",
+          "odds": 1.8,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Galway Flyer",
+          "tag": "Each-way chance",
+          "odds": 4.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Samurai Warrior",
+          "tag": "Value bet",
+          "odds": 81.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bundella",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "First Mission",
+          "tag": "Each-way chance",
+          "odds": 3.4,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Grafton",
+      "race_number": 7,
+      "date": "30-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bring Me Saki",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Diamondsaremio",
+          "tag": "Value bet",
+          "odds": 18.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Launceston",
+      "race_number": 8,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Iffycould",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Moorlands Miss",
+          "tag": "Each-way chance",
+          "odds": 3.9,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Sunshine Coast",
+      "race_number": 3,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Don't Doubt Missy",
+          "tag": "The one to beat",
+          "odds": 3.4,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Certify",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Emphatique",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 4,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Smart Action",
+          "tag": "Value bet",
+          "odds": 18.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Don'tcha Think",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Balaklava",
+      "race_number": 1,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Good Expectations",
+          "tag": "The one to beat",
+          "odds": 2.15,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Make Me A Star",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Our Little Star",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Caulfield",
+      "race_number": 6,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Point Barrow",
+          "tag": "The one to beat",
+          "odds": 2.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Alpha Sofie",
+          "tag": "Each-way chance",
+          "odds": 4.6,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Fundamental Nature",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Flemington",
+      "race_number": 10,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Al Duca",
+          "tag": "The one to beat",
+          "odds": 3.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Holymanz",
+          "tag": "Value bet",
+          "odds": 18.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Justadeel",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 8,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lupine",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Linthorpe Luck",
+          "tag": "Value bet",
+          "odds": 21.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 5,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "The Crimson Pirate",
+          "tag": "The one to beat",
+          "odds": 2.15,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Antique Star",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Cranbourne",
+      "race_number": 7,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "Hollerasaurous",
+          "tag": "Value bet",
+          "odds": 9.5,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Princess Montecito",
+          "tag": "Each-way chance",
+          "odds": 4.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Kyneton",
+      "race_number": 6,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Shanghai Venture",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 10
+        },
+        {
+          "horse": "Antisocial",
+          "tag": "Value bet",
+          "odds": 6.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Ipswich",
+      "race_number": 7,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Battlespace",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Casanova Man",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Revelaide",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Warwick Farm",
+      "race_number": 7,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Call Me Gorgeous",
+          "tag": "The one to beat",
+          "odds": 3.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Young Mister Grace",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Hawkesbury",
+      "race_number": 8,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Your Chilli",
+          "tag": "The one to beat",
+          "odds": 4.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Cheeky Smirk",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Johnny",
+          "tag": "Each-way chance",
+          "odds": 4.4,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Sale",
+      "race_number": 8,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "High Tempo",
+          "tag": "The one to beat",
+          "odds": 3.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Corona Lad",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Couldthisbetheone",
+          "tag": "Each-way chance",
+          "odds": 3.2,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 6,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Runwiththetide",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Araletta",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Kinross Lane",
+          "tag": "Value bet",
+          "odds": 13.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 6,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "So Immaculate",
+          "tag": "Value bet",
+          "odds": 20.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Townsville",
+      "race_number": 5,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Burlington Arcade",
+          "tag": "The one to beat",
+          "odds": 1.65,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Carohvic",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Ararat",
+      "race_number": 8,
+      "date": "30-Mar-2026",
+      "picks": [
+        {
+          "horse": "Secretdream",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        },
+        {
+          "horse": "Marty Mcfly",
+          "tag": "Each-way chance",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Grafton",
+      "race_number": 2,
+      "date": "30-Mar-2026",
+      "picks": [
+        {
+          "horse": "Referees",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Highwire Girl",
+          "tag": "Value bet",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Sunshine Coast",
+      "race_number": 8,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Fifty Calibre",
+          "tag": "The one to beat",
+          "odds": 4.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Mosamour",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Morphettville",
+      "race_number": 7,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Chillcuz",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Vaniteux",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Belmont Park",
+      "race_number": 7,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Fey King",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Royal Splendour",
+          "tag": "Each-way chance",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Eternal Romance",
+          "tag": "Each-way chance",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Geelong",
+      "race_number": 5,
+      "date": "22-Mar-2026",
+      "picks": [
+        {
+          "horse": "Naval Force",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Vaderlee",
+          "tag": "Each-way chance",
+          "odds": 4.4,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Simply Sassy",
+          "tag": "Value bet",
+          "odds": 4.8,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 5,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Publicise",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Mr Kissinger",
+          "tag": "Each-way chance",
+          "odds": 3.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Port Lincoln",
+      "race_number": 6,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lake Agawam",
+          "tag": "The one to beat",
+          "odds": 7.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Broadway Lane",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Newcastle",
+      "race_number": 8,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sunsprite",
+          "tag": "The one to beat",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Is It Spectacular",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Mister Martini",
+          "tag": "Each-way chance",
+          "odds": 3.9,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Albany",
+      "race_number": 7,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "God Has Drifted",
+          "tag": "The one to beat",
+          "odds": 2.4,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Hezangelic",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Insyde Success",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 2,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Divakara",
+          "tag": "The one to beat",
+          "odds": 2.8,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Nightcapped",
+          "tag": "Each-way chance",
+          "odds": 5.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 6,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Dr Farthing",
+          "tag": "The one to beat",
+          "odds": 4.4,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Angel Ladder",
+          "tag": "Each-way chance",
+          "odds": 4.2,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Better Sweet",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 8,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Aeliana",
+          "tag": "The one to beat",
+          "odds": 1.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Dubai Honour",
+          "tag": "Each-way chance",
+          "odds": 3.6,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Vauban",
+          "tag": "Value bet",
+          "odds": 7.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Randwick",
+      "race_number": 5,
+      "date": "11-Apr-2026",
+      "picks": [
+        {
+          "horse": "Ohope Wins",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Profoundly",
+          "tag": "Each-way chance",
+          "odds": 3.2,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Wyong",
+      "race_number": 7,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Diddle Dumpling",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 10
+        },
+        {
+          "horse": "Slinky",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Prancing Spirit",
+          "tag": "Value bet",
+          "odds": 13.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Morphettville",
+      "race_number": 6,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Blanc Visage",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Declared",
+          "tag": "Each-way chance",
+          "odds": 4.4,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Morphettville",
+      "race_number": 1,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Flying Brant",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 3,
+      "date": "06-Apr-2026",
+      "picks": [
+        {
+          "horse": "Hellabella",
+          "tag": "The one to beat",
+          "odds": 3.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Make Mine Moet",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Townsville",
+      "race_number": 4,
+      "date": "31-Mar-2026",
+      "picks": [
+        {
+          "horse": "Lowlands",
+          "tag": "The one to beat",
+          "odds": 2.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Storm Capital",
+          "tag": "Each-way chance",
+          "odds": 2.45,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 8,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Aye Aye Skipper",
+          "tag": "Each-way chance",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Headstream",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Beaumont",
+      "race_number": 5,
+      "date": "23-Mar-2026",
+      "picks": [
+        {
+          "horse": "Night Agent",
+          "tag": "The one to beat",
+          "odds": 1.3,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Scone",
+      "race_number": 6,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Honey Perfume",
+          "tag": "The one to beat",
+          "odds": 4.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Somerton Smart",
+          "tag": "Each-way chance",
+          "odds": 2.05,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Rockhampton",
+      "race_number": 6,
+      "date": "24-Mar-2026",
+      "picks": [
+        {
+          "horse": "Smart Mission",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Storm Force Ten",
+          "tag": "Each-way chance",
+          "odds": 6.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Amberinger",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Muswellbrook",
+      "race_number": 5,
+      "date": "27-Mar-2026",
+      "picks": [
+        {
+          "horse": "Solitario",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Lightning Speed",
+          "tag": "Each-way chance",
+          "odds": 8.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Smoke On The Water",
+          "tag": "Value bet",
+          "odds": 21.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Caulfield",
+      "race_number": 9,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Planet Red",
+          "tag": "The one to beat",
+          "odds": 1.75,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Roulette King",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Mackay",
+      "race_number": 4,
+      "date": "19-Mar-2026",
+      "picks": [
+        {
+          "horse": "Ready And Betta",
+          "tag": "Value bet",
+          "odds": 8.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Time Power",
+          "tag": "Value bet",
+          "odds": 17.0,
+          "won": false,
+          "placed": false,
+          "position": 10
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 7,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Climactic",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Out Of Turn",
+          "tag": "Value bet",
+          "odds": 14.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Warwick Farm",
+      "race_number": 8,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Unique Ambition",
+          "tag": "Value bet",
+          "odds": 14.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Hanau",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 8
+        }
+      ]
+    },
+    {
+      "track": "Flemington",
+      "race_number": 8,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Birdman",
+          "tag": "The one to beat",
+          "odds": 2.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Sabaj",
+          "tag": "Value bet",
+          "odds": 13.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Pride Of Jenni",
+          "tag": "Each-way chance",
+          "odds": 11.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 5,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Zoufani",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Ten Deep",
+          "tag": "Each-way chance",
+          "odds": 3.8,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "First Empire",
+          "tag": "Each-way chance",
+          "odds": 3.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Ballarat",
+      "race_number": 7,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Kawa",
+          "tag": "The one to beat",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        },
+        {
+          "horse": "Garfield",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        }
+      ]
+    },
+    {
+      "track": "Wagga",
+      "race_number": 7,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sir Lunchalots",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Group Chat",
+          "tag": "Each-way chance",
+          "odds": 3.5,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Grafton",
+      "race_number": 4,
+      "date": "07-Apr-2026",
+      "picks": [
+        {
+          "horse": "Deebee's Girl",
+          "tag": "Value bet",
+          "odds": 10.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Highland Force",
+          "tag": "Each-way chance",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Hawkesbury",
+      "race_number": 7,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Il Passero",
+          "tag": "The one to beat",
+          "odds": 1.75,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Duke Of Camden",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 9
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 4,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Skyhook",
+          "tag": "The one to beat",
+          "odds": 3.1,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Beadman",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Nashville Jack",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 13
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 7,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Idle Flyer",
+          "tag": "The one to beat",
+          "odds": 1.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Perfumist",
+          "tag": "Value bet",
+          "odds": 21.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Scone",
+      "race_number": 4,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Tupakara",
+          "tag": "The one to beat",
+          "odds": 1.4,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Crystal Conspiracy",
+          "tag": "Value bet",
+          "odds": 51.0,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Sale",
+      "race_number": 7,
+      "date": "29-Mar-2026",
+      "picks": [
+        {
+          "horse": "Small Town Hero",
+          "tag": "The one to beat",
+          "odds": 2.05,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Lulu Darling",
+          "tag": "Each-way chance",
+          "odds": 4.8,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 1,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Country God",
+          "tag": "The one to beat",
+          "odds": 5.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Excess Baggage",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        }
+      ]
+    },
+    {
+      "track": "Doomben",
+      "race_number": 6,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Mr O'reilly",
+          "tag": "The one to beat",
+          "odds": 4.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Lovey Dovey",
+          "tag": "Each-way chance",
+          "odds": 3.1,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Saint Emilion",
+          "tag": "Value bet",
+          "odds": 7.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Pakenham",
+      "race_number": 6,
+      "date": "19-Mar-2026",
+      "picks": [
+        {
+          "horse": "Rainbow Delight",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": false,
+          "position": 9
+        },
+        {
+          "horse": "Customer Service",
+          "tag": "The one to beat",
+          "odds": 4.2,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Wyong",
+      "race_number": 4,
+      "date": "18-Mar-2026",
+      "picks": [
+        {
+          "horse": "Don't Doubt Merlin",
+          "tag": "The one to beat",
+          "odds": 3.2,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Shirvington",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Gold Coast",
+      "race_number": 5,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Ciphertext",
+          "tag": "The one to beat",
+          "odds": 2.1,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Miss Fleetwood",
+          "tag": "Each-way chance",
+          "odds": 3.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Marathia",
+          "tag": "Value bet",
+          "odds": 8.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Beaumont",
+      "race_number": 4,
+      "date": "23-Mar-2026",
+      "picks": [
+        {
+          "horse": "Blazing Guru",
+          "tag": "Value bet",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Devils Daughter",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Rosehill",
+      "race_number": 2,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "Juja Kibo",
+          "tag": "The one to beat",
+          "odds": 3.7,
+          "won": false,
+          "placed": true,
+          "position": 3
+        },
+        {
+          "horse": "Mr Monaco",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Don Diego De Vega",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": false,
+          "position": 11
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 4,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "About To Explode",
+          "tag": "The one to beat",
+          "odds": 1.75,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Moonhaven",
+          "tag": "Each-way chance",
+          "odds": 6.5,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Cairns",
+      "race_number": 8,
+      "date": "26-Mar-2026",
+      "picks": [
+        {
+          "horse": "Coppabella Road",
+          "tag": "The one to beat",
+          "odds": 3.4,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Threebrothers",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Airborne Hotdog",
+          "tag": "Each-way chance",
+          "odds": 4.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    },
+    {
+      "track": "Ballina",
+      "race_number": 7,
+      "date": "23-Mar-2026",
+      "picks": [
+        {
+          "horse": "Jade Trees",
+          "tag": "The one to beat",
+          "odds": 1.85,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Aureate",
+          "tag": "Each-way chance",
+          "odds": 7.0,
+          "won": false,
+          "placed": false,
+          "position": 7
+        }
+      ]
+    },
+    {
+      "track": "Eagle Farm",
+      "race_number": 7,
+      "date": "25-Mar-2026",
+      "picks": [
+        {
+          "horse": "Sir Maurice",
+          "tag": "Value bet",
+          "odds": 12.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Enterprise Attack",
+          "tag": "Value bet",
+          "odds": 11.0,
+          "won": false,
+          "placed": false,
+          "position": 8
+        },
+        {
+          "horse": "Dark Arts",
+          "tag": "Each-way chance",
+          "odds": 2.9,
+          "won": true,
+          "placed": true,
+          "position": 1
+        }
+      ]
+    },
+    {
+      "track": "Terang",
+      "race_number": 2,
+      "date": "17-Mar-2026",
+      "picks": [
+        {
+          "horse": "Dirty Robber",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "What A Cross",
+          "tag": "Each-way chance",
+          "odds": 3.1,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Kyneton",
+      "race_number": 4,
+      "date": "28-Mar-2026",
+      "picks": [
+        {
+          "horse": "Bit Of Shoosh",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": false,
+          "placed": false,
+          "position": 5
+        },
+        {
+          "horse": "Please Me Do",
+          "tag": "Value bet",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Launceston",
+      "race_number": 1,
+      "date": "20-Mar-2026",
+      "picks": [
+        {
+          "horse": "Genuine Lady",
+          "tag": "The one to beat",
+          "odds": 3.5,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Royal Scene",
+          "tag": "Value bet",
+          "odds": 5.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Port Macquarie",
+      "race_number": 7,
+      "date": "16-Mar-2026",
+      "picks": [
+        {
+          "horse": "Via Vegas",
+          "tag": "The one to beat",
+          "odds": 1.7,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Savvyrocker",
+          "tag": "Value bet",
+          "odds": 9.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        }
+      ]
+    },
+    {
+      "track": "Ararat",
+      "race_number": 7,
+      "date": "30-Mar-2026",
+      "picks": [
+        {
+          "horse": "Yoomee Wonder",
+          "tag": "The one to beat",
+          "odds": 2.6,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Warparty",
+          "tag": "Each-way chance",
+          "odds": 5.5,
+          "won": false,
+          "placed": false,
+          "position": 6
+        },
+        {
+          "horse": "Artpark",
+          "tag": "Value bet",
+          "odds": 13.0,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Ascot",
+      "race_number": 6,
+      "date": "01-Apr-2026",
+      "picks": [
+        {
+          "horse": "Wonderfully Made",
+          "tag": "The one to beat",
+          "odds": 2.05,
+          "won": true,
+          "placed": true,
+          "position": 1
+        },
+        {
+          "horse": "Masmelo",
+          "tag": "Each-way chance",
+          "odds": 2.35,
+          "won": false,
+          "placed": false,
+          "position": 4
+        }
+      ]
+    },
+    {
+      "track": "Gold Coast",
+      "race_number": 3,
+      "date": "21-Mar-2026",
+      "picks": [
+        {
+          "horse": "The Grand Duchy",
+          "tag": "The one to beat",
+          "odds": 5.0,
+          "won": false,
+          "placed": true,
+          "position": 2
+        },
+        {
+          "horse": "Thrash A Bully",
+          "tag": "Each-way chance",
+          "odds": 7.5,
+          "won": false,
+          "placed": false,
+          "position": 4
+        },
+        {
+          "horse": "Miss Wildcat",
+          "tag": "Each-way chance",
+          "odds": 3.0,
+          "won": false,
+          "placed": true,
+          "position": 3
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "The one to beat": {
+      "picks": 142,
+      "wins": 64,
+      "places": 106,
+      "profit": 38.599999999999994,
+      "odds_sum": 458.9500000000001
+    },
+    "Each-way chance": {
+      "picks": 140,
+      "wins": 18,
+      "places": 63,
+      "profit": -49.800000000000004,
+      "odds_sum": 760.25
+    },
+    "Value bet": {
+      "picks": 136,
+      "wins": 17,
+      "places": 36,
+      "profit": -9.900000000000002,
+      "odds_sum": 1662.2
+    }
+  },
+  "total_races": 187
+}

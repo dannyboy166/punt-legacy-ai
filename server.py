@@ -85,6 +85,9 @@ tracker = PredictionTracker()
 
 DATE_PATTERN = re.compile(r'^\d{2}-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-\d{4}$')
 
+# V6 predictor deployed on this date - stats from this date onwards are V6
+V6_START_DATE = "16-Apr-2026"
+
 
 class PredictionRequest(BaseModel):
     track: str
@@ -1548,6 +1551,48 @@ def get_stats_by_condition_and_tag():
     Returns dict of condition_group -> tag -> stats
     """
     return tracker.get_stats_by_condition_and_tag()
+
+
+# =============================================================================
+# V6 STATS (Predictions since V6 deployment on 16-Apr-2026)
+# =============================================================================
+
+@app.get("/stats/v6/summary")
+def get_v6_stats_summary():
+    """
+    Get summary statistics for V6 predictor only (since 16-Apr-2026).
+
+    V6 predictor uses: Adj column only, no Pos/Margin/Rating, no Trainer A/E.
+    Backtested at 45% TTOB win rate, +27% ROI across 187 races.
+    """
+    return {
+        "v6_start_date": V6_START_DATE,
+        "stats": tracker.get_summary(since_date=V6_START_DATE),
+        "backtest": {
+            "races": 187,
+            "ttob_win_rate": 0.451,
+            "ttob_roi": 0.272,
+            "verified": True
+        }
+    }
+
+
+@app.get("/stats/v6/by-tag")
+def get_v6_stats_by_tag():
+    """
+    Get V6-era performance statistics grouped by tag.
+
+    Returns stats for predictions made since V6 deployment (16-Apr-2026).
+    """
+    return {
+        "v6_start_date": V6_START_DATE,
+        "stats": tracker.get_stats_by_tag(min_samples=1, since_date=V6_START_DATE),
+        "backtest_reference": {
+            "The one to beat": {"win_rate": 0.451, "roi": 0.272, "picks": 142},
+            "Each-way chance": {"win_rate": 0.129, "roi": -0.356, "picks": 140},
+            "Value bet": {"win_rate": 0.125, "roi": -0.073, "picks": 136}
+        }
+    }
 
 
 @app.post("/tracking/backfill-conditions")

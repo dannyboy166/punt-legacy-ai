@@ -468,30 +468,46 @@ class PredictionTracker:
 
             return [dict(row) for row in rows]
 
-    def get_stats_by_tag(self, min_samples: int = 5) -> dict:
+    def get_stats_by_tag(self, min_samples: int = 5, since_date: Optional[str] = None) -> dict:
         """
         Get performance statistics grouped by tag.
 
         Args:
             min_samples: Minimum samples required to include tag
+            since_date: Optional date filter in dd-MMM-yyyy format (e.g., "16-Apr-2026")
 
         Returns:
             Dict of tag -> stats
         """
         with sqlite3.connect(self.db_path) as conn:
-            rows = conn.execute("""
-                SELECT
-                    tag,
-                    COUNT(*) as total,
-                    SUM(won) as wins,
-                    SUM(placed) as places,
-                    AVG(odds) as avg_odds,
-                    SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
-                FROM predictions
-                WHERE outcome_recorded = 1
-                GROUP BY tag
-                HAVING COUNT(*) >= ?
-            """, (min_samples,)).fetchall()
+            if since_date:
+                rows = conn.execute("""
+                    SELECT
+                        tag,
+                        COUNT(*) as total,
+                        SUM(won) as wins,
+                        SUM(placed) as places,
+                        AVG(odds) as avg_odds,
+                        SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
+                    FROM predictions
+                    WHERE outcome_recorded = 1 AND race_date >= ?
+                    GROUP BY tag
+                    HAVING COUNT(*) >= ?
+                """, (since_date, min_samples)).fetchall()
+            else:
+                rows = conn.execute("""
+                    SELECT
+                        tag,
+                        COUNT(*) as total,
+                        SUM(won) as wins,
+                        SUM(placed) as places,
+                        AVG(odds) as avg_odds,
+                        SUM(CASE WHEN won = 1 THEN odds ELSE 0 END) as total_returns
+                    FROM predictions
+                    WHERE outcome_recorded = 1
+                    GROUP BY tag
+                    HAVING COUNT(*) >= ?
+                """, (min_samples,)).fetchall()
 
             stats = {}
             for row in rows:
@@ -655,18 +671,34 @@ class PredictionTracker:
 
             return stats
 
-    def get_summary(self) -> dict:
-        """Get overall summary statistics."""
+    def get_summary(self, since_date: Optional[str] = None) -> dict:
+        """Get overall summary statistics.
+
+        Args:
+            since_date: Optional date filter in dd-MMM-yyyy format (e.g., "16-Apr-2026")
+        """
         with sqlite3.connect(self.db_path) as conn:
-            row = conn.execute("""
-                SELECT
-                    COUNT(*) as total_predictions,
-                    SUM(outcome_recorded) as outcomes_recorded,
-                    SUM(won) as total_wins,
-                    SUM(placed) as total_places,
-                    AVG(odds) as avg_odds
-                FROM predictions
-            """).fetchone()
+            if since_date:
+                row = conn.execute("""
+                    SELECT
+                        COUNT(*) as total_predictions,
+                        SUM(outcome_recorded) as outcomes_recorded,
+                        SUM(won) as total_wins,
+                        SUM(placed) as total_places,
+                        AVG(odds) as avg_odds
+                    FROM predictions
+                    WHERE race_date >= ?
+                """, (since_date,)).fetchone()
+            else:
+                row = conn.execute("""
+                    SELECT
+                        COUNT(*) as total_predictions,
+                        SUM(outcome_recorded) as outcomes_recorded,
+                        SUM(won) as total_wins,
+                        SUM(placed) as total_places,
+                        AVG(odds) as avg_odds
+                    FROM predictions
+                """).fetchone()
 
             total, recorded, wins, places, avg_odds = row
             wins = wins or 0

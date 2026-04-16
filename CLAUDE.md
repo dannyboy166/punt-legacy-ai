@@ -1392,6 +1392,15 @@ The backtesting is legitimate:
 
 V6 is now live on Railway. All new predictions use the V6 configuration.
 
+**Backtest Verification (187 races):**
+| Tag | Picks | Win% | ROI |
+|-----|-------|------|-----|
+| **The one to beat** | 142 | **45.1%** | **+27.2%** ✅ |
+| Each-way chance | 140 | 12.9% | -35.6% |
+| Value bet | 136 | 12.5% | -7.3% |
+
+**Robustness check:** 7/7 batches of 30 races were profitable. Cumulative profit never went negative.
+
 **What changed:**
 - Adj column only (no Rating, Pos, Margin)
 - No Trainer A/E display (keeps Jockey A/E)
@@ -1399,7 +1408,13 @@ V6 is now live on Railway. All new predictions use the V6 configuration.
 
 **Backwards compatible:** Set `v6_mode=False` in `to_prompt_text()` to revert.
 
-**Stats note:** Existing 3899 predictions are V0. New predictions are V6. Compare performance over time.
+**New V6 Stats Endpoints:**
+```bash
+GET /stats/v6/summary    # Summary for V6 predictions only
+GET /stats/v6/by-tag     # By-tag stats for V6 predictions only
+```
+
+**Stats note:** Existing 3899 predictions are V0 (pre-16-Apr-2026). New predictions are V6. Use `/stats/v6/*` endpoints to track V6 performance separately. Old stats archived to `data/archives/pre_v6_stats_*.json`.
 
 ### Pending Improvements
 
@@ -1422,7 +1437,7 @@ V6 is now live on Railway. All new predictions use the V6 configuration.
 7. ~~Simple Daily Picks System~~ ✅ Done (condition proximity documented)
 8. ~~Performance analysis~~ ✅ Done (April 2026 - see above)
 9. ~~A/B Testing~~ ✅ Done (April 16, 2026 - 188 races, V6 wins)
-10. **Deploy V6 to production** - 46% win rate, +22% ROI on TTOB
+10. ~~Deploy V6 to production~~ ✅ Done (April 16, 2026 - verified 45% win, +27% ROI)
 11. Performance dashboard improvements
 12. User customization options
 13. Consider hybrid V3/V6 (V3 for metro, V6 for non-metro)
