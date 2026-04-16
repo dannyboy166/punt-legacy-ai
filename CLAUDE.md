@@ -1388,9 +1388,22 @@ The backtesting is legitimate:
 
 ---
 
+### V6 Deployed to Production (April 16, 2026)
+
+V6 is now live on Railway. All new predictions use the V6 configuration.
+
+**What changed:**
+- Adj column only (no Rating, Pos, Margin)
+- No Trainer A/E display (keeps Jockey A/E)
+- Simplified SYSTEM_PROMPT
+
+**Backwards compatible:** Set `v6_mode=False` in `to_prompt_text()` to revert.
+
+**Stats note:** Existing 3899 predictions are V0. New predictions are V6. Compare performance over time.
+
 ### Pending Improvements
 
-- [ ] Deploy V6 configuration to production
+- [x] Deploy V6 configuration to production ✅ (April 16, 2026)
 - [ ] Add PFAI filter for Each-way chance at metro
 - [ ] Track starred vs non-starred performance separately
 - [ ] Build automated weekly performance reports
