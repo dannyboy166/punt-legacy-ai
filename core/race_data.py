@@ -358,10 +358,10 @@ class RaceData:
                     form_summary += " ⚠️ LIMITED FORM DATA"
                 lines.append(form_summary)
                 lines.append("")
-                # V6: Simplified columns - only Adj, no Pos/Margin/Rating/Dist%/CStep/WtCh
+                # V6: Remove Pos/Margin/Rating, keep Dist%/CStep/WtCh and Adj
                 if v6_mode:
-                    lines.append("| Date | Track | Dist | Cond | Adj | Prep | Trial | Notes |")
-                    lines.append("|------|-------|------|------|-----|------|-------|-------|")
+                    lines.append("| Date | Track | Dist | Cond | Dist% | CStep | WtCh | Adj | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-------|-------|------|-----|------|-------|-------|")
                 elif include_venue_adjusted:
                     lines.append("| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial | Notes |")
                     lines.append("|------|-------|------|------|-----|--------|-------|-------|------|--------|-----|------|-------|-------|")
@@ -409,9 +409,9 @@ class RaceData:
                     else:
                         wt_str = "?"
 
-                    # V6: Simplified row - only Adj, no Pos/Margin/Rating/Dist%/CStep/WtCh
+                    # V6: Remove Pos/Margin/Rating, keep Dist%/CStep/WtCh and Adj
                     if v6_mode:
-                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {dist_str} | {cond_str_diff} | {wt_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
                     elif include_venue_adjusted:
                         lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {dist_str} | {cond_str_diff} | {wt_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
                     else:
