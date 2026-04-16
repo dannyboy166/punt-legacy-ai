@@ -216,24 +216,21 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 
 ## Understanding the Data
 
-### Speed Ratings
-Ratings are normalized to 100 = benchmark performance. Higher = faster.
-- Ratings are comparable across conditions (102 on Heavy = 102 on Good in terms of speed)
-- BUT horses perform differently on wet vs dry tracks
-- Use the CStep column to find runs at similar conditions - these are most predictive of today's performance
+### Speed Ratings (Adj column)
+The **Adj** column is your primary data. It shows venue-adjusted speed ratings:
+- 100 = benchmark performance
+- Higher = faster
+- Normalized by distance, track condition, AND venue quality
+- Comparable across ALL venues (Randwick 100 = country track 100)
+
+Look at each horse's recent Adj ratings at similar distance and conditions to today's race.
 
 ### Form Table Columns
 | Column | Meaning |
 |--------|---------|
 | Dist | Race distance in metres |
 | Cond | Track condition (G4=Good4, S5=Soft5, H8=Heavy8, etc.) |
-| Pos | Finish position / field size |
-| Margin | Lengths behind winner (0L for winner) |
-| Dist% | Distance difference from TODAY's race (+8% = 8% longer, = means same) |
-| CStep | Condition steps from TODAY's track (0=same, -2=drier, +2=wetter) |
-| WtCh | Weight change vs that run. Negative = less weight (easier). Positive = more weight (harder). |
-| Rating | Speed rating normalized by distance + condition (100=par, higher=faster) |
-| Adj | **USE THIS** - Rating further normalized by track quality. Comparable across all venues (Randwick vs country tracks). |
+| Adj | **Primary data** - Venue-adjusted speed rating (100=par, higher=faster) |
 | Prep | Run number in current prep (1=first-up, 2=second-up, etc.) |
 | Trial | "TRIAL" if barrier trial (not a real race - horses don't always try) |
 | Notes | Stewards report (eased, checked, held up, etc.) |
@@ -246,15 +243,11 @@ Ratings are normalized to 100 = benchmark performance. Higher = faster.
 
 ## Key Analysis
 
-**Compare ratings at similar distance and conditions.** Use the Dist% and CStep columns to identify relevant form. A horse's best rating at a different distance/condition may not reflect their ability today.
+**Compare Adj ratings at similar distance and conditions.** Find each horse's runs at similar distance (within ~200m) and conditions to today. Recent form is more relevant.
 
-**Prep patterns matter.** Check each horse's Prep column to see where they are in their campaign. Compare to their career first-up/second-up record and their past ratings at that prep stage.
+**Prep patterns matter.** Check each horse's Prep column to see where they are in their campaign. Compare to their career first-up/second-up record.
 
 **Notes column can explain bad runs.** "Eased", "checked", "held up" suggest the rating doesn't reflect true ability.
-
-**Weight is simple.** Less weight = easier task. More weight = harder task. Good rating + less weight today = advantage.
-
-**Compare ratings using:** distance (Dist%), conditions (CStep), prep stage, and weight. These are the factors that affect how a rating translates to today's race.
 
 **Critical:**
 - Barrier trials (TRIAL) don't count as form - horses don't always try
@@ -264,8 +257,8 @@ Ratings are normalized to 100 = benchmark performance. Higher = faster.
 ## Runner Notes
 
 For non-selected runners, briefly explain why they weren't picked:
-- Their ratings at similar distance/condition vs contenders
-- Relevant issues (weight up, poor prep record, wrong conditions)
+- Their Adj ratings at similar distance/condition vs contenders
+- Relevant issues (poor prep record, wrong conditions, etc.)
 Avoid generic career stats - be specific to today's race.
 
 ## Output
@@ -425,8 +418,8 @@ class Predictor:
             logger.warning(f"Invalid mode '{mode}', defaulting to 'normal'")
             mode = "normal"
 
-        # Format race data for prompt (include venue-adjusted ratings)
-        race_text = race_data.to_prompt_text(include_venue_adjusted=True)
+        # Format race data for prompt (V6: Adj only, no Pos/Margin/Rating, no Trainer A/E)
+        race_text = race_data.to_prompt_text(include_venue_adjusted=True, v6_mode=True)
 
         # Select prompt based on mode
         if mode == "promo_bonus":

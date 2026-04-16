@@ -269,11 +269,12 @@ class RaceData:
             "warnings": self.warnings,
         }
 
-    def to_prompt_text(self, include_venue_adjusted: bool = False) -> str:
+    def to_prompt_text(self, include_venue_adjusted: bool = False, v6_mode: bool = False) -> str:
         """Format as text for Claude prompt.
 
         Args:
             include_venue_adjusted: If True, add Adj column with venue-adjusted ratings.
+            v6_mode: If True, use simplified V6 format (Adj only, no Pos/Margin/Rating, no Trainer A/E).
         """
         # Format condition as abbreviation (e.g., "S6", "G4", "H8")
         cond_abbrev = f"{self.condition[0].upper()}{self.condition_num}" if self.condition_num else self.condition
@@ -306,7 +307,11 @@ class RaceData:
                 lines.append("Odds: Not available")
 
             lines.append(f"Jockey: {r.jockey} (A/E: {r.jockey_a2e or 'N/A'})")
-            lines.append(f"Trainer: {r.trainer} (A/E: {r.trainer_a2e or 'N/A'})")
+            # V6: Remove Trainer A/E (not predictive enough)
+            if v6_mode:
+                lines.append(f"Trainer: {r.trainer}")
+            else:
+                lines.append(f"Trainer: {r.trainer} (A/E: {r.trainer_a2e or 'N/A'})")
             lines.append(f"Career: {r.career_starts}: {r.career_wins}-{r.career_seconds}-{r.career_thirds} ({r.win_pct:.0f}% win)")
 
             # Weight change from last race run
@@ -353,7 +358,11 @@ class RaceData:
                     form_summary += " ⚠️ LIMITED FORM DATA"
                 lines.append(form_summary)
                 lines.append("")
-                if include_venue_adjusted:
+                # V6: Simplified columns - only Adj, no Pos/Margin/Rating/Dist%/CStep/WtCh
+                if v6_mode:
+                    lines.append("| Date | Track | Dist | Cond | Adj | Prep | Trial | Notes |")
+                    lines.append("|------|-------|------|------|-----|------|-------|-------|")
+                elif include_venue_adjusted:
                     lines.append("| Date | Track | Dist | Cond | Pos | Margin | Dist% | CStep | WtCh | Rating | Adj | Prep | Trial | Notes |")
                     lines.append("|------|-------|------|------|-----|--------|-------|-------|------|--------|-----|------|-------|-------|")
                 else:
@@ -400,7 +409,10 @@ class RaceData:
                     else:
                         wt_str = "?"
 
-                    if include_venue_adjusted:
+                    # V6: Simplified row - only Adj, no Pos/Margin/Rating/Dist%/CStep/WtCh
+                    if v6_mode:
+                        lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
+                    elif include_venue_adjusted:
                         lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {dist_str} | {cond_str_diff} | {wt_str} | {rating_str} | {adj_str} | {prep_str} | {trial_str} | {notes_str} |")
                     else:
                         lines.append(f"| {f.date} | {f.track[:10]} | {f.distance}m | {cond_str} | {f.position}/{f.starters} | {margin_str} | {dist_str} | {cond_str_diff} | {wt_str} | {rating_str} | {prep_str} | {trial_str} | {notes_str} |")
