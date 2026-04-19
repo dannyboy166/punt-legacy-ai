@@ -536,6 +536,79 @@ def get_races(track: str, date: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/results")
+def get_results_for_date(date: str):
+    """
+    Get race results for all tracks on a given date.
+
+    Returns dict: { "TrackName": { race_number: { "Horse Name": position } } }
+
+    Example response:
+    {
+        "Randwick": {
+            1: { "Horse A": 1, "Horse B": 2, "Horse C": 3 },
+            2: { "Horse X": 1, "Horse Y": 2 }
+        },
+        "Eagle Farm": { ... }
+    }
+    """
+    validate_date(date)
+
+    try:
+        meetings = pf_api.get_meetings(date)
+        all_results = {}
+
+        for meeting in meetings:
+            track = meeting.get("track", {}).get("name", "")
+            if not track:
+                continue
+
+            meeting_id = meeting.get("meetingId")
+            if not meeting_id:
+                continue
+
+            try:
+                # Get all race results for this meeting
+                results_data = pf_api.get_results(meeting_id, 0)  # 0 = all races
+
+                if not results_data:
+                    continue
+
+                # Get the meeting data (first item in list)
+                meeting_data = results_data[0] if isinstance(results_data, list) and results_data else results_data
+                races = meeting_data.get("raceResults", [])
+
+                track_results = {}
+                for race in races:
+                    race_num = race.get("raceNumber", 0)
+                    if not race_num:
+                        continue
+
+                    race_positions = {}
+                    for runner in race.get("runners", []):
+                        position = runner.get("position", 0)
+                        horse_name = runner.get("runner", "")
+                        if position > 0 and horse_name:  # 0 = scratched
+                            race_positions[horse_name] = position
+
+                    if race_positions:
+                        track_results[race_num] = race_positions
+
+                if track_results:
+                    all_results[track] = track_results
+
+            except Exception:
+                # Skip this track if results unavailable
+                continue
+
+        return all_results
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/odds")
 def get_odds(track: str, race_number: int, date: str):
     """
