@@ -4,7 +4,7 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 5 Complete - V6 Predictor Optimized (46% TTOB win rate, +22% ROI)
+**Status:** Phase 5 Complete - V6 Live (Day 1: 50% TTOB win rate, +35.5% ROI)
 
 ---
 
@@ -1416,11 +1416,37 @@ GET /stats/v6/by-tag     # By-tag stats for V6 predictions only
 
 **Stats note:** Existing 3899 predictions are V0 (pre-16-Apr-2026). New predictions are V6. Use `/stats/v6/*` endpoints to track V6 performance separately. Old stats archived to `data/archives/pre_v6_stats_*.json`.
 
+### V6 Live Results (April 16-17, 2026)
+
+**Day 1 Results (April 16):**
+| Tag | Picks | Wins | Win % | ROI |
+|-----|-------|------|-------|-----|
+| **The one to beat** | 20 | 10 | **50%** | **+35.5%** |
+| ⭐ Tipsheet TTOB | 15 | 9 | **60%** | **+62.7%** |
+| Non-starred TTOB | 5 | 1 | 20% | -46% |
+
+The ⭐ tipsheet filter is working - starred picks significantly outperform non-starred.
+
+### Batch Prediction Script
+
+Run all races for a day safely (crash-resistant, saves incrementally):
+
+```bash
+# Edit DATE in script first, then run:
+python3 tools/batch_predict_safe.py
+
+# Features:
+# - Saves after each race (crash-safe)
+# - Skips already-completed races on restart
+# - Never overwrites - appends only
+# - Output: data/batch_predictions_DD_MMM_YYYY.json
+```
+
 ### Pending Improvements
 
 - [x] Deploy V6 configuration to production ✅ (April 16, 2026)
+- [x] Track starred vs non-starred performance ✅ (⭐ TTOB: 60% win, +63% ROI vs 20% / -46%)
 - [ ] Add PFAI filter for Each-way chance at metro
-- [ ] Track starred vs non-starred performance separately
 - [ ] Build automated weekly performance reports
 - [ ] Consider hybrid approach (V3 for metro, V6 for non-metro)
 

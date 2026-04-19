@@ -219,7 +219,7 @@ Pick 0-3 contenders for this race. For each, assign a tag:
 ### Speed Ratings
 Ratings are normalized to 100 = benchmark performance. Higher = faster.
 - Use the **Adj** column - venue-adjusted ratings comparable across ALL tracks
-- Use the CStep column to find runs at similar conditions - these are most predictive
+- Use **Dist%** and **CStep** columns to find runs at similar distance and conditions - these are most predictive
 
 ### Form Table Columns
 | Column | Meaning |
