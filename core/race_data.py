@@ -27,6 +27,7 @@ from api.ladbrokes import LadbrokeAPI
 from core.normalize import normalize_horse_name, horses_match
 from core.speed import calculate_run_rating, parse_condition_number
 from core.results import PredictionResult, RaceStatus
+from core.track_mapping import tracks_equivalent
 
 
 # Track ratings lookup for venue-adjusted speed ratings
@@ -591,7 +592,7 @@ class RaceDataPipeline:
                 for m in lb_meetings:
                     # Match by track name
                     lb_track = m.get("name", "")
-                    if lb_track.lower() == meeting_track.lower() or meeting_track.lower() in lb_track.lower():
+                    if tracks_equivalent(meeting_track, lb_track):
                         races = m.get("races", [])
                         for r in races:
                             if r.get("race_number") == race_number:
@@ -648,6 +649,7 @@ class RaceDataPipeline:
             odds = lb_runner_odds.get("fixed_win")
             place_odds = lb_runner_odds.get("fixed_place")
             odds_source = "ladbrokes" if odds else "none"
+
             implied_prob = (100 / odds) if odds and odds > 0 else None
 
             # Skip if scratched (also check Ladbrokes is_scratched)
