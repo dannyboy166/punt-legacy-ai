@@ -15,7 +15,8 @@ Known coverage gaps:
 - Pioneer Park (Alice Springs) - PF only, no Ladbrokes coverage
 - Newcastle - LB only, not in PuntingForm data
 - NZ tracks - PF only, no Ladbrokes coverage
-- HK tracks - PF only, no Ladbrokes coverage
+
+HK tracks (Sha Tin, Happy Valley) are supported via Ladbrokes country=HK.
 """
 
 from typing import Optional
@@ -56,8 +57,6 @@ PF_ONLY_TRACKS = {
         "New Plymouth Raceway", "Phar Lap Raceway", "Arawa Park",
         "Ascot Park", "Ashburton", "Gore", "Greymouth", "Kurow",
         "Reefton", "Riverton", "Wingatui",
-        # HK tracks
-        "Sha Tin", "Happy Valley",
     ]
 }
 

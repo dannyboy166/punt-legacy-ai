@@ -32,6 +32,14 @@ logger = get_logger(__name__)
 BASE_URL = "https://api.ladbrokes.com.au/affiliates/v1"
 DEFAULT_TIMEOUT = 10
 
+# HK tracks that need country='HK' when fetching from Ladbrokes
+_HK_TRACKS = {"sha tin", "happy valley"}
+
+
+def _get_country_for_track(track_name: str) -> str:
+    """Return the Ladbrokes country code for a track. HK tracks need 'HK', everything else 'AUS'."""
+    return "HK" if track_name.strip().lower() in _HK_TRACKS else "AUS"
+
 # Required headers
 DEFAULT_HEADERS = {
     "From": "contact@puntlegacy.com",
@@ -176,6 +184,7 @@ class LadbrokeAPI:
         track_name: str,
         race_number: int,
         date: str = "today",
+        country: str = "AUS",
     ) -> tuple[dict[str, dict], Optional[str], Optional[str]]:
         """
         Get odds for a specific track and race.
@@ -184,6 +193,7 @@ class LadbrokeAPI:
             track_name: Track name (partial match OK)
             race_number: Race number
             date: Date for the race (YYYY-MM-DD, "today", or "tomorrow")
+            country: Country code (AUS, HK, NZ, etc.)
 
         Returns:
             Tuple of (odds_dict, race_status, error_message)
@@ -191,9 +201,9 @@ class LadbrokeAPI:
             - race_status: "open", "closed", "final", "abandoned" or None
             - error_message: Human-readable error or None if success
         """
-        logger.debug(f"Fetching odds for {track_name} R{race_number} on {date}")
+        logger.debug(f"Fetching odds for {track_name} R{race_number} on {date} (country={country})")
 
-        meetings = self.get_meetings(date_from=date)
+        meetings = self.get_meetings(date_from=date, country=country)
 
         for meeting in meetings:
             meeting_name = meeting.get("name", "")
@@ -262,8 +272,11 @@ class LadbrokeAPI:
             log_prediction_skip(logger, pf_track_name, race_number, reason)
             return {}, reason
 
+        # Detect HK tracks - they need country='HK' for Ladbrokes API
+        country = _get_country_for_track(pf_track_name)
+
         # Fetch odds and check race status
-        odds, race_status, error = self.get_odds_for_race(lb_track, race_number, date)
+        odds, race_status, error = self.get_odds_for_race(lb_track, race_number, date, country=country)
 
         logger.debug(f"Race status for {pf_track_name} R{race_number}: '{race_status}' (repr: {repr(race_status)})")
 

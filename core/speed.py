@@ -163,6 +163,12 @@ def get_condition_multiplier(condition: str) -> Optional[float]:
         "Good": "G4",
         "Good 3": "G3",
         "Good 4": "G4",
+        "Firm": "G3",
+        "F": "G3",
+        "Good to Firm": "G3",
+        "Damp": "S5",
+        "D": "S5",
+        "Yielding": "S5",
         "Soft": "S5",
         "Soft 5": "S5",
         "Soft 6": "S6",
@@ -229,7 +235,7 @@ def parse_condition_number(condition: str) -> Optional[int]:
         return int(match.group(1))
 
     # Map text-only conditions to default numbers
-    text_map = {"Good": 4, "Soft": 5, "Heavy": 8, "Synthetic": 5}
+    text_map = {"Good": 4, "Firm": 3, "Damp": 5, "Soft": 5, "Heavy": 8, "Synthetic": 5}
     for text, num in text_map.items():
         if text.lower() in str(condition).lower():
             return num

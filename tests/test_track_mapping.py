@@ -91,9 +91,9 @@ class TestIsPfOnlyTrack:
         assert is_pf_only_track("Te Rapa") is True
 
     def test_hk_tracks(self):
-        """HK tracks are PF only."""
-        assert is_pf_only_track("Sha Tin") is True
-        assert is_pf_only_track("Happy Valley") is True
+        """HK tracks are supported (Ladbrokes country=HK)."""
+        assert is_pf_only_track("Sha Tin") is False
+        assert is_pf_only_track("Happy Valley") is False
 
     def test_aus_tracks(self):
         """Australian tracks are NOT PF only."""
@@ -163,7 +163,11 @@ class TestGetLbTrackForOdds:
         """PF-only tracks return None."""
         assert get_lb_track_for_odds("Pioneer Park") is None
         assert get_lb_track_for_odds("Tauranga") is None
-        assert get_lb_track_for_odds("Sha Tin") is None
+
+    def test_hk_track_returns_name(self):
+        """HK tracks return their name (supported via country=HK)."""
+        assert get_lb_track_for_odds("Sha Tin") == "sha tin"
+        assert get_lb_track_for_odds("Happy Valley") == "happy valley"
 
 
 class TestNormalizeWithAliases:

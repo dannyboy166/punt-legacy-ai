@@ -53,6 +53,8 @@ METRO_TRACKS = {
     "ascot", "belmont", "belmont park",
     # TAS
     "hobart", "launceston",
+    # HK
+    "sha tin", "happy valley",
 }
 
 
@@ -440,7 +442,9 @@ class Predictor:
             logger.warning(f"Invalid mode '{mode}', defaulting to 'normal'")
             mode = "normal"
 
-        # Format race data for prompt (V6: Adj only, no Pos/Margin/Rating, no Trainer A/E)
+        # Format race data for prompt
+        # v6_mode = data format (Adj only, no Pos/Margin/Rating, no Trainer A/E)
+        # V7 = system prompt (recency + trajectory guidance). V7 kept the V6 data format.
         race_text = race_data.to_prompt_text(include_venue_adjusted=True, v6_mode=True)
 
         # Select prompt based on mode

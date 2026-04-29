@@ -445,11 +445,12 @@ def get_meetings(date: str):
     try:
         meetings = pf_api.get_meetings(date)
 
-        # Filter to Australian meetings only
+        # Filter to Australian and Hong Kong meetings
+        supported_countries = {"AUS", "HK"}
         aus_meetings = [
             m for m in meetings
             if m.get("track", {}).get("name")
-            and m.get("track", {}).get("country") == "AUS"
+            and m.get("track", {}).get("country") in supported_countries
         ]
 
         # Fetch race counts in parallel for all meetings

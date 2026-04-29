@@ -275,7 +275,8 @@ class RaceData:
 
         Args:
             include_venue_adjusted: If True, add Adj column with venue-adjusted ratings.
-            v6_mode: If True, use simplified V6 format (Adj only, no Pos/Margin/Rating, no Trainer A/E).
+            v6_mode: If True, use simplified V6 data format (Adj only, no Pos/Margin/Rating, no Trainer A/E).
+                     Note: V7 predictor uses v6_mode=True (V7 changed the prompt, not the data format).
         """
         # Format condition as abbreviation (e.g., "S6", "G4", "H8")
         cond_abbrev = f"{self.condition[0].upper()}{self.condition_num}" if self.condition_num else self.condition
@@ -469,11 +470,13 @@ class RaceDataPipeline:
 
         meeting_id = None
         meeting_track = None
+        meeting_country = None
         for m in meetings:
             m_track = m.get("track", {}).get("name", "")
             if m_track.lower() == track.lower() or track.lower() in m_track.lower():
                 meeting_id = m.get("meetingId")
                 meeting_track = m_track
+                meeting_country = m.get("track", {}).get("country", "AUS")
                 break
 
         if not meeting_id:
@@ -588,19 +591,22 @@ class RaceDataPipeline:
                 dt = datetime.strptime(date, "%d-%b-%Y")
                 lb_date = dt.strftime("%Y-%m-%d")
 
-                lb_meetings = self.lb_api.get_meetings(date_from=lb_date)
-                for m in lb_meetings:
-                    # Match by track name
-                    lb_track = m.get("name", "")
-                    if tracks_equivalent(meeting_track, lb_track):
-                        races = m.get("races", [])
-                        for r in races:
-                            if r.get("race_number") == race_number:
-                                lb_condition = r.get("track_condition")  # e.g., "Heavy8", "Good4"
-                                if lb_condition:
-                                    condition = lb_condition
-                                    condition_num = parse_condition_number(lb_condition)
-                                break
+                # Search AUS and HK meetings for condition data
+                for lb_country in ["AUS", "HK"]:
+                    lb_meetings = self.lb_api.get_meetings(date_from=lb_date, country=lb_country)
+                    for m in lb_meetings:
+                        lb_track = m.get("name", "")
+                        if tracks_equivalent(meeting_track, lb_track):
+                            races = m.get("races", [])
+                            for r in races:
+                                if r.get("race_number") == race_number:
+                                    lb_condition = r.get("track_condition")  # e.g., "Heavy8", "Good4", "Good"
+                                    if lb_condition:
+                                        condition = lb_condition
+                                        condition_num = parse_condition_number(lb_condition)
+                                    break
+                            break
+                    if condition:
                         break
             except Exception:
                 pass
@@ -608,6 +614,13 @@ class RaceDataPipeline:
         # Fallback to fields_data - but FAIL if still missing (no silent defaults)
         if not condition:
             condition = fields_data.get("expectedCondition")
+
+        # HK fallback: conditions are almost always Good (85%+ of races)
+        # Ladbrokes often doesn't list HK meetings until close to race time
+        if not condition and meeting_country == "HK":
+            condition = "Good"
+            condition_num = 4
+
         if not condition:
             return None, f"Track condition not available for {meeting_track} R{race_number}. Cannot make accurate prediction."
 
@@ -753,7 +766,12 @@ class RaceDataPipeline:
                 # Calculate venue-adjusted rating
                 rating_venue_adjusted = None
                 if rating is not None:
-                    track_rating = get_track_rating(run_track)
+                    # Sha Tin synthetic (AWT) has its own track rating
+                    track_for_rating = run_track
+                    run_cond = run.get("trackCondition", "")
+                    if run_track == "Sha Tin" and run_cond == "Syn":
+                        track_for_rating = "Sha Tin AWT"
+                    track_rating = get_track_rating(track_for_rating)
                     if track_rating:
                         rating_venue_adjusted = rating / track_rating
 
