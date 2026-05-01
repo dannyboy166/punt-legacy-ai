@@ -205,25 +205,40 @@ class LadbrokeAPI:
 
         meetings = self.get_meetings(date_from=date, country=country)
 
+        # Collect all matching meetings, scored by name closeness
+        matched_meetings = []
+        search_normalized = normalize_track_name(track_name)
+
         for meeting in meetings:
             meeting_name = meeting.get("name", "")
 
             if tracks_match(track_name, meeting_name) or tracks_equivalent(track_name, meeting_name):
-                # Found the track, find the race
-                for race in meeting.get("races", []):
-                    if race.get("race_number") == race_number:
-                        race_id = race.get("id")
-                        race_status = race.get("status", "unknown")
+                meeting_normalized = normalize_track_name(meeting_name)
+                # Prefer exact match, then closest length (most specific match)
+                if search_normalized == meeting_normalized:
+                    score = 0  # Perfect match
+                else:
+                    score = abs(len(search_normalized) - len(meeting_normalized))
+                matched_meetings.append((score, meeting))
 
-                        race_data = self.get_race(race_id)
+        # Sort by score (best match first)
+        matched_meetings.sort(key=lambda x: x[0])
 
-                        if not race_data:
-                            logger.warning(f"No race data for {track_name} R{race_number}")
-                            return {}, race_status, f"No race data available"
+        for _, meeting in matched_meetings:
+            for race in meeting.get("races", []):
+                if race.get("race_number") == race_number:
+                    race_id = race.get("id")
+                    race_status = race.get("status", "unknown")
 
-                        odds = self._build_odds_dict(race_data.get("runners", []))
-                        logger.debug(f"Found odds for {len(odds)} runners at {track_name} R{race_number} (status: {race_status})")
-                        return odds, race_status, None
+                    race_data = self.get_race(race_id)
+
+                    if not race_data:
+                        logger.warning(f"No race data for {track_name} R{race_number}")
+                        return {}, race_status, f"No race data available"
+
+                    odds = self._build_odds_dict(race_data.get("runners", []))
+                    logger.debug(f"Found odds for {len(odds)} runners at {track_name} R{race_number} (status: {race_status})")
+                    return odds, race_status, None
 
         logger.info(f"Track not found in Ladbrokes: {track_name}")
         return {}, None, f"Track not found: {track_name}"
