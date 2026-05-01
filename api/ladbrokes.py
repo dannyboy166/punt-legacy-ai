@@ -214,11 +214,17 @@ class LadbrokeAPI:
 
             if tracks_match(track_name, meeting_name) or tracks_equivalent(track_name, meeting_name):
                 meeting_normalized = normalize_track_name(meeting_name)
-                # Prefer exact match, then closest length (most specific match)
+                # Prefer exact match, then search is substring of meeting
+                # (e.g. "sunshine coast poly" in "sunshine coast poly track"),
+                # then meeting is substring of search, then length difference
                 if search_normalized == meeting_normalized:
                     score = 0  # Perfect match
+                elif search_normalized in meeting_normalized:
+                    score = 1  # Search is contained in meeting name
+                elif meeting_normalized in search_normalized:
+                    score = 2  # Meeting name is contained in search
                 else:
-                    score = abs(len(search_normalized) - len(meeting_normalized))
+                    score = 3  # Mapping-based match
                 matched_meetings.append((score, meeting))
 
         # Sort by score (best match first)
