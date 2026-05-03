@@ -1963,11 +1963,11 @@ class PredictionTracker:
             # Group by condition range
             def get_condition_group(cond_num: int) -> str:
                 if cond_num <= 4:
-                    return "Good (1-4)"
-                elif cond_num <= 6:
-                    return "Soft (5-6)"
+                    return "Good (3-4)"
+                elif cond_num <= 7:
+                    return "Soft (5-7)"
                 else:
-                    return "Heavy (7-10)"
+                    return "Heavy (8-10)"
 
             by_group: dict[str, list] = {}
             for row in rows:
@@ -2080,7 +2080,7 @@ class PredictionTracker:
                 # Condition label
                 if cond_num <= 4:
                     label = f"Good {cond_num}"
-                elif cond_num <= 6:
+                elif cond_num <= 7:
                     label = f"Soft {cond_num}"
                 else:
                     label = f"Heavy {cond_num}"
@@ -2125,11 +2125,11 @@ class PredictionTracker:
             # Group by condition range
             def get_condition_group(cond_num: int) -> str:
                 if cond_num <= 4:
-                    return "Good (1-4)"
-                elif cond_num <= 6:
-                    return "Soft (5-6)"
+                    return "Good (3-4)"
+                elif cond_num <= 7:
+                    return "Soft (5-7)"
                 else:
-                    return "Heavy (7-10)"
+                    return "Heavy (8-10)"
 
             # Nested grouping: condition -> tag -> picks
             by_condition_tag: dict[str, dict[str, list]] = {}

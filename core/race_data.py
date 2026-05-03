@@ -698,7 +698,7 @@ class RaceDataPipeline:
             condition_record = None
             if condition_num <= 4:
                 condition_record = runner.get("goodRecord")
-            elif condition_num <= 6:
+            elif condition_num <= 7:
                 condition_record = runner.get("softRecord")
             else:
                 condition_record = runner.get("heavyRecord")

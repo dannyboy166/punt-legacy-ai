@@ -44,7 +44,7 @@ def get_condition_category(condition: str) -> str | None:
 
     if cond_num <= 4:
         return "good"
-    elif cond_num <= 6:
+    elif cond_num <= 7:
         return "soft"
     else:
         return "heavy"
