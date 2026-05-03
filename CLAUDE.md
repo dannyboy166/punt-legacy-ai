@@ -4,7 +4,7 @@
 
 AI-powered horse racing predictor product for Punt Legacy subscribers.
 
-**Status:** Phase 5 Complete - V6 Live (Day 1: 50% TTOB win rate, +35.5% ROI)
+**Status:** Phase 5 Complete - V7 Live (backtest: 46% TTOB win rate, +29% ROI)
 
 ---
 
@@ -509,16 +509,28 @@ The predictor is exposed via FastAPI server and called from the racing-tips-plat
 ### Architecture
 
 ```
-racing-tips-platform (Next.js)     punt-legacy-ai (Python FastAPI)
-        │                                    │
-        │  POST /predict                     │
-        │  {track, race_number, date}        │
-        ├───────────────────────────────────►│
-        │                                    │ → PuntingForm API
-        │                                    │ → Ladbrokes API
-        │                                    │ → Claude API
-        │◄───────────────────────────────────┤
-        │  {contenders[], summary}           │
+racing-tips-platform (Next.js/Vercel)     punt-legacy-ai (Python FastAPI/Railway)
+        │                                          │
+        │  POST /predict                           │
+        │  {track, race_number, date, mode}        │
+        ├─────────────────────────────────────────►│
+        │                                          │ → PuntingForm API (form data)
+        │                                          │ → Ladbrokes API (live odds)
+        │                                          │ → Claude API (prediction)
+        │◄─────────────────────────────────────────┤
+        │  {contenders[], summary}                 │
+        │                                          │
+        ├── Stores in Prisma (PredictionUsage)     │
+        │   (single source of truth)               │
+        │                                          │
+        │  GET /results?date=X                     │
+        │  (for outcome syncing)                   │
+        ├─────────────────────────────────────────►│
+        │                                          │ → PuntingForm API (results)
+        │◄─────────────────────────────────────────┤
+        │  {track: {race: {horse: position}}}      │
+        │                                          │
+        └── Updates Prisma (outcomes)              │
 ```
 
 ### FastAPI Server
@@ -536,26 +548,21 @@ POST /predict                        # Generate prediction (accepts allow_finish
 POST /predict-meeting                # Generate predictions for entire meeting (admin)
 POST /backtest                       # Run backtest on historical races
 
-# Stats Endpoints
+# Results Endpoint (used by racing-tips-platform for outcome syncing)
+GET  /results?date=22-Apr-2026       # Race results from PuntingForm (positions by horse)
+
+# Legacy Stats Endpoints (DEPRECATED - use Prisma stats in racing-tips-platform instead)
+# These read from Railway SQLite which stopped receiving predictions after April 19, 2026.
+# Only useful for historical V0 data (Feb 3 - Apr 18, 2026).
 GET  /stats/summary                  # Overall prediction stats
 GET  /stats/by-tag                   # Performance by tag
-GET  /stats/by-tag-staking           # Performance by tag with staking ROI
-GET  /stats/by-meeting               # Performance by meeting (track + date)
-GET  /stats/by-confidence            # Performance by confidence level
-GET  /stats/by-race-confidence       # Performance by race-level confidence
-GET  /stats/by-mode                  # Performance by mode (normal vs promo)
-
-# Tracking Endpoints
-GET  /predictions/pending            # Predictions awaiting outcomes
-GET  /predictions/recent?limit=50    # Recent predictions
-POST /outcomes                       # Record race outcomes
-POST /outcomes/sync?race_date=X      # Auto-sync outcomes from PuntingForm
-POST /backfill                       # Import historical predictions
+GET  /stats/v6/summary               # V6-only stats (Apr 16-18 only)
+GET  /predictions/recent?limit=50    # Recent predictions from Railway SQLite
 ```
 
-#### Stats by Meeting Response
+#### Legacy Stats by Meeting Response (Railway - deprecated)
 ```json
-GET /stats/by-meeting
+GET /stats/by-meeting  (only has Feb 3 - Apr 18 data)
 [
   {
     "track": "Canterbury",
@@ -574,6 +581,8 @@ GET /stats/by-meeting
   }
 ]
 ```
+
+For current stats, use `npm run prediction-stats` in racing-tips-platform.
 
 ### Modifying Claude Prompts
 
@@ -999,18 +1008,20 @@ Comprehensive analysis of ~4000+ predictions from Feb 3 - Apr 1, 2026.
 ### Quick Stats Commands
 
 ```bash
-# From racing-tips-platform directory:
-npm run stats                      # Overall summary
-npm run stats -- --by-tag          # Performance by tag
-npm run stats -- --by-tipsheet     # ⭐ Starred vs regular picks
-npm run stats -- --pending         # Predictions still awaiting outcomes
-npm run sync-outcomes              # Sync results from PuntingForm
-
-# Direct API queries (Railway production):
-curl -s "https://punt-legacy-ai-production.up.railway.app/stats/summary"
-curl -s "https://punt-legacy-ai-production.up.railway.app/stats/by-tag"
-curl -s "https://punt-legacy-ai-production.up.railway.app/stats/by-pfai-rank-metro?tag=The%20one%20to%20beat&metro=true"
+# From racing-tips-platform directory (Prisma = source of truth since April 19, 2026):
+npm run sync-outcomes                          # Sync all pending outcomes
+npm run sync-outcomes -- 22-Apr-2026           # Sync specific date
+npm run prediction-stats                       # Overall summary
+npm run prediction-stats -- --by-tag           # Performance by tag
+npm run prediction-stats -- --by-tipsheet      # ⭐ Starred vs regular picks
+npm run prediction-stats -- --starred-only     # Only ⭐ tipsheet picks
+npm run prediction-stats -- --from 16-Apr-2026 # From date
+npm run prediction-stats -- --tag "The one to beat"  # Specific tag
+npm run prediction-stats -- --pending          # Show predictions awaiting sync
+npm run prediction-stats -- --unique-races     # 1 prediction per race (deduped)
 ```
+
+**Note:** The old Railway SQLite `/stats/*` endpoints are deprecated. They only have data from Feb 3 - Apr 18, 2026 (V0 era). All new stats come from Prisma.
 
 ### Overall Performance Summary
 
@@ -1129,30 +1140,24 @@ So non-metro "The one to beat" needs BOTH:
 
 ### Data Sources
 
-- **Predictions stored:** Railway SQLite (`punt-legacy-ai-production.up.railway.app`)
-- **Results from:** PuntingForm API via `/outcomes/sync`
-- **PFAI ranks:** Backfilled from PuntingForm via `/backfill/pfai-rank`
-- **Tracking start date:** Feb 3, 2026
+- **Predictions stored:** Prisma/PostgreSQL in racing-tips-platform (Vercel) — single source of truth since April 19, 2026
+- **Results from:** PuntingForm API via Railway `/results` endpoint
+- **Outcome syncing:** `npm run sync-outcomes` in racing-tips-platform fetches results from Railway and saves to Prisma
+- **Historical data (Feb 3 - Apr 18):** Railway SQLite (deprecated, read-only)
+- **Tracking start date:** Feb 3, 2026 (V0), April 16, 2026 (V6), April 21, 2026 (V7)
 
-### API Endpoints for Analysis
+### Stats & Outcome Syncing
 
 ```bash
-# Overall stats
-GET /stats/summary
+# From racing-tips-platform directory:
+npm run sync-outcomes                    # Sync all pending outcomes
+npm run sync-outcomes -- 22-Apr-2026     # Sync specific date
+npm run prediction-stats -- --by-tag     # Performance by tag
+npm run prediction-stats -- --by-tag --by-tipsheet  # Tag + starred breakdown
 
-# By tag
-GET /stats/by-tag
-
-# By PFAI rank with metro filter
-GET /stats/by-pfai-rank-metro?tag=The%20one%20to%20beat&metro=true
-GET /stats/by-pfai-rank-metro?tag=Each-way%20chance&metro=true
-GET /stats/by-pfai-rank-metro?tag=Value%20bet&metro=true
-
-# Sync outcomes for a date
-POST /outcomes/sync?race_date=01-Apr-2026
-
-# Backfill PFAI ranks (if missing)
-POST /backfill/pfai-rank
+# Admin API (racing-tips-platform):
+POST /api/admin/ai-predictor/sync        # Sync outcomes (requires admin auth)
+GET  /api/admin/ai-predictor/stats       # Stats with filters (?by-tag=true&from=16-Apr-2026)
 ```
 
 ### Key Recommendations
@@ -1390,7 +1395,7 @@ The backtesting is legitimate:
 
 ### V6 Deployed to Production (April 16, 2026)
 
-V6 is now live on Railway. All new predictions use the V6 configuration.
+V6 was deployed to Railway on April 16, 2026. Upgraded to V7 on April 21, 2026.
 
 **Backtest Verification (187 races):**
 | Tag | Picks | Win% | ROI |
@@ -1408,13 +1413,7 @@ V6 is now live on Railway. All new predictions use the V6 configuration.
 
 **Backwards compatible:** Set `v6_mode=False` in `to_prompt_text()` to revert.
 
-**New V6 Stats Endpoints:**
-```bash
-GET /stats/v6/summary    # Summary for V6 predictions only
-GET /stats/v6/by-tag     # By-tag stats for V6 predictions only
-```
-
-**Stats note:** Existing 3899 predictions are V0 (pre-16-Apr-2026). New predictions are V6. Use `/stats/v6/*` endpoints to track V6 performance separately. Old stats archived to `data/archives/pre_v6_stats_*.json`.
+**Stats note:** Railway SQLite has V0 predictions (Feb 3 - Apr 15) and V6 predictions (Apr 16-18) only. From April 19 onwards, all predictions are stored in Prisma (racing-tips-platform). Use `npm run prediction-stats` for current stats.
 
 ### V6 Live Results (April 16-17, 2026)
 
@@ -1442,20 +1441,93 @@ python3 tools/batch_predict_safe.py
 # - Output: data/batch_predictions_DD_MMM_YYYY.json
 ```
 
+### V7 Deployed to Production (April 21, 2026)
+
+V7 (recency + trajectory) is now live. 151-race backtest showed V7 outperforms V6:
+
+| Tag | V6 (Old) | V7 (New) |
+|-----|----------|----------|
+| **TTOB** | 41.3% win, +14.2% ROI | **46.1% win, +28.7% ROI** |
+| Value bet | 12.0% win, +8.8% ROI | **13.6% win, +13.6% ROI** |
+| Overall | 23.6%, -3.2% ROI | **26.0%, +3.1% ROI** |
+
+V7 adds "Recency & Trajectory" guidance to the V6 lean format:
+- Focus on last 2-3 runs at similar distance/conditions
+- Consider if horse is improving or declining
+- Check Notes column for excuses
+
+See `V7_SYSTEM_PROMPT` in `core/predictor.py`.
+
 ### Pending Improvements
 
 - [x] Deploy V6 configuration to production ✅ (April 16, 2026)
+- [x] Deploy V7 to production ✅ (April 21, 2026)
 - [x] Track starred vs non-starred performance ✅ (⭐ TTOB: 60% win, +63% ROI vs 20% / -46%)
+- [x] Unified prediction tracking in Prisma ✅ (April 19, 2026 - racing-tips-platform)
 - [ ] Add PFAI filter for Each-way chance at metro
 - [ ] Build automated weekly performance reports
-- [ ] Consider hybrid approach (V3 for metro, V6 for non-metro)
+
+---
+
+## Prediction Tracking Architecture
+
+### Current System (from April 19, 2026)
+
+```
+User requests prediction
+        │
+        ▼
+racing-tips-platform (Next.js / Vercel)
+        │
+        ├── Calls POST /predict on Railway (punt-legacy-ai)
+        │       → PuntingForm API (form data)
+        │       → Ladbrokes API (live odds)
+        │       → Claude API (prediction)
+        │       ← Returns contenders + summary
+        │
+        ├── Stores prediction in Prisma (PredictionUsage table)
+        │       → userId, track, raceNumber, date
+        │       → prediction JSON (contenders, tags, odds, analysis)
+        │       → Deducts user token
+        │
+        └── Returns prediction to user
+
+Outcome syncing (manual, run daily):
+        │
+        ├── npm run sync-outcomes [date]
+        │       → Fetches results from Railway GET /results?date=X
+        │       → Railway calls PuntingForm API for finishing positions
+        │       → Updates Prisma: outcomeSynced=true, outcomes JSON
+        │
+        └── npm run prediction-stats -- --by-tag
+                → Reads from Prisma, calculates win%, ROI, etc.
+```
+
+**Prisma is the single source of truth** for all predictions and outcomes.
+
+**Railway's role is now:**
+1. Prediction engine (receives `/predict` calls, runs Claude)
+2. Results proxy (serves `/results` endpoint from PuntingForm)
+3. Legacy stats (V0 data from Feb 3 - Apr 18, read-only)
+
+### Key Files
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `predictions/generate/route.ts` | racing-tips-platform | Stores predictions in Prisma |
+| `scripts/sync-outcomes.js` | racing-tips-platform | Syncs race results to Prisma |
+| `scripts/prediction-stats.js` | racing-tips-platform | CLI stats from Prisma |
+| `admin/ai-predictor/sync/route.ts` | racing-tips-platform | Admin API for outcome syncing |
+| `admin/ai-predictor/stats/route.ts` | racing-tips-platform | Admin API for stats |
+| `core/tracking.py` | punt-legacy-ai | Legacy Railway SQLite tracker (deprecated) |
+| `server.py /results` | punt-legacy-ai | Results proxy for PuntingForm |
 
 ---
 
 ## Next Steps
 
 1. ~~Historical backtesting~~ ✅ Done (experiments/backtest.py)
-2. ~~Prediction accuracy tracking~~ ✅ Done (tracking endpoints)
+2. ~~Prediction accuracy tracking~~ ✅ Done (Prisma unified system)
 3. ~~Switch live predictor to v2 approach~~ ✅ Done (auto-skip, tipsheet_pick)
 4. ~~Tipsheet generator~~ ✅ Done (/admin/tipsheet)
 5. ~~Claude Code export~~ ✅ Done (tools/export_for_claude_code.py)
@@ -1464,6 +1536,7 @@ python3 tools/batch_predict_safe.py
 8. ~~Performance analysis~~ ✅ Done (April 2026 - see above)
 9. ~~A/B Testing~~ ✅ Done (April 16, 2026 - 188 races, V6 wins)
 10. ~~Deploy V6 to production~~ ✅ Done (April 16, 2026 - verified 45% win, +27% ROI)
-11. Performance dashboard improvements
-12. User customization options
-13. Consider hybrid V3/V6 (V3 for metro, V6 for non-metro)
+11. ~~Deploy V7 to production~~ ✅ Done (April 21, 2026 - 46% win, +29% ROI in backtest)
+12. ~~Unified prediction tracking~~ ✅ Done (April 19, 2026 - Prisma single source of truth)
+13. Performance dashboard improvements
+14. User customization options
