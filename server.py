@@ -415,6 +415,11 @@ def build_admin_data(race_data, contenders) -> dict:
             "jockey_a2e": round(runner.jockey_a2e, 2) if runner.jockey_a2e else None,
             "weight_change": weight_change,  # +/- kg since last run
             "condition_record": condition_record_summary,  # Soft/Heavy record when relevant
+            "first_up": runner.first_up,
+            "second_up": runner.second_up,
+            "first_up_record": runner.first_up_record,
+            "second_up_record": runner.second_up_record,
+            "days_since_last": runner.days_since_last,
             "all_runs": all_runs,  # ALL runs with is_relevant flag
         }
 
