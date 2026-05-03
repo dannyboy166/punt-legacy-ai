@@ -347,6 +347,18 @@ class RaceData:
             elif r.days_since_last:
                 lines.append(f"Days since last run: {r.days_since_last}")
 
+            # Show wet track record when today is Soft (5-7) or Heavy (8+)
+            if self.condition_num >= 5 and r.condition_record:
+                cr = r.condition_record
+                cr_starts = cr.get("starts", 0)
+                if cr_starts > 0:
+                    cr_wins = cr.get("firsts", 0)
+                    cr_seconds = cr.get("seconds", 0)
+                    cr_thirds = cr.get("thirds", 0)
+                    cr_win_pct = round(cr_wins / cr_starts * 100) if cr_starts else 0
+                    cond_label = "Heavy" if self.condition_num >= 8 else "Soft"
+                    lines.append(f"{cond_label} record: {cr_starts}: {cr_wins}-{cr_seconds}-{cr_thirds} ({cr_win_pct}% win)")
+
             if r.early_speed_rank is not None:
                 lines.append(f"Speed Rank: {r.early_speed_rank} | Settles: {r.settling_position}")
 

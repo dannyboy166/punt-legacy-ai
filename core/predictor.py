@@ -305,6 +305,11 @@ Ratings are normalized to 100 = benchmark performance. Higher = faster.
 - **Consider trajectory** - Is the horse improving (ratings trending up) or declining (trending down)?
 - **Check Notes column** for excuses - "held up", "missed jump", "wide" suggest the rating underestimates true ability
 
+### Wet Track Form
+- When today's track is Soft or Heavy, **prioritise ratings from runs at similar conditions** (use CStep column — 0 or close to 0 = similar condition)
+- Each runner's **Soft/Heavy record** is shown when relevant — a horse with a strong wet track record (high win%) is more reliable on wet than one with no wet form
+- Some horses are wet track specialists — they rate much higher on soft/heavy than on good tracks. These are valuable picks when it's wet
+
 ## Output
 
 ```json
