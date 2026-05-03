@@ -389,6 +389,21 @@ def build_admin_data(race_data, contenders) -> dict:
         if race_form_runs and race_form_runs[0].weight and runner.weight:
             weight_change = round(runner.weight - race_form_runs[0].weight, 1)
 
+        # Build condition record summary for wet tracks
+        condition_record_summary = None
+        if today_condition_num and today_condition_num >= 5 and runner.condition_record:
+            cr = runner.condition_record
+            cr_starts = cr.get("starts", 0)
+            if cr_starts > 0:
+                cond_label = "Heavy" if today_condition_num >= 8 else "Soft"
+                condition_record_summary = {
+                    "label": cond_label,
+                    "starts": cr_starts,
+                    "wins": cr.get("firsts", 0),
+                    "seconds": cr.get("seconds", 0),
+                    "thirds": cr.get("thirds", 0),
+                }
+
         all_runners_form[runner.name] = {
             "tab_no": runner.tab_no,
             "odds": runner.odds,
@@ -399,6 +414,7 @@ def build_admin_data(race_data, contenders) -> dict:
             "jockey": runner.jockey,
             "jockey_a2e": round(runner.jockey_a2e, 2) if runner.jockey_a2e else None,
             "weight_change": weight_change,  # +/- kg since last run
+            "condition_record": condition_record_summary,  # Soft/Heavy record when relevant
             "all_runs": all_runs,  # ALL runs with is_relevant flag
         }
 
