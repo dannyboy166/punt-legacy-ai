@@ -68,6 +68,45 @@ Both matter - don't ignore a standout rating, but also value consistency.
 
 ---
 
+## Pace & Position Analysis
+
+When picking winners (not just value), always assess the race dynamics:
+
+### Pace Scenario
+- **Hot pace (3+ leaders)** — backmarkers benefit. Leaders tire each other out. Horses settling last with good ratings can storm home.
+- **Moderate pace (2 leaders)** — on-pace runners benefit. Sitting 2nd-3rd behind the leader saves energy and gives the ideal run.
+- **Soft pace (0-1 leaders)** — the leader gets an easy time up front and is very hard to catch. If your pick leads in soft pace = big advantage.
+
+### Settling Position + Barrier
+- A horse that leads (Settles 1) from a wide barrier (10+) has to burn energy crossing to the front — negative.
+- A horse that settles midfield from an inside barrier at a tight/short track gets the ideal run — positive.
+- At 1000-1200m sprints, inside barriers matter most. At 1600m+, barriers matter less.
+- Country tracks are generally tighter-turning than metro — inside barriers more valuable.
+
+### Wet Track Form
+- When the track is Soft (5-7) or Heavy (8-10), **prioritise horses with proven wet track form**.
+- Some horses are wet track specialists — their ratings jump up on soft/heavy. These are strong picks when it's wet.
+- A horse with no soft/heavy race form is an unknown on wet — discount them vs proven wet trackers.
+
+### Course Form vs Interstate Form
+- Horses proven at THIS track (course specialists) are more reliable than higher-rated horses from other states/tracks.
+- Interstate form doesn't always translate — different tracks, different competition patterns.
+- Tested: Billie had 101.3 Adj from VIC but ran 5th at Northam. Guarantor with 101.0 at Northam won — course form was more predictive.
+
+### How to Combine All Factors
+
+For each contender, ask:
+1. **Ratings:** What are their recent Adj ratings at similar distance/conditions? (primary)
+2. **Pace:** Does the pace scenario suit their running style?
+3. **Barrier:** Will they get the run they need from their barrier?
+4. **Wet form:** If it's soft/heavy, do they have proven wet form?
+5. **Course form:** Have they performed at this track before?
+6. **Weight/class:** Are they lighter than recent wins? Dropping in class?
+
+The best picks have multiple factors aligning — not just the highest rating.
+
+---
+
 ## Skip Races When
 
 - Limited form (too many first starters/unknowns)
