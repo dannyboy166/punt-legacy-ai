@@ -136,8 +136,8 @@ class TestGetBaselineSpeed:
         assert get_baseline_speed(1350) == pytest.approx(expected, rel=1e-4)
 
     def test_clamp_below_min(self):
-        # Below 900m should return 900m baseline
-        assert get_baseline_speed(800) == get_baseline_speed(900)
+        # Below 800m should return 800m baseline
+        assert get_baseline_speed(700) == get_baseline_speed(800)
 
     def test_clamp_above_max(self):
         # Above 2400m should return 2400m baseline
@@ -258,8 +258,8 @@ class TestCalculateSpeedRating:
         assert rating_h8 > rating_g4
 
     def test_distance_out_of_range(self):
-        # Too short
-        assert calculate_speed_rating(800, 50.0) is None
+        # Too short (below 800m)
+        assert calculate_speed_rating(700, 40.0) is None
         # Too long
         assert calculate_speed_rating(3000, 200.0) is None
 

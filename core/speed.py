@@ -38,7 +38,7 @@ from typing import Optional
 METRES_PER_LENGTH = 2.45  # Standard length measurement
 
 # Distance range for valid calculations
-MIN_DISTANCE = 900
+MIN_DISTANCE = 800
 MAX_DISTANCE = 2400
 
 # Paths to normalization data
