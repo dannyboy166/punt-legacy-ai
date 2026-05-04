@@ -105,6 +105,26 @@ For each contender, ask:
 
 The best picks have multiple factors aligning — not just the highest rating.
 
+### When to Bet vs Skip
+
+**BET when:**
+- One horse has clearly better RECENT Adj ratings than the rest of the field at similar distance/conditions
+- Multiple factors align (ratings + barrier + wet form + pace)
+- There's genuine separation (2+ points of Adj above the next best)
+
+**SKIP when:**
+- Top 3-4 horses are within 1 point of each other on recent Adj — it's a coin flip
+- No horse has proven form on today's conditions (e.g., all G4 form on an H9 day)
+- Too many unknowns (first starters, limited form)
+- You're forcing a pick because you feel you should — patience wins
+
+**The best winners we've found had clear edges:**
+- Zouslayer: 101.9 with 3 excuses at exact track/condition, next best was 99.5
+- Sexy Warrior: 100.2 on H8 with excuses + barrier 2, field had no heavy form
+- West Star: 102.7 at exact track + 102.2 on S5, vs fav at 102.4 but no course form
+
+Don't bet every race. Wait for the clear standout.
+
 ---
 
 ## Skip Races When
