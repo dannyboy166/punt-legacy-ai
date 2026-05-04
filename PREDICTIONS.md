@@ -125,6 +125,18 @@ The best picks have multiple factors aligning — not just the highest rating.
 
 Don't bet every race. Wait for the clear standout.
 
+### Staking ($1-$3 per race max)
+
+**$3 single bet** — High confidence. Clear standout on recent form, multiple factors align, not a huge roughie (under $10). Example: Zouslayer at $7 with 101.9 and 3 excuses at the exact track.
+
+**$2 single bet** — Good pick but minor concerns (wide barrier, untested on surface, one factor not ideal). Or a confident pick at longer odds ($10-$15).
+
+**$1 single bet** — Speculative. The form is there but something holds you back (first time at track, long layoff, competitive field). Or a roughie ($15+) with genuine form.
+
+**Multiple $1 bets** — When 2-3 horses have genuine claims and you can't separate them. Better to spread $2-$3 across the top contenders than load up on one in a competitive race.
+
+**Never bet more than $3 total on a single race during testing.**
+
 ---
 
 ## Skip Races When
