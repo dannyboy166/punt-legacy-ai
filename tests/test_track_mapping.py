@@ -81,8 +81,8 @@ class TestIsPfOnlyTrack:
     """Tests for is_pf_only_track()."""
 
     def test_pioneer_park(self):
-        """Pioneer Park (Alice Springs) is PF only."""
-        assert is_pf_only_track("Pioneer Park") is True
+        """Pioneer Park (Alice Springs) maps to Ladbrokes as Alice Springs."""
+        assert is_pf_only_track("Pioneer Park") is False
 
     def test_nz_tracks(self):
         """NZ tracks are PF only."""
@@ -161,8 +161,11 @@ class TestGetLbTrackForOdds:
 
     def test_pf_only_track_returns_none(self):
         """PF-only tracks return None."""
-        assert get_lb_track_for_odds("Pioneer Park") is None
         assert get_lb_track_for_odds("Tauranga") is None
+
+    def test_pioneer_park_maps_to_alice_springs(self):
+        """Pioneer Park maps to Alice Springs on Ladbrokes."""
+        assert get_lb_track_for_odds("Pioneer Park") == "alice springs"
 
     def test_hk_track_returns_name(self):
         """HK tracks return their name (supported via country=HK)."""

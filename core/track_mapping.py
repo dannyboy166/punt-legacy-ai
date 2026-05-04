@@ -10,9 +10,9 @@ Verified mappings as of Jan 2026:
 - Murray Bridge GH (PF) = Murray Bridge (LB)
 - Geelong (PF) = Ladbrokes Geelong (LB)
 - Fannie Bay (PF) = Darwin (LB)
+- Pioneer Park (PF) = Alice Springs (LB)
 
 Known coverage gaps:
-- Pioneer Park (Alice Springs) - PF only, no Ladbrokes coverage
 - Newcastle - LB only, not in PuntingForm data
 - NZ tracks - PF only, no Ladbrokes coverage
 
@@ -32,6 +32,7 @@ _TRACK_MAPPINGS = [
     ("Fannie Bay", "Darwin"),
     ("Beaumont", "Newcastle"),
     ("Kingscote", "Kangaroo Island"),
+    ("Pioneer Park", "Alice Springs"),
 ]
 
 # Build normalized lookup dictionaries
@@ -49,8 +50,6 @@ LB_TO_PF_MAPPING = {
 # All stored as normalized names
 PF_ONLY_TRACKS = {
     normalize_track_name(t) for t in [
-        # NT
-        "Pioneer Park",  # Alice Springs - no Ladbrokes coverage
         # NZ tracks
         "Tauranga", "Ellerslie", "Te Rapa", "Matamata", "Ruakaka",
         "Te Aroha", "Trentham", "Otaki", "Tauherenikau", "Taupo",
