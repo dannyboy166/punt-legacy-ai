@@ -305,6 +305,13 @@ Ratings are normalized to 100 = benchmark performance. Higher = faster.
 - **Consider trajectory** - Is the horse improving (ratings trending up) or declining (trending down)?
 - **Check Notes column** for excuses - "held up", "missed jump", "wide" suggest the rating underestimates true ability
 
+### Weight Changes (WtCh column)
+- **Weight drops are a significant positive signal.** If a horse ran strong ratings at heavier weights and is now lighter, they should run even faster.
+- A horse that ran 101 at 60kg and is now carrying 54kg has a big advantage — same engine, less weight
+- Scale: **1-2kg = minor** | **3-5kg = solid advantage** | **6+kg = major advantage**
+- Weight drops combined with strong recent ratings = strong pick
+- Weight INCREASES of 3+kg are a negative — the horse has to carry more than when it produced those ratings
+
 ### Wet Track Form
 - When today's track is Soft or Heavy, **prioritise ratings from runs at similar conditions** (use CStep column — 0 or close to 0 = similar condition)
 - Each runner's **Soft/Heavy record** is shown when relevant — a horse with a strong wet track record (high win%) is more reliable on wet than one with no wet form
