@@ -1,4 +1,4 @@
-# PREDICTIONS.md
+2# PREDICTIONS.md
 
 Manual race analysis methodology for Claude Code.
 
@@ -93,47 +93,51 @@ When picking winners (not just value), always assess the race dynamics:
 - Interstate form doesn't always translate — different tracks, different competition patterns.
 - Tested: Billie had 101.3 Adj from VIC but ran 5th at Northam. Guarantor with 101.0 at Northam won — course form was more predictive.
 
-### How to Combine All Factors
+### Race Analysis Checklist
 
-For each contender, ask:
-1. **Ratings:** What are their recent Adj ratings at similar distance/conditions? (primary)
-2. **Pace:** Does the pace scenario suit their running style?
-3. **Barrier:** Will they get the run they need from their barrier?
-4. **Wet form:** If it's soft/heavy, do they have proven wet form?
-5. **Course form:** Have they performed at this track before?
-6. **Weight/class:** Are they lighter than recent wins? Dropping in class?
+For EVERY runner, check ALL of these. No shortcuts.
 
-The best picks have multiple factors aligning — not just the highest rating.
+1. **Recent Adj ratings at similar distance/conditions** — PRIMARY factor. Most recent runs first. What are they running RIGHT NOW, not 6 months ago?
+2. **Trajectory** — Improving (98→99→100.5) or declining (102→100→98)? An improving horse at 100 can beat a declining horse at 101.
+3. **Weight change** — Lighter than their good runs = bonus. 1-2kg minor | 3-5kg decent | 6+kg big change. Same scale for increases (negative).
+4. **Notes/excuses** — "held up", "wide throughout", "slowly away", "eased" = rating UNDERSTATES true ability. Multiple excuses = true form significantly higher.
+5. **Barrier** — Inside matters more at shorter distances (1000-1200m) and on heavy tracks. Less important at 1600m+.
+6. **Wet form** — When track is Soft/Heavy, check their record AND their ratings on similar conditions. Some horses are wet specialists.
+7. **Course form** — Proven at THIS track beats higher-rated form from different tracks, especially at country level.
+8. **Jockey A/E** — Above 1.0 positive, below 0.85 slight concern. Not a primary factor.
+9. **Pace** — Leader in soft pace = advantage. Backmarker in hot pace = advantage. Consider settling position + pace scenario.
+
+**IMPORTANT: Never dismiss a horse because of finishing positions.** "Always runs 2nd" or "can't win" is irrelevant. If the RATINGS say they're the best horse, pick them. Past positions don't predict future ones — ratings do.
 
 ### When to Bet vs Skip
 
 **BET when:**
-- One horse has clearly better RECENT Adj ratings than the rest of the field at similar distance/conditions
-- Multiple factors align (ratings + barrier + wet form + pace)
-- There's genuine separation (2+ points of Adj above the next best)
+- One horse's recent form at similar conditions/distance is clearly above the rest of the field
+- Multiple checklist factors align (ratings + barrier + weight + excuses)
+- You can look at the field and confidently say "this horse is the best" — it's a judgement call, not a specific number threshold
 
 **SKIP when:**
-- Top 3-4 horses are within 1 point of each other on recent Adj — it's a coin flip
-- No horse has proven form on today's conditions (e.g., all G4 form on an H9 day)
+- Field is bunched — top 3-4 horses all at similar ratings with no separation
+- No horse has proven form on today's conditions
 - Too many unknowns (first starters, limited form)
 - You're forcing a pick because you feel you should — patience wins
 
-**The best winners we've found had clear edges:**
+**The best winners had clear edges:**
 - Zouslayer: 101.9 with 3 excuses at exact track/condition, next best was 99.5
-- Sexy Warrior: 100.2 on H8 with excuses + barrier 2, field had no heavy form
-- West Star: 102.7 at exact track + 102.2 on S5, vs fav at 102.4 but no course form
+- Come Along Jeffrey: 102.9 recent, 101.9 at this track on soft, 2 heavy wins — clearly above field
+- Voronya: 102.1 recent (won), consistent 101-102, field was 99-100
 
 Don't bet every race. Wait for the clear standout.
 
 ### Staking ($1-$3 per race max)
 
-**$3 single bet** — High confidence. Clear standout on recent form, multiple factors align, not a huge roughie (under $10). Example: Zouslayer at $7 with 101.9 and 3 excuses at the exact track.
+**$3 single bet** — High confidence. Clear standout on recent form, multiple factors align, not a huge roughie (under $10).
 
 **$2 single bet** — Good pick but minor concerns (wide barrier, untested on surface, one factor not ideal). Or a confident pick at longer odds ($10-$15).
 
-**$1 single bet** — Speculative. The form is there but something holds you back (first time at track, long layoff, competitive field). Or a roughie ($15+) with genuine form.
+**$1 single bet** — Speculative. The form is there but something holds you back. Or a roughie ($15+) with genuine form.
 
-**Multiple $1 bets** — When 2-3 horses have genuine claims and you can't separate them. Better to spread $2-$3 across the top contenders than load up on one in a competitive race.
+**Multiple $1 bets** — When 2-3 horses have genuine claims and you can't separate them.
 
 **Never bet more than $3 total on a single race during testing.**
 
