@@ -353,6 +353,21 @@ def build_admin_data(race_data, contenders) -> dict:
 
         for run in runner.form:
             if run.is_barrier_trial:
+                # Include barrier trials for display but mark them clearly
+                all_runs.append({
+                    "date": run.date,
+                    "track": run.track,
+                    "distance": run.distance,
+                    "condition": run.condition,
+                    "position": f"{run.position}/{run.starters}" if run.starters else str(run.position) if run.position else "-",
+                    "margin": run.margin,
+                    "weight": run.weight,
+                    "barrier": run.barrier,
+                    "rating": round(run.rating, 3) if run.rating else None,
+                    "is_relevant": False,  # Trials are never relevant
+                    "is_barrier_trial": True,
+                    "notes": run.stewards_report,
+                })
                 continue
 
             # Check if this run is "relevant" (similar distance/condition)
@@ -380,6 +395,7 @@ def build_admin_data(race_data, contenders) -> dict:
                 "barrier": run.barrier,
                 "rating": round(run.rating, 3) if run.rating else None,
                 "is_relevant": is_relevant,  # Highlight flag
+                "is_barrier_trial": False,
                 "notes": run.stewards_report,  # Stewards notes (e.g., "Began awkwardly")
             })
 
