@@ -722,6 +722,10 @@ def predict(req: PredictionRequest):
 
         if no_form_percentage > 50:
             # Return skipped response - doesn't call Claude, doesn't count against limit
+            # Still include admin_data so All Runners form is visible
+            skip_admin_data = None
+            if req.include_admin_data:
+                skip_admin_data = build_admin_data(race_data, [])
             return PredictionResponse(
                 mode=req.mode,
                 track=race_data.track,
@@ -733,7 +737,8 @@ def predict(req: PredictionRequest):
                 contenders=[],
                 summary=f"This race has insufficient form data for reliable predictions. {runners_with_no_form} of {total_runners} runners ({no_form_percentage:.0f}%) are first starters or have only barrier trial form.",
                 skipped=True,
-                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history"
+                skip_reason=f"{runners_with_no_form}/{total_runners} runners have no race history",
+                admin_data=skip_admin_data,
             )
 
         # Generate prediction with specified mode
@@ -852,9 +857,9 @@ def predict(req: PredictionRequest):
                 import traceback
                 traceback.print_exc()
 
-            # Build admin data if requested
+            # Build admin data if requested (even with 0 contenders)
             admin_data = None
-            if req.include_admin_data and contenders:
+            if req.include_admin_data:
                 admin_data = build_admin_data(race_data, result.contenders)
 
             # Build other_chances for response
@@ -971,7 +976,7 @@ def predict_test(req: PredictionRequest):
 
         # Build admin data if requested
         admin_data = None
-        if req.include_admin_data and contenders:
+        if req.include_admin_data:
             admin_data = build_admin_data(race_data, result.contenders)
 
         # NOT tracked - this is test only
@@ -1073,7 +1078,7 @@ def predict_test_adj(req: PredictionRequest):
 
         # Build admin data if requested
         admin_data = None
-        if req.include_admin_data and contenders:
+        if req.include_admin_data:
             admin_data = build_admin_data(race_data, result.contenders)
 
         # NOT tracked - this is test only
@@ -1183,7 +1188,7 @@ def predict_test_condition(req: PredictionRequest):
 
         # Build admin data if requested
         admin_data = None
-        if req.include_admin_data and contenders:
+        if req.include_admin_data:
             admin_data = build_admin_data(race_data, result.contenders)
 
         # NOT tracked - this is test only
