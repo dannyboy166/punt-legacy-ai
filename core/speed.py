@@ -444,10 +444,6 @@ def calculate_run_rating(run: dict) -> Optional[float]:
     Returns:
         Normalized rating, or None if can't calculate
     """
-    # Skip barrier trials
-    if run.get("isBarrierTrial", False):
-        return None
-
     # Skip scratched/DNF (position 0 or 99+ means didn't finish)
     position = run.get("position")
     if position is None or position <= 0 or position >= 90:
